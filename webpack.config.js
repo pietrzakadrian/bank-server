@@ -42,6 +42,16 @@ module.exports = {
     resolve: {
         alias: {
             common: srcPath('common'),
+            decorators: srcPath('decorators'),
+            exceptions: srcPath('exceptions'),
+            filters: srcPath('filters'),
+            guards: srcPath('guards'),
+            interceptors: srcPath('interceptors'),
+            interfaces: srcPath('interfaces'),
+            middlewares: srcPath('middlewares'),
+            modules: srcPath('modules'),
+            providers: srcPath('providers'),
+            shared: srcPath('shared'),
         },
     },
 };
