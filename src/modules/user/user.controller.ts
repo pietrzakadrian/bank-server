@@ -10,7 +10,7 @@ import {
     UseInterceptors,
     ValidationPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { RoleType } from '../../common/constants/role-type';
 import { AuthUser } from '../../decorators/auth-user.decorator';
@@ -18,13 +18,13 @@ import { Roles } from '../../decorators/roles.decorator';
 import { AuthGuard } from '../../guards/auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { AuthUserInterceptor } from '../../interceptors/auth-user-interceptor.service';
-import { UsersPageOptionsDto } from './dto/UsersPageOptionsDto';
 import { UsersPageDto } from './dto/UsersPageDto';
+import { UsersPageOptionsDto } from './dto/UsersPageOptionsDto';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
 
 @Controller('users')
-@ApiUseTags('users')
+@ApiTags('users')
 @UseGuards(AuthGuard, RolesGuard)
 @UseInterceptors(AuthUserInterceptor)
 @ApiBearerAuth()

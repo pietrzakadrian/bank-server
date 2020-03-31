@@ -1,41 +1,41 @@
 'use strict';
 
+import { ApiProperty } from '@nestjs/swagger';
 import {
-    IsString,
     IsEmail,
-    MinLength,
     IsNotEmpty,
-    IsPhoneNumber,
     IsOptional,
+    IsPhoneNumber,
+    IsString,
+    MinLength,
 } from 'class-validator';
-import { ApiModelProperty } from '@nestjs/swagger';
 import { Column } from 'typeorm';
 
 export class UserRegisterDto {
     @IsString()
     @IsNotEmpty()
-    @ApiModelProperty()
+    @ApiProperty()
     readonly firstName: string;
 
     @IsString()
     @IsNotEmpty()
-    @ApiModelProperty()
+    @ApiProperty()
     readonly lastName: string;
 
     @IsString()
     @IsEmail()
     @IsNotEmpty()
-    @ApiModelProperty()
+    @ApiProperty()
     readonly email: string;
 
     @IsString()
     @MinLength(6)
-    @ApiModelProperty({ minLength: 6 })
+    @ApiProperty({ minLength: 6 })
     readonly password: string;
 
     @Column()
     @IsPhoneNumber('ZZ')
     @IsOptional()
-    @ApiModelProperty()
+    @ApiProperty()
     phone: string;
 }

@@ -1,20 +1,20 @@
 import {
-    Controller,
-    Post,
     Body,
+    Controller,
+    Get,
     HttpCode,
     HttpStatus,
-    Get,
-    UseInterceptors,
-    UseGuards,
+    Post,
     UploadedFile,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
-    ApiOkResponse,
-    ApiUseTags,
     ApiBearerAuth,
-    ApiImplicitFile,
+    // ApiImplicitFile,
+    ApiOkResponse,
+    ApiTags,
 } from '@nestjs/swagger';
 
 import { AuthUser } from '../../decorators/auth-user.decorator';
@@ -30,7 +30,7 @@ import { UserLoginDto } from './dto/UserLoginDto';
 import { UserRegisterDto } from './dto/UserRegisterDto';
 
 @Controller('auth')
-@ApiUseTags('auth')
+@ApiTags('auth')
 export class AuthController {
     constructor(
         public readonly userService: UserService,
@@ -55,7 +55,7 @@ export class AuthController {
     @Post('register')
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({ type: UserDto, description: 'Successfully Registered' })
-    @ApiImplicitFile({ name: 'avatar', required: true })
+    // @ApiImplicitFile({ name: 'avatar', required: true })
     @UseInterceptors(FileInterceptor('avatar'))
     async userRegister(
         @Body() userRegisterDto: UserRegisterDto,

@@ -1,5 +1,5 @@
-import * as dotenv from 'dotenv';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import * as dotenv from 'dotenv';
 
 import { IAwsConfig } from '../../interfaces/IAwsConfig';
 import { SnakeNamingStrategy } from '../../snake-naming.strategy';
@@ -41,7 +41,7 @@ export class ConfigService {
                 true,
                 /\.entity\.ts$/,
             );
-            entities = entityContext.keys().map(id => {
+            entities = entityContext.keys().map((id) => {
                 const entityModule = entityContext(id);
                 const [entity] = Object.values(entityModule);
                 return entity;
@@ -51,7 +51,7 @@ export class ConfigService {
                 false,
                 /\.ts$/,
             );
-            migrations = migrationContext.keys().map(id => {
+            migrations = migrationContext.keys().map((id) => {
                 const migrationModule = migrationContext(id);
                 const [migration] = Object.values(migrationModule);
                 return migration;

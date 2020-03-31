@@ -25,7 +25,7 @@ export class UtilsService {
         options?: any,
     ): T | T[] {
         if (_.isArray(entity)) {
-            return entity.map(u => new model(u, options));
+            return entity.map((u) => new model(u, options));
         }
 
         return new model(entity, options);

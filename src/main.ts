@@ -1,9 +1,9 @@
-import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import {
-    NestExpressApplication,
     ExpressAdapter,
+    NestExpressApplication,
 } from '@nestjs/platform-express';
 import * as compression from 'compression';
 import * as RateLimit from 'express-rate-limit';
@@ -32,7 +32,7 @@ async function bootstrap() {
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     app.use(helmet());
     app.use(
-        new RateLimit({
+        RateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutes
             max: 100, // limit each IP to 100 requests per windowMs
         }),

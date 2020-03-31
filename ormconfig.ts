@@ -1,6 +1,8 @@
-import * as dotenv from 'dotenv';
-import { SnakeNamingStrategy } from './src/snake-naming.strategy';
 import './src/boilerplate.polyfill';
+
+import * as dotenv from 'dotenv';
+
+import { SnakeNamingStrategy } from './src/snake-naming.strategy';
 
 if (!(<any>module).hot /* for webpack HMR */) {
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -23,10 +25,6 @@ module.exports = {
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DATABASE,
     namingStrategy: new SnakeNamingStrategy(),
-    entities: [
-        'src/modules/**/*.entity{.ts,.js}',
-    ],
-    migrations: [
-        'src/migrations/*{.ts,.js}',
-    ],
+    entities: ['src/modules/**/*.entity{.ts,.js}'],
+    migrations: ['src/migrations/*{.ts,.js}'],
 };
