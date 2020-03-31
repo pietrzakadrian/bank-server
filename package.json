@@ -1,5 +1,5 @@
 {
-    "name": "bank-client",
+    "name": "bank-server",
     "version": "1.2.0",
     "description": "Backend Application",
     "author": "Adrian Pietrzak <contact@pietrzakadrian.com>",
@@ -23,10 +23,7 @@
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-        "test:e2e": "jest --config ./test/jest-e2e.json",
-        "docs:dev": "vuepress dev -p 7070",
-        "docs:build": "DEPLOY_ENV=gh-pages vuepress build",
-        "docs:deploy": "yarn docs:build && gh-pages -d .vuepress/dist"
+        "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
         "@nestjs/common": "^7.0.7",
@@ -51,11 +48,9 @@
         "lodash": "^4.17.15",
         "mime-types": "~2.1.26",
         "morgan": "~1.10.0",
-        "npm-check-updates": "^4.1.0",
         "passport": "~0.4.1",
         "passport-jwt": "^4.0.0",
         "pg": "^8.0.0",
-        "reflect-metadata": "~0.1.13",
         "request-context": "~2.0.0",
         "rxjs": "^6.5.4",
         "source-map-support": "^0.5.16",
@@ -93,10 +88,10 @@
         "eslint-plugin-import-helpers": "^1.0.2",
         "eslint-plugin-prettier": "^3.1.2",
         "eslint-plugin-simple-import-sort": "^5.0.2",
-        "gh-pages": "^2.2.0",
         "husky": "^4.2.3",
         "jest": "^25.2.4",
         "lint-staged": "~10.1.0",
+        "npm-check-updates": "^4.1.0",
         "nodemon": "^2.0.2",
         "prettier": "^2.0.2",
         "supertest": "^4.0.2",
@@ -109,7 +104,6 @@
         "tslint-consistent-codestyle": "^1.16.0",
         "tslint-eslint-rules": "^5.4.0",
         "tslint-plugin-prettier": "^2.3.0",
-        "vuepress": "^1.4.0",
         "webpack": "^4.42.1",
         "webpack-cli": "^3.3.11",
         "webpack-node-externals": "^1.7.2"

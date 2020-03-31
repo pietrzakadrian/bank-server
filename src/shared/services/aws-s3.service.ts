@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import * as mime from 'mime-types';
 
-import { IFile } from '../../interfaces/IFile';
+import { IFile } from '../../interfaces';
 import { ConfigService } from './config.service';
 import { GeneratorService } from './generator.service';
 

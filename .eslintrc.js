@@ -25,6 +25,14 @@ module.exports = {
         'prettier',
         'simple-import-sort',
     ],
+    settings: {
+        'import/resolver': {
+            node: {
+                extensions: ['.js', '.jsx', '.ts', '.tsx'],
+                moduleDirectory: ['node_modules', 'src/'],
+            },
+        },
+    },
     rules: {
         '@typescript-eslint/no-unused-vars': [
             'error',
@@ -252,7 +260,7 @@ module.exports = {
                     'no-accessor-recursion': true,
                     'no-as-type-assertion': true,
                     'no-collapsible-if': true,
-                    'no-implicit-dependencies': true,
+                    'no-implicit-dependencies': [true, ['src', 'common']],
                     'no-multi-spaces': true,
                     'no-reference-import': true,
                     'no-return-undefined': [true, 'allow-void-expression'],

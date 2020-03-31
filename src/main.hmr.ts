@@ -9,8 +9,8 @@ import * as morgan from 'morgan';
 
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './filters/bad-request.filter';
+import { SharedModule } from './shared/modules/shared.module';
 import { ConfigService } from './shared/services/config.service';
-import { SharedModule } from './shared/shared.module';
 import { setupSwagger } from './viveo-swagger';
 
 declare const module: any;
@@ -23,7 +23,7 @@ async function bootstrap() {
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     app.use(helmet());
     app.use(
-        new RateLimit({
+        RateLimit({
             windowMs: 15 * 60 * 1000, // 15 minutes
             max: 100, // limit each IP to 100 requests per windowMs
         }),
