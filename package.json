@@ -16,7 +16,7 @@
         "webpack": "webpack --config webpack.config.js --progress",
         "migration:create": "ts-node node_modules/typeorm/cli.js migration:create -f ormconfig -d src/migrations -n",
         "schema:drop": "ts-node node_modules/typeorm/cli.js schema:drop -f ormconfig",
-        "start:prod": "node dist/main.js",
+        "start:prod": "node -r ./tsconfig-paths-bootstrap.js dist/main.js",
         "lint": "eslint . --ext .ts",
         "lint:fix": "eslint --fix . --ext .ts",
         "test": "jest",
