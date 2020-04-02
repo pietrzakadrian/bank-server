@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
-import { UserNotFoundException } from '../../../exceptions/user-not-found.exception';
-import { ContextService } from '../../../providers/context.provider';
-import { UtilsService } from '../../../providers/utils.provider';
-import { ConfigService } from '../../../shared/services/config.service';
-import { UserDto } from '../../user/dto/user.dto';
-import { UserEntity } from '../../user/entities/user.entity';
-import { UserService } from '../../user/services/user.service';
-import { TokenPayloadDto } from '../dto/token-payload.dto';
-import { UserLoginDto } from '../dto/user-login.dto';
+import { UserNotFoundException } from 'exceptions';
+import { TokenPayloadDto, UserLoginDto } from 'modules/auth/dto';
+import { UserDto } from 'modules/user/dto';
+import { UserEntity } from 'modules/user/entities';
+import { UserService } from 'modules/user/services';
+import { ContextService, UtilsService } from 'providers';
+import { ConfigService } from 'shared/services';
 
 @Injectable()
 export class AuthService {

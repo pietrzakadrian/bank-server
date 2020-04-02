@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { PageMetaDto } from 'common/dto';
+import { FileNotImageException } from 'exceptions';
+import { IFile } from 'interfaces';
+import { UserRegisterDto } from 'modules/auth/dto';
+import { UsersPageDto, UsersPageOptionsDto } from 'modules/user/dto';
+import { UserEntity } from 'modules/user/entities';
+import { UserRepository } from 'modules/user/repositories';
+import { AwsS3Service, ValidatorService } from 'shared/services';
 import { FindConditions } from 'typeorm';
-
-import { PageMetaDto } from '../../../common/dto/page-meta.dto';
-import { FileNotImageException } from '../../../exceptions/file-not-image.exception';
-import { IFile } from '../../../interfaces';
-import { AwsS3Service } from '../../../shared/services/aws-s3.service';
-import { ValidatorService } from '../../../shared/services/validator.service';
-import { UserRegisterDto } from '../../auth/dto/user-register.dto';
-import { UsersPageOptionsDto } from '../dto/users-page-options.dto';
-import { UsersPageDto } from '../dto/users-page.dto';
-import { UserEntity } from '../entities/user.entity';
-import { UserRepository } from '../repositories/user.repository';
 
 @Injectable()
 export class UserService {

@@ -1,6 +1,6 @@
 'use strict';
 
-import { AbstractEntity } from '../entities';
+import { AbstractEntity } from 'common/entities';
 
 export class AbstractDto {
     id: string;

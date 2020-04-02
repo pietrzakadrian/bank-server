@@ -14,17 +14,17 @@
         "outDir": "./dist",
         "baseUrl": "./src",
         "paths": {
-            "common": ["src/common"],
-            "decorators": ["src/decorators"],
-            "exceptions": ["src/exceptions"],
-            "filters": ["src/filters"],
-            "guards": ["src/guards"],
-            "interceptors": ["src/interceptors"],
-            "interfaces": ["src/interfaces"],
-            "middlewares": ["src/middlewares"],
-            "modules": ["src/modules"],
-            "providers": ["src/providers"],
-            "shared": ["src/shared"]
+            "common": ["common/"],
+            "decorators": ["decorators/"],
+            "exceptions": ["exceptions/"],
+            "filters": ["filters/"],
+            "guards": ["guards/"],
+            "interceptors": ["interceptors/"],
+            "interfaces": ["interfaces/"],
+            "middlewares": ["middlewares/"],
+            "modules": ["modules/"],
+            "providers": ["providers/"],
+            "shared": ["shared/"]
         }
     },
     "include": ["src/**/*"],

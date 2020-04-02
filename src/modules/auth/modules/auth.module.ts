@@ -1,10 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
-
-import { UserModule } from '../../user/modules/user.module';
-import { AuthController } from '../controllers/auth.controller';
-import { AuthService } from '../services/auth.service';
-import { JwtStrategy } from '../strategies/jwt.strategy';
+import { AuthController } from 'modules/auth/controllers';
+import { AuthService } from 'modules/auth/services';
+import { JwtStrategy } from 'modules/auth/strategies';
+import { UserModule } from 'modules/user/modules';
 
 @Module({
     imports: [

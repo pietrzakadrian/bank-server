@@ -11,17 +11,13 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-
-import { RoleType } from '../../../common/constants/role-type.constant';
-import { AuthUser } from '../../../decorators/auth-user.decorator';
-import { Roles } from '../../../decorators/roles.decorator';
-import { AuthGuard } from '../../../guards/auth.guard';
-import { RolesGuard } from '../../../guards/roles.guard';
-import { AuthUserInterceptor } from '../../../interceptors/auth-user.interceptor';
-import { UsersPageOptionsDto } from '../dto/users-page-options.dto';
-import { UsersPageDto } from '../dto/users-page.dto';
-import { UserEntity } from '../entities/user.entity';
-import { UserService } from '../services/user.service';
+import { RoleType } from 'common/constants';
+import { AuthUser, Roles } from 'decorators';
+import { AuthGuard, RolesGuard } from 'guards';
+import { AuthUserInterceptor } from 'interceptors';
+import { UsersPageDto, UsersPageOptionsDto } from 'modules/user/dto';
+import { UserEntity } from 'modules/user/entities';
+import { UserService } from 'modules/user/services';
 
 @Controller('users')
 @ApiTags('users')

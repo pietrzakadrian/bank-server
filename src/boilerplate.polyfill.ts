@@ -1,9 +1,8 @@
 import 'source-map-support/register';
 
+import { AbstractDto } from 'common/dto';
+import { AbstractEntity } from 'common/entities';
 import * as _ from 'lodash';
-
-import { AbstractDto } from './common/dto/abstract.dto';
-import { AbstractEntity } from './common/entities/abstract.entity';
 
 declare global {
     // tslint:disable-next-line:naming-convention no-unused

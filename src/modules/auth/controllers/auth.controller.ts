@@ -16,16 +16,19 @@ import {
     ApiOkResponse,
     ApiTags,
 } from '@nestjs/swagger';
-
-import { AuthUser } from '../../../decorators';
-import { AuthGuard } from '../../../guards';
-import { AuthUserInterceptor } from '../../../interceptors';
-import { IFile } from '../../../interfaces';
-import { UserDto } from '../../user/dto';
-import { UserEntity } from '../../user/entities';
-import { UserService } from '../../user/services';
-import { LoginPayloadDto, UserLoginDto, UserRegisterDto } from '../dto';
-import { AuthService } from '../services/auth.service';
+import { AuthUser } from 'decorators';
+import { AuthGuard } from 'guards';
+import { AuthUserInterceptor } from 'interceptors';
+import { IFile } from 'interfaces';
+import {
+    LoginPayloadDto,
+    UserLoginDto,
+    UserRegisterDto,
+} from 'modules/auth/dto';
+import { AuthService } from 'modules/auth/services';
+import { UserDto } from 'modules/user/dto';
+import { UserEntity } from 'modules/user/entities';
+import { UserService } from 'modules/user/services';
 
 @Controller('auth')
 @ApiTags('auth')

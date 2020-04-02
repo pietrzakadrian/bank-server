@@ -4,13 +4,13 @@ import { Transport } from '@nestjs/microservices';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as compression from 'compression';
 import * as RateLimit from 'express-rate-limit';
+import { HttpExceptionFilter } from 'filters';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
+import { SharedModule } from 'shared/modules';
+import { ConfigService } from 'shared/services';
 
 import { AppModule } from './app.module';
-import { HttpExceptionFilter } from './filters/bad-request.filter';
-import { SharedModule } from './shared/modules/shared.module';
-import { ConfigService } from './shared/services/config.service';
 import { setupSwagger } from './viveo-swagger';
 
 declare const module: any;
