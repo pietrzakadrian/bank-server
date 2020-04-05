@@ -275,6 +275,7 @@ module.exports = {
                             'modules',
                             'providers',
                             'shared',
+                            'utils',
                         ],
                     ],
                     'no-multi-spaces': true,

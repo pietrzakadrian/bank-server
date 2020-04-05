@@ -24,7 +24,8 @@
             "middlewares": ["middlewares/"],
             "modules": ["modules/"],
             "providers": ["providers/"],
-            "shared": ["shared/"]
+            "shared": ["shared/"],
+            "utils": ["utils/"]
         }
     },
     "include": ["src/**/*"],

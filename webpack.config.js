@@ -52,6 +52,7 @@ module.exports = {
             modules: srcPath('modules/'),
             providers: srcPath('providers/'),
             shared: srcPath('shared/'),
+            utils: srcPath('utils/'),
         },
     },
 };

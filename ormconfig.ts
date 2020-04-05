@@ -2,7 +2,7 @@ import './src/boilerplate.polyfill';
 
 import * as dotenv from 'dotenv';
 
-import { SnakeNamingStrategy } from './src/snake-naming.strategy';
+import { SnakeNamingStrategy } from './src/utils/snake-naming.strategy';
 
 if (!(<any>module).hot /* for webpack HMR */) {
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
