@@ -4,6 +4,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { contextMiddleware } from 'middlewares';
 import { AuthModule } from 'modules/auth/modules';
+import { CurrencyModule } from 'modules/currency/modules';
 import { MathModule } from 'modules/math/math.module';
 import { UserModule } from 'modules/user/modules';
 import { SharedModule } from 'shared/modules';
@@ -14,6 +15,7 @@ import { ConfigService } from 'shared/services';
         AuthModule,
         UserModule,
         MathModule,
+        CurrencyModule,
         TypeOrmModule.forRootAsync({
             imports: [SharedModule],
             useFactory: (configService: ConfigService) =>
