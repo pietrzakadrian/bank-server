@@ -1,14 +1,17 @@
 import { AbstractEntity } from 'common/entities';
+import { BillEntity } from 'modules/bill/entities/bill.entity';
 import { UserDto } from 'modules/user/dto';
+import { UserAuthEntity } from 'modules/user/entities';
 import {
     Column,
     CreateDateColumn,
     Entity,
+    OneToMany,
     OneToOne,
     UpdateDateColumn,
 } from 'typeorm';
 
-import { UserAuthEntity } from './user-auth.entity';
+import { UserConfigEntity } from './user-config.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends AbstractEntity<UserDto> {
@@ -44,6 +47,18 @@ export class UserEntity extends AbstractEntity<UserDto> {
         { nullable: false },
     )
     userAuth: UserAuthEntity;
+
+    @OneToOne(
+        () => UserConfigEntity,
+        (userConfig: UserConfigEntity) => userConfig.user,
+        { nullable: false },
+    )
+    userConfig: UserConfigEntity;
+
+    @OneToMany(() => BillEntity, (bill: BillEntity) => bill.user, {
+        nullable: false,
+    })
+    bill: BillEntity[];
 
     dtoClass = UserDto;
 }

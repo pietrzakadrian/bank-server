@@ -1,6 +1,7 @@
 import { AbstractEntity } from 'common/entities';
+import { BillEntity } from 'modules/bill/entities/bill.entity';
 import { CurrencyDto } from 'modules/currency/dto';
-import { Column, Entity, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, OneToMany, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'currency' })
 export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
@@ -18,6 +19,11 @@ export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
         nullable: true,
     })
     updatedAt: Date;
+
+    @OneToMany(() => BillEntity, (bill: BillEntity) => bill.currency, {
+        nullable: false,
+    })
+    bill: BillEntity[];
 
     dtoClass = CurrencyDto;
 }

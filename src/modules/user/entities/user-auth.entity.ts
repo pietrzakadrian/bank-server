@@ -1,6 +1,7 @@
 import { RoleType } from 'common/constants';
 import { AbstractEntity } from 'common/entities';
 import { UserAuthDto } from 'modules/user/dto';
+import { UserEntity } from 'modules/user/entities';
 import { PasswordTransformer } from 'modules/user/transformers';
 import {
     Column,
@@ -9,8 +10,6 @@ import {
     OneToOne,
     UpdateDateColumn,
 } from 'typeorm';
-
-import { UserEntity } from './user.entity';
 
 @Entity({ name: 'users_auth' })
 export class UserAuthEntity extends AbstractEntity<UserAuthDto> {

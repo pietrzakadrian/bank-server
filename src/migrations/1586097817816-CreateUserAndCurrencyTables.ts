@@ -1,7 +1,7 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class CreateCurrencyTable1586090780774 implements MigrationInterface {
-    name = 'CreateCurrencyTable1586090780774'
+export class CreateUserAndCurrencyTables1586097817816 implements MigrationInterface {
+    name = 'CreateUserAndCurrencyTables1586097817816'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "currency" ("id" SERIAL NOT NULL, "uuid" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "current_exchange_rate" integer NOT NULL, "main" boolean NOT NULL, "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT now(), CONSTRAINT "PK_3cda65c731a6264f0e444cc9b91" PRIMARY KEY ("id"))`, undefined);
