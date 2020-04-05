@@ -7,6 +7,7 @@ import { AuthModule } from 'modules/auth/modules';
 import { BillModule } from 'modules/bill/modules';
 import { CurrencyModule } from 'modules/currency/modules';
 import { MathModule } from 'modules/math/math.module';
+import { TransactionModule } from 'modules/transaction/modules';
 import { UserModule } from 'modules/user/modules';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
@@ -18,6 +19,7 @@ import { ConfigService } from 'shared/services';
         MathModule,
         CurrencyModule,
         BillModule,
+        TransactionModule,
         TypeOrmModule.forRootAsync({
             imports: [SharedModule],
             useFactory: (configService: ConfigService) =>
