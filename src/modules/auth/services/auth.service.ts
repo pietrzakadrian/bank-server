@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserNotFoundException } from 'exceptions';
 import { TokenPayloadDto, UserLoginDto } from 'modules/auth/dto';
-import { UserDto } from 'modules/user/dto';
-import { UserEntity } from 'modules/user/entities';
-import { UserService } from 'modules/user/services';
+import { UserAuthEntity, UserEntity } from 'modules/user/entities';
+import { UserAuthService, UserService } from 'modules/user/services';
 import { ContextService, UtilsService } from 'providers';
 import { ConfigService } from 'shared/services';
 
@@ -16,31 +15,40 @@ export class AuthService {
         public readonly jwtService: JwtService,
         public readonly configService: ConfigService,
         public readonly userService: UserService,
+        public readonly userAuthService: UserAuthService,
     ) {}
 
-    async createToken(user: UserEntity | UserDto): Promise<TokenPayloadDto> {
+    async createToken(userAuth: UserAuthEntity): Promise<TokenPayloadDto> {
+        const {
+            user: { uuid },
+            role,
+        } = userAuth;
+
         return new TokenPayloadDto({
             expiresIn: this.configService.getNumber('JWT_EXPIRATION_TIME'),
-            accessToken: await this.jwtService.signAsync({ id: user.id }),
+            accessToken: await this.jwtService.signAsync({ uuid, role }),
         });
     }
 
-    async validateUser(userLoginDto: UserLoginDto): Promise<UserEntity> {
-        const user = await this.userService.findOne({
-            email: userLoginDto.email,
-        });
+    async validateUser(userLoginDto: UserLoginDto): Promise<UserAuthEntity> {
+        const { pinCode, password } = userLoginDto;
+
+        const userAuth = await this.userAuthService.findOne({ pinCode });
+
         const isPasswordValid = await UtilsService.validateHash(
-            userLoginDto.password,
-            user && user.password,
+            password,
+            userAuth && userAuth.password,
         );
-        if (!user || !isPasswordValid) {
+
+        if (!userAuth || !isPasswordValid) {
             throw new UserNotFoundException();
         }
-        return user;
+
+        return userAuth;
     }
 
-    static setAuthUser(user: UserEntity) {
-        ContextService.set(AuthService._authUserKey, user);
+    static setAuthUser(userAuth: UserAuthEntity) {
+        ContextService.set(AuthService._authUserKey, userAuth);
     }
 
     static getAuthUser(): UserEntity {

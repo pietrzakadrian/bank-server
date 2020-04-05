@@ -3,13 +3,9 @@
 import { AbstractEntity } from 'common/entities';
 
 export class AbstractDto {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
+    uuid: string;
 
-    constructor(entity: AbstractEntity) {
-        this.id = entity.id;
-        this.createdAt = entity.createdAt;
-        this.updatedAt = entity.updatedAt;
+    constructor(abstractEntity: AbstractEntity) {
+        this.uuid = abstractEntity.uuid;
     }
 }

@@ -33,6 +33,7 @@ module.exports = {
             },
         },
     },
+    ignorePatterns: ['migrations'],
     rules: {
         '@typescript-eslint/no-unused-vars': [
             'error',

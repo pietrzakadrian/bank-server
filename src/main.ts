@@ -16,9 +16,9 @@ import {
     initializeTransactionalContext,
     patchTypeORMRepositoryWithBaseRepository,
 } from 'typeorm-transactional-cls-hooked';
-import { setupSwagger } from 'utils';
 
 import { AppModule } from './app.module';
+import { setupSwagger } from './viveo-swagger';
 
 async function bootstrap() {
     initializeTransactionalContext();

@@ -1,13 +1,12 @@
 'use strict';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class UserLoginDto {
-    @IsString()
-    @IsEmail()
+    @IsNumber()
     @ApiProperty()
-    readonly email: string;
+    readonly pinCode: number;
 
     @IsString()
     @ApiProperty()

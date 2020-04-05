@@ -1,31 +1,49 @@
-import { RoleType } from 'common/constants';
 import { AbstractEntity } from 'common/entities';
 import { UserDto } from 'modules/user/dto';
-import { PasswordTransformer } from 'modules/user/transformers';
-import { Column, Entity } from 'typeorm';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    OneToOne,
+    UpdateDateColumn,
+} from 'typeorm';
+
+import { UserAuthEntity } from './user-auth.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends AbstractEntity<UserDto> {
-    @Column({ nullable: true })
+    @Column()
     firstName: string;
 
-    @Column({ nullable: true })
+    @Column()
     lastName: string;
 
-    @Column({ type: 'enum', enum: RoleType, default: RoleType.USER })
-    role: RoleType;
-
-    @Column({ unique: true, nullable: true })
+    @Column({ unique: true })
     email: string;
 
-    @Column({ nullable: true, transformer: new PasswordTransformer() })
-    password: string;
-
-    @Column({ nullable: true })
+    @Column({ unique: true, nullable: true })
     phone: string;
 
     @Column({ nullable: true })
     avatar: string;
+
+    @CreateDateColumn({
+        type: 'timestamp with time zone',
+    })
+    createdAt: Date;
+
+    @UpdateDateColumn({
+        type: 'timestamp with time zone',
+        nullable: true,
+    })
+    updatedAt: Date;
+
+    @OneToOne(
+        () => UserAuthEntity,
+        (userAuth: UserAuthEntity) => userAuth.user,
+        { nullable: false },
+    )
+    userAuth: UserAuthEntity;
 
     dtoClass = UserDto;
 }

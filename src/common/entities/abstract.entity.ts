@@ -2,27 +2,14 @@
 
 import { AbstractDto } from 'common/dto';
 import { UtilsService } from 'providers';
-import {
-    CreateDateColumn,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn,
-} from 'typeorm';
-
+import { Column, Generated, PrimaryGeneratedColumn } from 'typeorm';
 export abstract class AbstractEntity<T extends AbstractDto = AbstractDto> {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn('increment')
+    id: number;
 
-    @CreateDateColumn({
-        type: 'timestamp without time zone',
-        name: 'created_at',
-    })
-    createdAt: Date;
-
-    @UpdateDateColumn({
-        type: 'timestamp without time zone',
-        name: 'updated_at',
-    })
-    updatedAt: Date;
+    @Column()
+    @Generated('uuid')
+    uuid: string;
 
     abstract dtoClass: new (entity: AbstractEntity, options?: any) => T;
 
