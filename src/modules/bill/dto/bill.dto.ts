@@ -6,10 +6,10 @@ import { BillEntity } from 'modules/bill/entities';
 
 export class BillDto extends AbstractDto {
     @ApiProperty()
-    accountBill: string;
+    accountBillNumber: string;
 
     constructor(bill: BillEntity) {
         super(bill);
-        this.accountBill = bill.accountBill;
+        this.accountBillNumber = bill.accountBillNumber;
     }
 }

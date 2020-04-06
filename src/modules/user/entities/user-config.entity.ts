@@ -11,16 +11,16 @@ import {
 
 @Entity({ name: 'users_config' })
 export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
-    @Column()
+    @Column({ default: false })
     notificationStatus: boolean;
 
-    @Column()
+    @Column({ default: 0 })
     notificationCount: number;
 
-    @Column()
+    @Column({ default: false })
     messageStatus: boolean;
 
-    @Column()
+    @Column({ default: 0 })
     messageCount: number;
 
     @UpdateDateColumn({

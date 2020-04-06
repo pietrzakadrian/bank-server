@@ -11,7 +11,7 @@ export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
     @Column()
     currentExchangeRate: number;
 
-    @Column()
+    @Column({ default: false })
     main: boolean;
 
     @UpdateDateColumn({

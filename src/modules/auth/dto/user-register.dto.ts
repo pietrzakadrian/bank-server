@@ -1,12 +1,13 @@
 'use strict';
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
     IsEmail,
     IsNotEmpty,
     IsOptional,
     IsPhoneNumber,
     IsString,
+    Length,
     MinLength,
 } from 'class-validator';
 import { Column } from 'typeorm';
@@ -36,6 +37,12 @@ export class UserRegisterDto {
     @Column()
     @IsPhoneNumber('ZZ')
     @IsOptional()
+    @ApiPropertyOptional()
+    readonly phone: string;
+
+    @IsString()
+    @IsNotEmpty()
     @ApiProperty()
-    phone: string;
+    @Length(3)
+    readonly currency: string;
 }

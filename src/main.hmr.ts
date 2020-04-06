@@ -9,9 +9,9 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
-import { setupSwagger } from 'utils';
 
 import { AppModule } from './app.module';
+import { setupSwagger } from './viveo-swagger';
 
 declare const module: any;
 
@@ -30,6 +30,7 @@ async function bootstrap() {
     );
     app.use(compression());
     app.use(morgan('combined'));
+    app.setGlobalPrefix('api');
 
     const reflector = app.get(Reflector);
 

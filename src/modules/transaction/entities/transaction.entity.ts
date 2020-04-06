@@ -20,7 +20,7 @@ export class TransactionEntity extends AbstractEntity<TransactionDto> {
     @Column()
     authorizationKey: string;
 
-    @Column()
+    @Column({ default: false })
     authorizationStatus: boolean;
 
     @CreateDateColumn({
