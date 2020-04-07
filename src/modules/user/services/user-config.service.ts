@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CreateFailedException } from 'exceptions';
 import { UserConfigEntity } from 'modules/user/entities';
 import { UserConfigRepository } from 'modules/user/repositories';
 
@@ -9,6 +10,10 @@ export class UserConfigService {
     public async createUserConfig(createdUser): Promise<UserConfigEntity[]> {
         const config = this._userConfigRepository.create(createdUser);
 
-        return this._userConfigRepository.save(config);
+        try {
+            return this._userConfigRepository.save(config);
+        } catch (error) {
+            throw new CreateFailedException(error);
+        }
     }
 }

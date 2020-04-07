@@ -13,17 +13,25 @@ export class BillService {
         private readonly _currencyService: CurrencyService,
     ) {}
 
-    public async createAccountBill(createdUser): Promise<BillEntity[]> {
+    public async createAccountBill(createdUser): Promise<BillEntity[] | any> {
         const { currencyName } = createdUser;
         const [accountBillNumber, currency] = await Promise.all([
             this._createAccountBillNumber(),
             this._currencyService.findCurrencyByName({ name: currencyName }),
         ]);
 
-        const createdBill = { ...createdUser, accountBillNumber, currency };
-        const bill = this._billRepository.create(createdBill);
+        const createdBill: BillEntity = {
+            ...createdUser,
+            accountBillNumber,
+            currency,
+        };
 
-        return this._billRepository.save(bill);
+        const bill = this._billRepository.create(createdBill);
+        try {
+            return this._billRepository.save(bill);
+        } catch (e) {
+            throw new Error('l');
+        }
     }
 
     private async _createAccountBillNumber(): Promise<string> {

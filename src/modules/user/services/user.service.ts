@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PageMetaDto } from 'common/dto';
+import { CreateFailedException } from 'exceptions';
 import { UserRegisterDto } from 'modules/auth/dto';
 import { BillService } from 'modules/bill/services';
 import { UsersPageDto, UsersPageOptionsDto } from 'modules/user/dto';
 import { UserEntity } from 'modules/user/entities';
 import { UserRepository } from 'modules/user/repositories';
 import { FindConditions } from 'typeorm';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 import { UserAuthService } from './user-auth.service';
 import { UserConfigService } from './user-config.service';
@@ -19,16 +21,22 @@ export class UserService {
         private readonly _billService: BillService,
     ) {}
 
+    @Transactional()
     public async createUser(userRegisterDto: UserRegisterDto): Promise<any> {
         const user = this._userRepository.create(userRegisterDto);
         await this._userRepository.save(user);
 
         const createdUser = { ...userRegisterDto, user };
-        await Promise.all([
-            this._userAuthService.createUserAuth(createdUser),
-            this._userConfigService.createUserConfig(createdUser),
-            this._billService.createAccountBill(createdUser),
-        ]);
+
+        try {
+            await Promise.all([
+                this._userAuthService.createUserAuth(createdUser),
+                this._userConfigService.createUserConfig(createdUser),
+                this._billService.createAccountBill(createdUser),
+            ]);
+        } catch (error) {
+            throw new CreateFailedException(error);
+        }
 
         return user;
     }

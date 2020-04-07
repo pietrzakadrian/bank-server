@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PinCodeGenerationIncorrect } from 'exceptions';
+import { CreateFailedException, PinCodeGenerationIncorrect } from 'exceptions';
 import { UserAuthEntity } from 'modules/user/entities';
 import { UserAuthRepository } from 'modules/user/repositories';
 import { UtilsService } from 'providers';
@@ -22,7 +22,11 @@ export class UserAuthService {
             pinCode,
         });
 
-        return this._userAuthRepository.save(auth);
+        try {
+            return this._userAuthRepository.save(auth);
+        } catch (error) {
+            throw new CreateFailedException(error);
+        }
     }
 
     private async _createPinCode(): Promise<number> {
