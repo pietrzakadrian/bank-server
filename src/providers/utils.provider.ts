@@ -41,16 +41,6 @@ export class UtilsService {
     }
 
     /**
-     * generate random string
-     * @param length
-     */
-    static generateRandomString(length: number) {
-        return Math.random()
-            .toString(36)
-            .replace(/[^a-zA-Z0-9]+/g, '')
-            .substr(0, length);
-    }
-    /**
      * validate text with hash
      * @param {string} password
      * @param {string} hash
@@ -58,5 +48,9 @@ export class UtilsService {
      */
     static validateHash(password: string, hash: string): Promise<boolean> {
         return bcrypt.compare(password, hash || '');
+    }
+
+    static generateRandomInteger(min: number, max: number): number {
+        return Math.floor(min + Math.random() * (max + 1 - min));
     }
 }

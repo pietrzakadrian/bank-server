@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'modules/auth/modules';
 
 import { CurrencyRepository } from '../repositories';
+import { CurrencyService } from '../services';
 
 @Module({
     imports: [
@@ -10,7 +11,7 @@ import { CurrencyRepository } from '../repositories';
         TypeOrmModule.forFeature([CurrencyRepository]),
     ],
     controllers: [],
-    exports: [],
-    providers: [],
+    exports: [CurrencyService],
+    providers: [CurrencyService],
 })
 export class CurrencyModule {}

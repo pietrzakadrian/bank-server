@@ -44,5 +44,5 @@ export class UserRegisterDto {
     @IsNotEmpty()
     @ApiProperty()
     @Length(3)
-    readonly currency: string;
+    readonly currencyName: string;
 }

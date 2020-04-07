@@ -4,45 +4,48 @@ import { UserRegisterDto } from 'modules/auth/dto';
 import { BillService } from 'modules/bill/services';
 import { UsersPageDto, UsersPageOptionsDto } from 'modules/user/dto';
 import { UserEntity } from 'modules/user/entities';
-import {
-    UserAuthRepository,
-    UserConfigRepository,
-    UserRepository,
-} from 'modules/user/repositories';
+import { UserRepository } from 'modules/user/repositories';
 import { FindConditions } from 'typeorm';
+
+import { UserAuthService } from './user-auth.service';
+import { UserConfigService } from './user-config.service';
 
 @Injectable()
 export class UserService {
     constructor(
-        public readonly userRepository: UserRepository,
-        public readonly userAuthRepository: UserAuthRepository,
-        public readonly userConfigRepository: UserConfigRepository,
-        public readonly billService: BillService,
+        private readonly _userRepository: UserRepository,
+        private readonly _userAuthService: UserAuthService,
+        private readonly _userConfigService: UserConfigService,
+        private readonly _billService: BillService,
     ) {}
 
-    findOne(findData: FindConditions<UserEntity>): Promise<UserEntity> {
-        return this.userRepository.findOne(findData);
-    }
-
-    async createUser(userRegisterDto: UserRegisterDto): Promise<UserEntity> {
-        const user = this.userRepository.create(userRegisterDto);
-        await this.userRepository.save(user);
+    public async createUser(
+        userRegisterDto: UserRegisterDto,
+    ): Promise<UserEntity> {
+        const user = this._userRepository.create(userRegisterDto);
+        await this._userRepository.save(user);
 
         const createdUser = { ...userRegisterDto, user };
-        const userAuth = this.userAuthRepository.create(createdUser);
-        const userConfig = this.userConfigRepository.create(createdUser);
 
         await Promise.all([
-            this.userAuthRepository.save(userAuth),
-            this.userConfigRepository.save(userConfig),
-            this.billService.createAccountBill(user),
+            this._userAuthService.createUserAuth(createdUser),
+            this._userConfigService.createUserConfig(createdUser),
+            this._billService.createAccountBill(createdUser),
         ]);
 
         return user;
     }
 
-    async getUsers(pageOptionsDto: UsersPageOptionsDto): Promise<UsersPageDto> {
-        const queryBuilder = this.userRepository.createQueryBuilder('user');
+    public async getUser(
+        findData: FindConditions<UserEntity>,
+    ): Promise<UserEntity> {
+        return this._userRepository.findOne(findData);
+    }
+
+    public async getUsers(
+        pageOptionsDto: UsersPageOptionsDto,
+    ): Promise<UsersPageDto> {
+        const queryBuilder = this._userRepository.createQueryBuilder('user');
         const [users, usersCount] = await queryBuilder
             .skip(pageOptionsDto.skip)
             .take(pageOptionsDto.take)

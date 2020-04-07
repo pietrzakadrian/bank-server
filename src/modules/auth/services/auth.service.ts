@@ -33,7 +33,7 @@ export class AuthService {
     async validateUser(userLoginDto: UserLoginDto): Promise<UserAuthEntity> {
         const { pinCode, password } = userLoginDto;
 
-        const userAuth = await this.userAuthService.findOne({ pinCode });
+        const userAuth = await this.userAuthService.getUserAuth({ pinCode });
 
         const isPasswordValid = await UtilsService.validateHash(
             password,

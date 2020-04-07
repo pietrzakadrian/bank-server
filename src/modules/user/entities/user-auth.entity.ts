@@ -16,16 +16,16 @@ export class UserAuthEntity extends AbstractEntity<UserAuthDto> {
     @Column({ type: 'enum', enum: RoleType, default: RoleType.USER })
     role: RoleType;
 
-    @Column()
+    @Column({ unique: true })
     pinCode: number;
 
     @Column({ transformer: new PasswordTransformer() })
     password: string;
 
-    @Column()
+    @Column({ nullable: true })
     lastSuccessfulLoggedDate: Date;
 
-    @Column()
+    @Column({ nullable: true })
     lastFailedLoggedDate: Date;
 
     @UpdateDateColumn({
