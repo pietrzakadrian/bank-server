@@ -30,9 +30,8 @@ export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
     updatedAt: Date;
 
     @OneToOne(() => UserEntity, (user: UserEntity) => user.userConfig, {
-        cascade: true,
-        eager: true,
         nullable: false,
+        onDelete: 'CASCADE',
     })
     @JoinColumn()
     user: UserEntity;

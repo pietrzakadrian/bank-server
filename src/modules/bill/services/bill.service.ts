@@ -14,10 +14,11 @@ export class BillService {
     ) {}
 
     public async createAccountBill(createdUser): Promise<BillEntity[]> {
-        const accountBillNumber = await this._createAccountBillNumber();
-        const currency = await this._currencyService.findCurrencyByName({
-            name: createdUser.currencyName,
-        });
+        const { currencyName } = createdUser;
+        const [accountBillNumber, currency] = await Promise.all([
+            this._createAccountBillNumber(),
+            this._currencyService.findCurrencyByName({ name: currencyName }),
+        ]);
 
         const createdBill = { ...createdUser, accountBillNumber, currency };
         const bill = this._billRepository.create(createdBill);

@@ -12,6 +12,7 @@ export class BillEntity extends AbstractEntity<BillDto> {
 
     @ManyToOne(() => UserEntity, (user: UserEntity) => user.bill, {
         nullable: false,
+        onDelete: 'CASCADE',
     })
     user: UserEntity;
 
@@ -20,6 +21,7 @@ export class BillEntity extends AbstractEntity<BillDto> {
         (currency: CurrencyEntity) => currency.bill,
         {
             nullable: false,
+            onDelete: 'CASCADE',
         },
     )
     currency: CurrencyEntity;

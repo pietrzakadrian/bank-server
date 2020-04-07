@@ -19,14 +19,11 @@ export class UserService {
         private readonly _billService: BillService,
     ) {}
 
-    public async createUser(
-        userRegisterDto: UserRegisterDto,
-    ): Promise<UserEntity> {
+    public async createUser(userRegisterDto: UserRegisterDto): Promise<any> {
         const user = this._userRepository.create(userRegisterDto);
         await this._userRepository.save(user);
 
         const createdUser = { ...userRegisterDto, user };
-
         await Promise.all([
             this._userAuthService.createUserAuth(createdUser),
             this._userConfigService.createUserConfig(createdUser),

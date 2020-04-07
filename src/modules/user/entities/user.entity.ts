@@ -41,17 +41,12 @@ export class UserEntity extends AbstractEntity<UserDto> {
     })
     updatedAt: Date;
 
-    @OneToOne(
-        () => UserAuthEntity,
-        (userAuth: UserAuthEntity) => userAuth.user,
-        { nullable: false },
-    )
+    @OneToOne(() => UserAuthEntity, (userAuth: UserAuthEntity) => userAuth.user)
     userAuth: UserAuthEntity;
 
     @OneToOne(
         () => UserConfigEntity,
         (userConfig: UserConfigEntity) => userConfig.user,
-        { nullable: false },
     )
     userConfig: UserConfigEntity;
 
