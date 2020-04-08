@@ -29,16 +29,16 @@ export class UserService {
         const createdUser = { ...userRegisterDto, user };
 
         try {
-            await Promise.all([
+            const [userAuth, , bill] = await Promise.all([
                 this._userAuthService.createUserAuth(createdUser),
                 this._userConfigService.createUserConfig(createdUser),
                 this._billService.createAccountBill(createdUser),
             ]);
+
+            return [user, userAuth, bill];
         } catch (error) {
             throw new CreateFailedException(error);
         }
-
-        return user;
     }
 
     public async getUser(

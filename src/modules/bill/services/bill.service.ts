@@ -36,9 +36,9 @@ export class BillService {
 
     private async _createAccountBillNumber(): Promise<string> {
         const accountBillNumber = this._generateAccountBillNumber();
-        const billEntity = await this._findAccountBillByAccountBillNumber({
+        const billEntity = await this._findAccountBillByAccountBillNumber(
             accountBillNumber,
-        });
+        );
 
         try {
             return billEntity
@@ -61,12 +61,12 @@ export class BillService {
     }
 
     private async _findAccountBillByAccountBillNumber(
-        options: Partial<{ accountBillNumber: string }>,
+        accountBillNumber: string,
     ): Promise<BillEntity | undefined> {
         const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
         queryBuilder.where('bill.accountBillNumber = :accountBillNumber', {
-            accountBillNumber: options.accountBillNumber,
+            accountBillNumber,
         });
 
         return queryBuilder.getOne();

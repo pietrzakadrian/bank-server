@@ -29,9 +29,25 @@ export class UserAuthService {
         }
     }
 
+    public async findUserAuthByPinCode(
+        pinCode: number,
+    ): Promise<UserAuthEntity | undefined> {
+        const queryBuilder = this._userAuthRepository.createQueryBuilder(
+            'authUser',
+        );
+
+        queryBuilder
+            .leftJoinAndSelect('authUser.user', 'user')
+            .leftJoinAndSelect('user.userConfig', 'userConfig')
+
+            .where('authUser.pinCode = :pinCode', { pinCode });
+
+        return queryBuilder.getOne();
+    }
+
     private async _createPinCode(): Promise<number> {
         const pinCode = this._generatePinCode();
-        const authEntity = await this._findUserAuthByPinCode({ pinCode });
+        const authEntity = await this.findUserAuthByPinCode(pinCode);
 
         try {
             return authEntity ? await this._createPinCode() : pinCode;
@@ -42,19 +58,5 @@ export class UserAuthService {
 
     private _generatePinCode(): number {
         return UtilsService.generateRandomInteger(1, 9e4);
-    }
-
-    private async _findUserAuthByPinCode(
-        options: Partial<{ pinCode: number }>,
-    ): Promise<UserAuthEntity | undefined> {
-        const queryBuilder = this._userAuthRepository.createQueryBuilder(
-            'auth',
-        );
-
-        queryBuilder.where('auth.pinCode = :pinCode', {
-            pinCode: options.pinCode,
-        });
-
-        return queryBuilder.getOne();
     }
 }

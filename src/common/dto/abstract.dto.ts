@@ -3,9 +3,9 @@
 import { AbstractEntity } from 'common/entities';
 
 export class AbstractDto {
-    uuid: string;
+    readonly uuid: string;
 
-    constructor(abstractEntity: AbstractEntity) {
-        this.uuid = abstractEntity.uuid;
+    constructor(abstract: AbstractEntity) {
+        this.uuid = abstract.uuid;
     }
 }

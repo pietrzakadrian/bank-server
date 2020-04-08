@@ -50,7 +50,25 @@ export class UtilsService {
         return bcrypt.compare(password, hash || '');
     }
 
+    /**
+     * generate random integer
+     * @param {number} min
+     * @param {number} max
+     * @returns {number}
+     */
     static generateRandomInteger(min: number, max: number): number {
         return Math.floor(min + Math.random() * (max + 1 - min));
+    }
+
+    /**
+     * generate random string
+     * @param {number} length
+     * @returns {string}
+     */
+    static generateRandomString(length: number): string {
+        return Math.random()
+            .toString(36)
+            .replace(/[^a-zA-Z0-9]+/g, '')
+            .substr(0, length);
     }
 }

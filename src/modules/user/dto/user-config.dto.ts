@@ -6,16 +6,16 @@ import { UserConfigEntity } from 'modules/user/entities';
 
 export class UserConfigDto extends AbstractDto {
     @ApiProperty()
-    notificationStatus: boolean;
+    readonly notificationStatus: boolean;
 
     @ApiProperty()
-    notificationCount: number;
+    readonly notificationCount: number;
 
     @ApiProperty()
-    messageStatus: boolean;
+    readonly messageStatus: boolean;
 
     @ApiProperty()
-    messageCount: number;
+    readonly messageCount: number;
 
     constructor(userConfig: UserConfigEntity) {
         super(userConfig);

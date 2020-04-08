@@ -10,7 +10,6 @@ import {
     Length,
     MinLength,
 } from 'class-validator';
-import { Column } from 'typeorm';
 
 export class UserRegisterDto {
     @IsString()
@@ -34,15 +33,14 @@ export class UserRegisterDto {
     @ApiProperty({ minLength: 6 })
     readonly password: string;
 
-    @Column()
+    @IsString()
+    @IsNotEmpty()
+    @Length(3)
+    @ApiProperty()
+    readonly currencyName: string;
+
     @IsPhoneNumber('ZZ')
     @IsOptional()
     @ApiPropertyOptional()
-    readonly phone: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    @Length(3)
-    readonly currencyName: string;
+    readonly phone?: string;
 }

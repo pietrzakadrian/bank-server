@@ -22,6 +22,8 @@ import { UserDto } from 'modules/user/dto';
 import { UserEntity } from 'modules/user/entities';
 import { UserService } from 'modules/user/services';
 
+import { RegisterPayloadDto } from '../dto/register-payload.dto';
+
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -39,21 +41,39 @@ export class AuthController {
     async userLogin(
         @Body() userLoginDto: UserLoginDto,
     ): Promise<LoginPayloadDto> {
-        const userAuth = await this.authService.validateUser(userLoginDto);
+        const [
+            user,
+            userAuth,
+            userConfig,
+        ] = await this.authService.validateUser(userLoginDto);
         const token = await this.authService.createToken(userAuth);
 
-        return new LoginPayloadDto(userAuth.user.toDto(), token);
+        return new LoginPayloadDto(
+            user.toDto(),
+            userAuth.toDto(),
+            userConfig.toDto(),
+            token,
+        );
     }
 
     @Post('register')
     @HttpCode(HttpStatus.OK)
-    @ApiOkResponse({ type: UserDto, description: 'Successfully Registered' })
+    @ApiOkResponse({
+        type: RegisterPayloadDto,
+        description: 'Successfully Registered',
+    })
     async userRegister(
         @Body() userRegisterDto: UserRegisterDto,
-    ): Promise<UserDto> {
-        const createdUser = await this.userService.createUser(userRegisterDto);
+    ): Promise<RegisterPayloadDto> {
+        const [user, userAuth, bill] = await this.userService.createUser(
+            userRegisterDto,
+        );
 
-        return createdUser.toDto();
+        return new RegisterPayloadDto(
+            user.toDto(),
+            userAuth.toDto(),
+            bill.toDto(),
+        );
     }
 
     @Get('me')

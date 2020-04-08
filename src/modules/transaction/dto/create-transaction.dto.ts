@@ -3,14 +3,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class UserLoginDto {
+export class CreateTransactionDto {
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    readonly pinCode: number;
+    readonly amountMoney: number;
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly password: string;
+    readonly transferTitle: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    readonly recipientAccountBillNumber: string;
 }

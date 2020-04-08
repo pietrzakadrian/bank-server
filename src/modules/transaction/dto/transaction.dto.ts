@@ -7,22 +7,22 @@ import { TransactionEntity } from 'modules/transaction/entities';
 
 export class TransactionDto extends AbstractDto {
     @ApiProperty()
-    amountMoney: number;
+    readonly amountMoney: number;
 
     @ApiProperty()
-    transferTitle: string;
+    readonly transferTitle: string;
 
     @ApiProperty()
-    authorizationKey: string;
+    readonly authorizationKey: string;
 
     @ApiProperty()
-    authorizationStatus: boolean;
+    readonly authorizationStatus: boolean;
 
-    @ApiProperty()
-    recipientAccountBill: BillDto;
+    @ApiProperty({ type: BillDto })
+    readonly recipientAccountBill: BillDto;
 
-    @ApiProperty()
-    senderAccountBill: BillDto;
+    @ApiProperty({ type: BillDto })
+    readonly senderAccountBill: BillDto;
 
     constructor(transaction: TransactionEntity) {
         super(transaction);

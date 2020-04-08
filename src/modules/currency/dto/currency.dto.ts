@@ -6,14 +6,18 @@ import { CurrencyEntity } from 'modules/currency/entities';
 
 export class CurrencyDto extends AbstractDto {
     @ApiProperty()
-    name: string;
+    readonly name: string;
 
     @ApiProperty()
-    currentExchangeRate: number;
+    readonly currentExchangeRate: number;
+
+    @ApiProperty()
+    readonly main: boolean;
 
     constructor(currency: CurrencyEntity) {
         super(currency);
         this.name = currency.name;
         this.currentExchangeRate = currency.currentExchangeRate;
+        this.main = currency.main;
     }
 }

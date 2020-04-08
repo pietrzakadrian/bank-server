@@ -1,18 +1,32 @@
 'use strict';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { UserDto } from 'modules/user/dto';
+import { UserAuthDto, UserConfigDto, UserDto } from 'modules/user/dto';
 
 import { TokenPayloadDto } from './token-payload.dto';
 
 export class LoginPayloadDto {
     @ApiProperty({ type: UserDto })
-    user: UserDto;
-    @ApiProperty({ type: TokenPayloadDto })
-    token: TokenPayloadDto;
+    readonly user: UserDto;
 
-    constructor(user: UserDto, token: TokenPayloadDto) {
+    @ApiProperty({ type: UserAuthDto })
+    readonly userAuth: UserAuthDto;
+
+    @ApiProperty({ type: UserConfigDto })
+    readonly userConfig: UserConfigDto;
+
+    @ApiProperty({ type: TokenPayloadDto })
+    readonly token: TokenPayloadDto;
+
+    constructor(
+        user: UserDto,
+        userAuth: UserAuthDto,
+        userConfig: UserConfigDto,
+        token: TokenPayloadDto,
+    ) {
         this.user = user;
+        this.userAuth = userAuth;
+        this.userConfig = userConfig;
         this.token = token;
     }
 }
