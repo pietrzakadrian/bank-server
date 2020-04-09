@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CreateFailedException } from 'exceptions';
 import { AccountBillNumberGenerationIncorrect } from 'exceptions/account-bill-number-generation-incorrect.exception';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyService } from 'modules/currency/services';
@@ -29,16 +30,16 @@ export class BillService {
         const bill = this._billRepository.create(createdBill);
         try {
             return this._billRepository.save(bill);
-        } catch (e) {
-            throw new Error('l');
+        } catch (error) {
+            throw new CreateFailedException(error);
         }
     }
 
     private async _createAccountBillNumber(): Promise<string> {
         const accountBillNumber = this._generateAccountBillNumber();
-        const billEntity = await this._findAccountBillByAccountBillNumber(
+        const billEntity = await this._findAccountBillByAccountBillNumber({
             accountBillNumber,
-        );
+        });
 
         try {
             return billEntity
@@ -61,12 +62,12 @@ export class BillService {
     }
 
     private async _findAccountBillByAccountBillNumber(
-        accountBillNumber: string,
+        options: Partial<{ accountBillNumber: string }>,
     ): Promise<BillEntity | undefined> {
         const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
         queryBuilder.where('bill.accountBillNumber = :accountBillNumber', {
-            accountBillNumber,
+            accountBillNumber: options.accountBillNumber,
         });
 
         return queryBuilder.getOne();
