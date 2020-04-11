@@ -4,6 +4,7 @@ import { AuthModule } from 'modules/auth/modules';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { CurrencyService } from 'modules/currency/services';
 
+import { BillController } from '../controllers';
 import { BillRepository } from '../repositories';
 import { BillService } from '../services';
 
@@ -12,7 +13,7 @@ import { BillService } from '../services';
         forwardRef(() => AuthModule),
         TypeOrmModule.forFeature([BillRepository, CurrencyRepository]),
     ],
-    controllers: [],
+    controllers: [BillController],
     exports: [BillService],
     providers: [BillService, CurrencyService],
 })

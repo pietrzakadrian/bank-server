@@ -9,7 +9,7 @@ import { AuthService } from 'modules/auth/services';
 import { UserDto } from 'modules/user/dto';
 import { UserService } from 'modules/user/services';
 
-@Controller('auth')
+@Controller('Auth')
 @ApiTags('Auth')
 export class AuthController {
     constructor(
