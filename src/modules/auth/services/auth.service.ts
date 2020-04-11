@@ -33,18 +33,18 @@ export class AuthService {
         });
     }
 
-    public async validateUser(userLoginDto: UserLoginDto): Promise<any> {
+    public async validateUser(userLoginDto: UserLoginDto): Promise<UserEntity> {
         const { pinCode, password } = userLoginDto;
         const user = await this._userService.findUserByPinCode(pinCode);
-
-        const isPasswordValid = await UtilsService.validateHash(
-            password,
-            user?.userAuth.password,
-        );
 
         if (!user) {
             throw new UserNotFoundException();
         }
+
+        const isPasswordValid = await UtilsService.validateHash(
+            password,
+            user.userAuth.password,
+        );
 
         await this._userAuthService.updateLastLoggedDate(user, isPasswordValid);
 

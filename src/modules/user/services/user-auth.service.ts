@@ -33,6 +33,7 @@ export class UserAuthService {
             await this._updateLastFailedLoggedDate(userAuth);
         } else {
             const { lastSuccessfulLoggedDate } = userAuth;
+
             if (!lastSuccessfulLoggedDate) {
                 await this._updateLastSuccessfulLoggedDate(userAuth);
                 await this._userConfigService.updateLastPresentLoggedDate(
