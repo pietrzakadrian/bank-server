@@ -1,7 +1,7 @@
 import { AbstractEntity } from 'common/entities';
 import { BillEntity } from 'modules/bill/entities/bill.entity';
 import { UserDto } from 'modules/user/dto';
-import { UserAuthEntity } from 'modules/user/entities';
+import { UserAuthEntity, UserConfigEntity } from 'modules/user/entities';
 import {
     Column,
     CreateDateColumn,
@@ -10,8 +10,6 @@ import {
     OneToOne,
     UpdateDateColumn,
 } from 'typeorm';
-
-import { UserConfigEntity } from './user-config.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends AbstractEntity<UserDto> {

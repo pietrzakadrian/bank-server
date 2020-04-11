@@ -13,8 +13,8 @@ import { UserService } from 'modules/user/services';
 @ApiTags('Auth')
 export class AuthController {
     constructor(
-        public readonly userService: UserService,
-        public readonly authService: AuthService,
+        private readonly _userService: UserService,
+        private readonly _authService: AuthService,
     ) {}
 
     @Post('login')
@@ -26,10 +26,10 @@ export class AuthController {
     async userLogin(
         @Body() userLoginDto: UserLoginDto,
     ): Promise<LoginPayloadDto> {
-        const user = await this.authService.validateUser(userLoginDto);
-        const token = await this.authService.createToken(user);
+        const user = await this._authService.validateUser(userLoginDto);
+        const token = await this._authService.createToken(user);
 
-        return new LoginPayloadDto(user.toDto(), token);
+        return new LoginPayloadDto(token);
     }
 
     @Post('register')
@@ -41,7 +41,7 @@ export class AuthController {
     async userRegister(
         @Body() userRegisterDto: UserRegisterDto,
     ): Promise<UserDto> {
-        const user = await this.userService.createUser(userRegisterDto);
+        const user = await this._userService.createUser(userRegisterDto);
 
         return user.toDto();
     }

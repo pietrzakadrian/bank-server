@@ -55,6 +55,7 @@ export class UserService {
         pageOptionsDto: UsersPageOptionsDto,
     ): Promise<UsersPageDto> {
         const queryBuilder = this._userRepository.createQueryBuilder('user');
+
         const [users, usersCount] = await queryBuilder
             .leftJoinAndSelect('user.userAuth', 'userAuth')
             .leftJoinAndSelect('user.userConfig', 'userConfig')
@@ -66,6 +67,7 @@ export class UserService {
             pageOptionsDto,
             itemCount: usersCount,
         });
+
         return new UsersPageDto(users.toDtos(), pageMetaDto);
     }
 

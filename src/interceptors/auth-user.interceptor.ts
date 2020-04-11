@@ -12,8 +12,8 @@ import { Observable } from 'rxjs';
 export class AuthUserInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const request = context.switchToHttp().getRequest();
-
         const user = <UserEntity>request.user;
+
         AuthService.setAuthUser(user);
 
         return next.handle();
