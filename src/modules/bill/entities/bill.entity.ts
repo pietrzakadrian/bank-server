@@ -10,7 +10,7 @@ export class BillEntity extends AbstractEntity<BillDto> {
     @Column({ unique: true })
     accountBillNumber: string;
 
-    @ManyToOne(() => UserEntity, (user: UserEntity) => user.bill, {
+    @ManyToOne(() => UserEntity, (user: UserEntity) => user.bills, {
         nullable: false,
         onDelete: 'CASCADE',
     })

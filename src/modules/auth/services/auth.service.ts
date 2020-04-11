@@ -5,7 +5,7 @@ import {
     UserPasswordNotValidException,
 } from 'exceptions';
 import { TokenPayloadDto, UserLoginDto } from 'modules/auth/dto';
-import { UserAuthEntity, UserEntity } from 'modules/user/entities';
+import { UserEntity } from 'modules/user/entities';
 import { UserAuthService, UserService } from 'modules/user/services';
 import { ContextService, UtilsService } from 'providers';
 import { ConfigService } from 'shared/services';
@@ -21,11 +21,11 @@ export class AuthService {
         private readonly _userAuthService: UserAuthService,
     ) {}
 
-    async createToken(userAuth: UserAuthEntity): Promise<TokenPayloadDto> {
+    public async createToken(user: UserEntity): Promise<TokenPayloadDto> {
         const {
-            user: { uuid },
-            role,
-        } = userAuth;
+            uuid,
+            userAuth: { role },
+        } = user;
 
         return new TokenPayloadDto({
             expiresIn: this._configService.getNumber('JWT_EXPIRATION_TIME'),
@@ -33,38 +33,33 @@ export class AuthService {
         });
     }
 
-    async validateUser(userLoginDto: UserLoginDto): Promise<any> {
+    public async validateUser(userLoginDto: UserLoginDto): Promise<any> {
         const { pinCode, password } = userLoginDto;
-
-        const userAuth = await this._userAuthService.findUserAuthByPinCode(
-            pinCode,
-        );
+        const user = await this._userService.findUserByPinCode(pinCode);
 
         const isPasswordValid = await UtilsService.validateHash(
             password,
-            userAuth && userAuth.password,
+            user?.userAuth.password,
         );
 
-        if (!userAuth) {
+        if (!user) {
             throw new UserNotFoundException();
         }
+
+        await this._userAuthService.updateLastLoggedDate(user, isPasswordValid);
 
         if (!isPasswordValid) {
             throw new UserPasswordNotValidException();
         }
 
-        const {
-            user,
-            user: { userConfig },
-        } = userAuth;
-        return [user, userAuth, userConfig];
+        return user;
     }
 
-    static setAuthUser(user: UserEntity) {
+    public static setAuthUser(user: UserEntity) {
         ContextService.set(AuthService._authUserKey, user);
     }
 
-    static getAuthUser(): UserEntity {
+    public static getAuthUser(): UserEntity {
         return ContextService.get(AuthService._authUserKey);
     }
 }

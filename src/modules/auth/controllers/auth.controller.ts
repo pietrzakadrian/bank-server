@@ -41,19 +41,10 @@ export class AuthController {
     async userLogin(
         @Body() userLoginDto: UserLoginDto,
     ): Promise<LoginPayloadDto> {
-        const [
-            user,
-            userAuth,
-            userConfig,
-        ] = await this.authService.validateUser(userLoginDto);
-        const token = await this.authService.createToken(userAuth);
+        const user = await this.authService.validateUser(userLoginDto);
+        const token = await this.authService.createToken(user);
 
-        return new LoginPayloadDto(
-            user.toDto(),
-            userAuth.toDto(),
-            userConfig.toDto(),
-            token,
-        );
+        return new LoginPayloadDto(user.toDto(), token);
     }
 
     @Post('register')
@@ -62,18 +53,16 @@ export class AuthController {
         type: RegisterPayloadDto,
         description: 'Successfully Registered',
     })
-    async userRegister(
-        @Body() userRegisterDto: UserRegisterDto,
-    ): Promise<RegisterPayloadDto> {
-        const [user, userAuth, bill] = await this.userService.createUser(
-            userRegisterDto,
-        );
+    async userRegister(@Body() userRegisterDto: UserRegisterDto): Promise<any> {
+        const user = await this.userService.createUser(userRegisterDto);
 
-        return new RegisterPayloadDto(
-            user.toDto(),
-            userAuth.toDto(),
-            bill.toDto(),
-        );
+        return user.toDto();
+
+        // return new RegisterPayloadDto(
+        //     user.toDto(),
+        //     userAuth.toDto(),
+        //     bill.toDto(),
+        // );
     }
 
     @Get('me')

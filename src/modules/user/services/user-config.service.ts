@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateFailedException } from 'exceptions';
 import { UserConfigEntity } from 'modules/user/entities';
 import { UserConfigRepository } from 'modules/user/repositories';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class UserConfigService {
@@ -15,5 +16,13 @@ export class UserConfigService {
         } catch (error) {
             throw new CreateFailedException(error);
         }
+    }
+
+    public async updateLastPresentLoggedDate(
+        userConfig: UserConfigEntity,
+    ): Promise<UpdateResult> {
+        return this._userConfigRepository.update(userConfig.id, {
+            lastPresentLoggedDate: new Date(),
+        });
     }
 }

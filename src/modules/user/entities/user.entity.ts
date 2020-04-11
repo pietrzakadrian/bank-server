@@ -53,7 +53,7 @@ export class UserEntity extends AbstractEntity<UserDto> {
     @OneToMany(() => BillEntity, (bill: BillEntity) => bill.user, {
         nullable: false,
     })
-    bill: BillEntity[];
+    bills: BillEntity[];
 
     dtoClass = UserDto;
 }

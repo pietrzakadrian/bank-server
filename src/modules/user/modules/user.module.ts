@@ -11,9 +11,11 @@ import {
     UserConfigRepository,
     UserRepository,
 } from 'modules/user/repositories';
-import { UserAuthService, UserService } from 'modules/user/services';
-
-import { UserConfigService } from '../services/user-config.service';
+import {
+    UserAuthService,
+    UserConfigService,
+    UserService,
+} from 'modules/user/services';
 
 @Module({
     imports: [
@@ -27,7 +29,7 @@ import { UserConfigService } from '../services/user-config.service';
         ]),
     ],
     controllers: [UserController],
-    exports: [UserService, UserAuthService, UserConfigService],
+    exports: [UserService, UserAuthService, UserConfigService, BillService],
     providers: [
         UserService,
         UserAuthService,

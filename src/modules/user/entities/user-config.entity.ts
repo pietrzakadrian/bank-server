@@ -23,6 +23,9 @@ export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
     @Column({ default: 0 })
     messageCount: number;
 
+    @Column({ nullable: true })
+    lastPresentLoggedDate: Date;
+
     @UpdateDateColumn({
         type: 'timestamp with time zone',
         nullable: true,
