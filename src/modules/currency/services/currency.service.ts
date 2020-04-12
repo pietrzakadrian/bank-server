@@ -1,5 +1,4 @@
 import { HttpService, Injectable } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
 import { ForeignExchangeRatesNotFoundException } from 'exceptions';
 
 import { CurrencyEntity } from '../entities';
@@ -24,26 +23,10 @@ export class CurrencyService {
         return queryBuilder.getOne();
     }
 
-    @Cron('1 * * * * *')
-    public async getget() {
-        const currencyForeignExchangeRates = await this._getCurrencyForeignExchangeRates();
-        Object.assign(currencyForeignExchangeRates, { PLN: 1 });
-
-        for await (const [name, currentExchangeRate] of Object.entries(
-            currencyForeignExchangeRates,
-        )) {
-            this._updateCurrencyForeignExchangeRates(
-                name,
-                currentExchangeRate,
-                name === 'PLN',
-            );
-        }
-    }
-
-    private async _updateCurrencyForeignExchangeRates(
-        name,
-        currentExchangeRate,
-        base,
+    public async upsertCurrencyForeignExchangeRates(
+        name: string,
+        currentExchangeRate, // todo: type number
+        base: boolean,
     ): Promise<void> {
         const queryBuilder = this._currencyRepository.createQueryBuilder(
             'currency',
@@ -60,7 +43,7 @@ export class CurrencyService {
             .execute();
     }
 
-    private async _getCurrencyForeignExchangeRates(): Promise<any> {
+    public async getCurrencyForeignExchangeRates(): Promise<any> {
         const endpoint = `https://api.exchangeratesapi.io/latest?base=PLN&symbols=USD,EUR`;
 
         return this._httpService

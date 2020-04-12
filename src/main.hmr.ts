@@ -6,6 +6,7 @@ import * as compression from 'compression';
 import * as RateLimit from 'express-rate-limit';
 import { HttpExceptionFilter } from 'filters';
 import * as helmet from 'helmet';
+import { CurrencyCron } from 'modules/currency/crons';
 import * as morgan from 'morgan';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
@@ -68,6 +69,7 @@ async function bootstrap() {
 
     const port = configService.getNumber('PORT');
     await app.listen(port);
+    await app.get(CurrencyCron).setCurrencyForeignExchangeRates();
 
     console.info(`server running on port ${port}`);
 
