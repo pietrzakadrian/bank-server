@@ -12,12 +12,12 @@ export class CurrencyDto extends AbstractDto {
     readonly currentExchangeRate: number;
 
     @ApiProperty()
-    readonly main: boolean;
+    readonly base: boolean;
 
     constructor(currency: CurrencyEntity) {
         super(currency);
         this.name = currency.name;
         this.currentExchangeRate = currency.currentExchangeRate;
-        this.main = currency.main;
+        this.base = currency.base;
     }
 }

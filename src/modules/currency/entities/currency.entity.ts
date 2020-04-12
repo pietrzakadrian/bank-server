@@ -5,14 +5,14 @@ import { Column, Entity, OneToMany, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'currency' })
 export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
-    @Column()
+    @Column({ unique: true })
     name: string;
 
-    @Column()
+    @Column({ type: 'float' })
     currentExchangeRate: number;
 
     @Column({ default: false })
-    main: boolean;
+    base: boolean;
 
     @UpdateDateColumn({
         type: 'timestamp with time zone',

@@ -1,6 +1,7 @@
 import './boilerplate.polyfill';
 
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { contextMiddleware } from 'middlewares';
 import { AuthModule } from 'modules/auth/modules';
@@ -20,6 +21,7 @@ import { ConfigService } from 'shared/services';
         CurrencyModule,
         BillModule,
         TransactionModule,
+        ScheduleModule.forRoot(),
         TypeOrmModule.forRootAsync({
             imports: [SharedModule],
             useFactory: (configService: ConfigService) =>

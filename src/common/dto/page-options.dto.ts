@@ -18,7 +18,7 @@ export class PageOptionsDto {
     })
     @IsEnum(Order)
     @IsOptional()
-    readonly order: Order = Order.ASC;
+    readonly order?: Order = Order.ASC;
 
     @ApiPropertyOptional({
         minimum: 1,
@@ -28,7 +28,7 @@ export class PageOptionsDto {
     @IsInt()
     @Min(1)
     @IsOptional()
-    readonly page: number = 1;
+    readonly page?: number = 1;
 
     @ApiPropertyOptional({
         minimum: 1,
@@ -40,7 +40,7 @@ export class PageOptionsDto {
     @Min(10)
     @Max(50)
     @IsOptional()
-    readonly take: number = 10;
+    readonly take?: number = 10;
 
     get skip(): number {
         return (this.page - 1) * this.take;

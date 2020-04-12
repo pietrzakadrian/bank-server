@@ -19,7 +19,7 @@ export class BillService {
 
     public async getBills(
         user: UserEntity,
-        pageOptionsDto: BillsPageOptionsDto,
+        pageOptionsDto?: BillsPageOptionsDto,
     ): Promise<BillsPageDto | undefined> {
         const queryBuilder = this._billRepository.createQueryBuilder('bills');
 
@@ -75,14 +75,14 @@ export class BillService {
     }
 
     private _generateAccountBillNumber(): string {
-        const checkSum = UtilsService.generateRandomInteger(10, 99); // CC
+        const checksum = UtilsService.generateRandomInteger(10, 99); // CC
         const bankOrganizationalUnitNumber = 28229297; // AAAA AAAA
         const customerAccountNumber = UtilsService.generateRandomInteger(
             1e15,
             9e15,
         ); // BBBB BBBB BBBB BBBB
 
-        return `${checkSum}${bankOrganizationalUnitNumber}${customerAccountNumber}`;
+        return `${checksum}${bankOrganizationalUnitNumber}${customerAccountNumber}`;
     }
 
     private async _findBillByAccountBillNumber(
@@ -95,5 +95,33 @@ export class BillService {
         });
 
         return queryBuilder.getOne();
+    }
+
+    public async getAmountMoney(user: UserEntity): Promise<BillEntity[] | any> {
+        const queryBuilder = this._billRepository.createQueryBuilder('bills');
+
+        queryBuilder
+
+            .leftJoin('bills.recipientAccountBill', 'recipientAccountBill')
+            .leftJoin('bills.senderAccountBill', 'senderAccountBill')
+            .leftJoin('bills.currency', 'currency')
+            .select(
+                `SUM(CASE
+                    WHEN "recipientAccountBill"."recipient_account_bill_id" = bills.id
+                    THEN 1 ELSE -1 END * "recipientAccountBill"."amount_money") as TOTAL`,
+            )
+            .where('bills.user = :user', { user: user.id })
+            .andWhere(
+                `bills.id IN ("senderAccountBill"."sender_account_bill_id",
+                "recipientAccountBill"."recipient_account_bill_id")`,
+            );
+
+        return queryBuilder.execute();
+
+        // select sum(case when transactions.recipient_account_bill_id = 2 then 1 else -1 end * amount_money)
+        // from transactions as transactions
+        // where 2 in (transactions.sender_account_bill_id, transactions.recipient_account_bill_id)
+
+        // return bills.toDtos();
     }
 }
