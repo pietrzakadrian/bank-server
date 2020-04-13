@@ -18,7 +18,7 @@ export class CurrencyCron {
             this._currencyService.upsertCurrencyForeignExchangeRates(
                 name,
                 currentExchangeRate,
-                name === 'PLN',
+                currentExchangeRate === 1,
             );
         }
     }

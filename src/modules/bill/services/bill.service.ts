@@ -4,6 +4,7 @@ import { CreateFailedException } from 'exceptions';
 import { AccountBillNumberGenerationIncorrect } from 'exceptions/account-bill-number-generation-incorrect.exception';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyService } from 'modules/currency/services';
+import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
 import { UtilsService } from 'providers';
 
@@ -14,6 +15,7 @@ import { BillEntity } from '../entities';
 export class BillService {
     constructor(
         private readonly _billRepository: BillRepository,
+        private readonly _transactionRepository: TransactionRepository,
         private readonly _currencyService: CurrencyService,
     ) {}
 
@@ -97,31 +99,47 @@ export class BillService {
         return queryBuilder.getOne();
     }
 
-    public async getAmountMoney(user: UserEntity): Promise<BillEntity[] | any> {
-        const queryBuilder = this._billRepository.createQueryBuilder('bills');
+    public async getAmountMoney(bill: BillEntity): Promise<any> {
+        const queryBuilder = this._transactionRepository.createQueryBuilder(
+            'transactions',
+        );
 
         queryBuilder
-
-            .leftJoin('bills.recipientAccountBill', 'recipientAccountBill')
-            .leftJoin('bills.senderAccountBill', 'senderAccountBill')
-            .leftJoin('bills.currency', 'currency')
             .select(
-                `SUM(CASE
-                    WHEN "recipientAccountBill"."recipient_account_bill_id" = bills.id
-                    THEN 1 ELSE -1 END * "recipientAccountBill"."amount_money") as TOTAL`,
+                `ROUND(SUM(
+                    CASE
+                        WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id" AND "recipientAccountBill"."user_id" = :userId
+                        THEN 1
+                        ELSE -1
+                    END * "transactions"."amount_money" *
+                    CASE
+                        WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
+                        THEN 1
+                        ELSE
+                            CASE
+                                WHEN "recipientAccountBillCurrency"."base"
+                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
+                                ELSE "senderAccountBillCurrency"."current_exchange_rate"
+                            END 
+                    END
+                )::numeric, 2)::float8 AS total`,
             )
-            .where('bills.user = :user', { user: user.id })
-            .andWhere(
-                `bills.id IN ("senderAccountBill"."sender_account_bill_id",
-                "recipientAccountBill"."recipient_account_bill_id")`,
-            );
+            .leftJoin(
+                'transactions.recipientAccountBill',
+                'recipientAccountBill',
+            )
+            .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
+            .leftJoin(
+                'recipientAccountBill.currency',
+                'recipientAccountBillCurrency',
+            )
+            .leftJoin('senderAccountBill.currency', 'senderAccountBillCurrency')
+            .where(
+                `:billId IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+            )
+            .setParameter('userId', bill.user.id)
+            .setParameter('billId', bill.id);
 
         return queryBuilder.execute();
-
-        // select sum(case when transactions.recipient_account_bill_id = 2 then 1 else -1 end * amount_money)
-        // from transactions as transactions
-        // where 2 in (transactions.sender_account_bill_id, transactions.recipient_account_bill_id)
-
-        // return bills.toDtos();
     }
 }

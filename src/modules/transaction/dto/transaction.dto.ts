@@ -30,7 +30,7 @@ export class TransactionDto extends AbstractDto {
         this.transferTitle = transaction.transferTitle;
         this.authorizationKey = transaction.authorizationKey;
         this.authorizationStatus = transaction.authorizationStatus;
-        this.recipientAccountBill = transaction.recipientAccountBill;
-        this.senderAccountBill = transaction.senderAccountBill;
+        this.recipientAccountBill = transaction.recipientAccountBill.toDto();
+        this.senderAccountBill = transaction.senderAccountBill.toDto();
     }
 }

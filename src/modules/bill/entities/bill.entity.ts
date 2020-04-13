@@ -7,7 +7,7 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity({ name: 'bills' })
 export class BillEntity extends AbstractEntity<BillDto> {
-    @Column({ unique: true })
+    @Column({ unique: true, length: 26 })
     accountBillNumber: string;
 
     @ManyToOne(() => UserEntity, (user: UserEntity) => user.bills, {

@@ -5,6 +5,7 @@ import { BillRepository } from 'modules/bill/repositories';
 import { BillService } from 'modules/bill/services';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { CurrencyService } from 'modules/currency/services';
+import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserController } from 'modules/user/controllers';
 import {
     UserAuthRepository,
@@ -26,6 +27,7 @@ import {
             UserConfigRepository,
             BillRepository,
             CurrencyRepository,
+            TransactionRepository,
         ]),
     ],
     controllers: [UserController],

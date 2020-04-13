@@ -43,13 +43,13 @@ export class BillController {
         return this._billService.getBills(user, pageOptionsDto);
     }
 
-    @Get('/amount')
-    @HttpCode(HttpStatus.OK)
-    @ApiResponse({
-        status: HttpStatus.OK,
-        description: `Get User's bills list`,
-    })
-    async userAmountMoney(@AuthUser() user: UserEntity): Promise<any> {
-        return this._billService.getAmountMoney(user);
-    }
+    // @Get('/amount')
+    // @HttpCode(HttpStatus.OK)
+    // @ApiResponse({
+    //     status: HttpStatus.OK,
+    //     description: `Get User's bills list`,
+    // })
+    // async userAmountMoney(@AuthUser() user: UserEntity): Promise<any> {
+    //     return this._billService.getAmountMoney(user);
+    // }
 }
