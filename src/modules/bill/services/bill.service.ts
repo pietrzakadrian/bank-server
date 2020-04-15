@@ -4,6 +4,7 @@ import { CreateFailedException } from 'exceptions';
 import { AccountBillNumberGenerationIncorrect } from 'exceptions/account-bill-number-generation-incorrect.exception';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyService } from 'modules/currency/services';
+import { TransactionEntity } from 'modules/transaction/entities';
 import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
 import { UtilsService } from 'providers';
@@ -19,15 +20,78 @@ export class BillService {
         private readonly _currencyService: CurrencyService,
     ) {}
 
+    public async getBill(uuid: string): Promise<BillEntity> {
+        const queryBuilder = this._billRepository.createQueryBuilder('bill');
+
+        queryBuilder
+            .leftJoinAndSelect('bill.currency', 'currency')
+            .leftJoinAndSelect('bill.user', 'user')
+
+            .where('bill.uuid = :uuid', { uuid });
+
+        return queryBuilder.getOne();
+    }
+
     public async getBills(
         user: UserEntity,
-        pageOptionsDto?: BillsPageOptionsDto,
-    ): Promise<BillsPageDto | undefined> {
+        pageOptionsDto: BillsPageOptionsDto,
+    ): Promise<BillsPageDto | undefined | any> {
         const queryBuilder = this._billRepository.createQueryBuilder('bills');
 
         const [bills, billsCount] = await queryBuilder
             .leftJoinAndSelect('bills.currency', 'currency')
             .where('bills.user = :user', { user: user.id })
+            .addSelect(
+                (subQuery) =>
+                    subQuery
+                        .select(
+                            `COALESCE(
+                                TRUNC(
+                                    SUM(
+                                        CASE
+                                            WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id"
+                                    AND "recipientAccountBill"."user_id" = :userId
+                                        THEN 1
+                                        ELSE -1
+                                        END * "transactions"."amount_money" *
+                                            CASE
+                                                WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
+                                                THEN 1
+                                                ELSE CASE
+                                                        WHEN "recipientAccountBillCurrency"."base"
+                                                        THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
+                                                        ELSE "recipientAccountBillCurrency"."current_exchange_rate"
+                                                            / "senderAccountBillCurrency"."current_exchange_rate"
+                                                        END
+                                            END
+                                    ),
+                                2),
+                            0) AS amountMoney`,
+                        )
+                        .from(TransactionEntity, 'transactions')
+                        .leftJoin(
+                            'transactions.recipientAccountBill',
+                            'recipientAccountBill',
+                        )
+                        .leftJoin(
+                            'transactions.senderAccountBill',
+                            'senderAccountBill',
+                        )
+                        .leftJoin(
+                            'recipientAccountBill.currency',
+                            'recipientAccountBillCurrency',
+                        )
+                        .leftJoin(
+                            'senderAccountBill.currency',
+                            'senderAccountBillCurrency',
+                        )
+                        .where(
+                            `"bills"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+                        )
+                        .setParameter('userId', user.id),
+                'bills_amount_money',
+            )
+
             .skip(pageOptionsDto.skip)
             .take(pageOptionsDto.take)
             .getManyAndCount();
@@ -106,23 +170,28 @@ export class BillService {
 
         queryBuilder
             .select(
-                `ROUND(SUM(
-                    CASE
-                        WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id" AND "recipientAccountBill"."user_id" = :userId
-                        THEN 1
-                        ELSE -1
-                    END * "transactions"."amount_money" *
-                    CASE
-                        WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
-                        THEN 1
-                        ELSE
-                            CASE
-                                WHEN "recipientAccountBillCurrency"."base"
-                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
-                                ELSE "senderAccountBillCurrency"."current_exchange_rate"
-                            END 
-                    END
-                )::numeric, 2)::float8 AS total`,
+                `COALESCE(
+                                TRUNC(
+                                    SUM(
+                                        CASE
+                                            WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id"
+                                    AND "recipientAccountBill"."user_id" = :userId
+                                        THEN 1
+                                        ELSE -1
+                                        END * "transactions"."amount_money" *
+                                            CASE
+                                                WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
+                                                THEN 1
+                                                ELSE CASE
+                                                        WHEN "recipientAccountBillCurrency"."base"
+                                                        THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
+                                                        ELSE "recipientAccountBillCurrency"."current_exchange_rate"
+                                                            / "senderAccountBillCurrency"."current_exchange_rate"
+                                                        END
+                                            END
+                                    ),
+                                2),
+                            0) AS amountMoney`,
             )
             .leftJoin(
                 'transactions.recipientAccountBill',

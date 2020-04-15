@@ -8,7 +8,7 @@ export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
     @Column({ unique: true })
     name: string;
 
-    @Column({ type: 'float' })
+    @Column('decimal', { precision: 5, scale: 2, nullable: false })
     currentExchangeRate: number;
 
     @Column({ default: false })

@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { CurrencyService } from '../services';
 
 @Injectable()
 export class CurrencyCron {
+    private readonly _logger = new Logger();
+
     constructor(private readonly _currencyService: CurrencyService) {}
 
     @Cron(CronExpression.EVERY_12_HOURS)
@@ -12,14 +14,16 @@ export class CurrencyCron {
         const currencyForeignExchangeRates = await this._currencyService.getCurrencyForeignExchangeRates();
         Object.assign(currencyForeignExchangeRates, { PLN: 1 });
 
-        for await (const [name, currentExchangeRate] of Object.entries(
+        for (const [name, currentExchangeRate] of Object.entries(
             currencyForeignExchangeRates,
         )) {
-            this._currencyService.upsertCurrencyForeignExchangeRates(
+            await this._currencyService.upsertCurrencyForeignExchangeRates(
                 name,
                 currentExchangeRate,
                 currentExchangeRate === 1,
             );
         }
+
+        this._logger.log(`Exchange rates have been updated`);
     }
 }

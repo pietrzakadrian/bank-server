@@ -10,6 +10,13 @@ export class BillEntity extends AbstractEntity<BillDto> {
     @Column({ unique: true, length: 26 })
     accountBillNumber: string;
 
+    /**
+     * this is a virtual column.
+     * used only to map entity correctly using the .getManyAndCount() method.
+     */
+    @Column({ select: false, insert: false, update: false, nullable: true })
+    readonly amountMoney: number;
+
     @ManyToOne(() => UserEntity, (user: UserEntity) => user.bills, {
         nullable: false,
         onDelete: 'CASCADE',
