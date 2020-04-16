@@ -42,27 +42,4 @@ export class BillController {
     ): Promise<BillsPageDto> {
         return this._billService.getBills(user, pageOptionsDto);
     }
-
-    @Get('/amount')
-    @HttpCode(HttpStatus.OK)
-    @ApiResponse({
-        status: HttpStatus.OK,
-        description: `Get User's bills list`,
-    })
-    async userAmountMoney(
-        @Query(new ValidationPipe({ transform: true }))
-        pageOptionsDto: BillsPageOptionsDto,
-        @AuthUser() user: UserEntity,
-    ): Promise<any> {
-        const { data } = await this._billService.getBills(user, pageOptionsDto);
-        for await (const bill of data) {
-            const billEntity = await this._billService.getBill(bill.uuid);
-            const [{ total }] = await this._billService.getAmountMoney(
-                billEntity,
-            );
-            Object.assign(billEntity, { total });
-        }
-
-        return data;
-    }
 }

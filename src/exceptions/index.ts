@@ -7,3 +7,4 @@ export * from './authorization-key-generation-incorrect.exception';
 export * from './user-password-not-valid.exception';
 export * from './last-present-logged-date-not-found.exception';
 export * from './foreign-exchange-rates-not-found.exception';
+export * from './currency-not-found.exception';

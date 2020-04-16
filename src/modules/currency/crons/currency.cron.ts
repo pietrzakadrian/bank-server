@@ -5,7 +5,7 @@ import { CurrencyService } from '../services';
 
 @Injectable()
 export class CurrencyCron {
-    private readonly _logger = new Logger();
+    private readonly _logger = new Logger(CurrencyCron.name);
 
     constructor(private readonly _currencyService: CurrencyService) {}
 

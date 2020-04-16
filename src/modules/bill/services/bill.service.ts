@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PageMetaDto } from 'common/dto';
-import { CreateFailedException } from 'exceptions';
+import { CreateFailedException, CurrencyNotFoundException } from 'exceptions';
 import { AccountBillNumberGenerationIncorrect } from 'exceptions/account-bill-number-generation-incorrect.exception';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyService } from 'modules/currency/services';
@@ -20,22 +20,10 @@ export class BillService {
         private readonly _currencyService: CurrencyService,
     ) {}
 
-    public async getBill(uuid: string): Promise<BillEntity> {
-        const queryBuilder = this._billRepository.createQueryBuilder('bill');
-
-        queryBuilder
-            .leftJoinAndSelect('bill.currency', 'currency')
-            .leftJoinAndSelect('bill.user', 'user')
-
-            .where('bill.uuid = :uuid', { uuid });
-
-        return queryBuilder.getOne();
-    }
-
     public async getBills(
         user: UserEntity,
         pageOptionsDto: BillsPageOptionsDto,
-    ): Promise<BillsPageDto | undefined | any> {
+    ): Promise<BillsPageDto | undefined> {
         const queryBuilder = this._billRepository.createQueryBuilder('bills');
 
         const [bills, billsCount] = await queryBuilder
@@ -50,9 +38,9 @@ export class BillService {
                                     SUM(
                                         CASE
                                             WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id"
-                                    AND "recipientAccountBill"."user_id" = :userId
-                                        THEN 1
-                                        ELSE -1
+                                                AND "recipientAccountBill"."user_id" = :userId
+                                            THEN 1
+                                            ELSE -1
                                         END * "transactions"."amount_money" *
                                             CASE
                                                 WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
@@ -62,7 +50,7 @@ export class BillService {
                                                         THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
                                                         ELSE "recipientAccountBillCurrency"."current_exchange_rate"
                                                             / "senderAccountBillCurrency"."current_exchange_rate"
-                                                        END
+                                                    END
                                             END
                                     ),
                                 2),
@@ -104,12 +92,16 @@ export class BillService {
         return new BillsPageDto(bills.toDtos(), pageMetaDto);
     }
 
-    public async createAccountBill(createdUser): Promise<BillEntity[] | any> {
+    public async createAccountBill(createdUser): Promise<BillEntity> {
         const { currencyName } = createdUser;
         const [accountBillNumber, currency] = await Promise.all([
             this._createAccountBillNumber(),
             this._currencyService.findCurrencyByName(currencyName),
         ]);
+
+        if (!currency) {
+            throw new CurrencyNotFoundException();
+        }
 
         const createdBill: BillEntity = {
             ...createdUser,
