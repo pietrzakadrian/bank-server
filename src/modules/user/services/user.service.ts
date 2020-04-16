@@ -46,6 +46,7 @@ export class UserService {
         queryBuilder
             .leftJoinAndSelect('user.userAuth', 'userAuth')
             .leftJoinAndSelect('user.userConfig', 'userConfig')
+            .leftJoinAndSelect('userConfig.currency', 'currency')
             .where('user.uuid = :uuid', { uuid });
 
         return queryBuilder.getOne();
@@ -59,6 +60,7 @@ export class UserService {
         const [users, usersCount] = await queryBuilder
             .leftJoinAndSelect('user.userAuth', 'userAuth')
             .leftJoinAndSelect('user.userConfig', 'userConfig')
+            .leftJoinAndSelect('userConfig.currency', 'currency')
             .skip(pageOptionsDto.skip)
             .take(pageOptionsDto.take)
             .getManyAndCount();
@@ -77,6 +79,7 @@ export class UserService {
         queryBuilder
             .leftJoinAndSelect('user.userAuth', 'userAuth')
             .leftJoinAndSelect('user.userConfig', 'userConfig')
+            .leftJoinAndSelect('userConfig.currency', 'currency')
             .where('userAuth.pinCode = :pinCode', { pinCode });
 
         return queryBuilder.getOne();

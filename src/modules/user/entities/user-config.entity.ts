@@ -1,4 +1,5 @@
 import { AbstractEntity } from 'common/entities';
+import { CurrencyEntity } from 'modules/currency/entities';
 import { UserConfigDto } from 'modules/user/dto';
 import { UserEntity } from 'modules/user/entities';
 import {
@@ -38,6 +39,17 @@ export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
     })
     @JoinColumn()
     user: UserEntity;
+
+    @OneToOne(
+        () => CurrencyEntity,
+        (currency: CurrencyEntity) => currency.userConfig,
+        {
+            nullable: false,
+            onDelete: 'CASCADE',
+        },
+    )
+    @JoinColumn({ name: 'main_currency_id' })
+    currency: CurrencyEntity;
 
     dtoClass = UserConfigDto;
 }

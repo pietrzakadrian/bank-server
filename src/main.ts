@@ -82,6 +82,29 @@ async function bootstrap() {
     await app.listen(port);
 
     await app.get(CurrencyCron).setCurrencyForeignExchangeRates();
+
+    // await app.get(UserService).createUser({
+    //     firstName: 'Adrian',
+    //     lastName: 'Pietrzak',
+    //     email: `test@test.com`,
+    //     password: '123456789',
+    //     currencyName: 'USD',
+    // });
+    // await app.get(UserService).createUser({
+    //     firstName: 'Mateusz',
+    //     lastName: 'Polaszek',
+    //     email: 'test2@test.com',
+    //     password: '123456789',
+    //     currencyName: 'EUR',
+    // });
+    // await app.get(UserService).createUser({
+    //     firstName: 'Aleksandra',
+    //     lastName: 'Królikowska',
+    //     email: 'test3@test.com',
+    //     password: '123456789',
+    //     currencyName: 'PLN',
+    // });
+
     console.info(`server running on port ${port}`);
 }
 
