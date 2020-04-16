@@ -6,6 +6,7 @@ import {
     Column,
     Entity,
     JoinColumn,
+    ManyToOne,
     OneToOne,
     UpdateDateColumn,
 } from 'typeorm';
@@ -40,13 +41,10 @@ export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
     @JoinColumn()
     user: UserEntity;
 
-    @OneToOne(
+    @ManyToOne(
         () => CurrencyEntity,
         (currency: CurrencyEntity) => currency.userConfig,
-        {
-            nullable: false,
-            onDelete: 'CASCADE',
-        },
+        { nullable: false, onDelete: 'CASCADE' },
     )
     @JoinColumn({ name: 'main_currency_id' })
     currency: CurrencyEntity;

@@ -2,7 +2,7 @@ import { AbstractEntity } from 'common/entities';
 import { BillEntity } from 'modules/bill/entities/bill.entity';
 import { CurrencyDto } from 'modules/currency/dto';
 import { UserConfigEntity } from 'modules/user/entities';
-import { Column, Entity, OneToMany, OneToOne, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, OneToMany, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'currency' })
 export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
@@ -26,11 +26,12 @@ export class CurrencyEntity extends AbstractEntity<CurrencyDto> {
     })
     bill: BillEntity[];
 
-    @OneToOne(
+    @OneToMany(
         () => UserConfigEntity,
         (userConfig: UserConfigEntity) => userConfig.currency,
+        { nullable: false },
     )
-    userConfig: UserConfigEntity;
+    userConfig: UserConfigEntity[];
 
     dtoClass = CurrencyDto;
 }

@@ -42,4 +42,18 @@ export class BillController {
     ): Promise<BillsPageDto> {
         return this._billService.getBills(user, pageOptionsDto);
     }
+
+    // @Post('/')
+    // @Roles(RoleType.USER, RoleType.ADMIN)
+    // @HttpCode(HttpStatus.OK)
+    // @ApiResponse({
+    //     status: HttpStatus.OK,
+    //     description: `Get User's bills list`,
+    // })
+    // async createBill(
+    //     @AuthUser() user: UserEntity,
+    //     @Body() createBillDto: CreateBillDto,
+    // ): Promise<any> {
+    //     return this._billService.createAccountBill(user, createBillDto);
+    // }
 }

@@ -108,6 +108,7 @@ export class BillService {
             accountBillNumber,
             currency,
         };
+
         const bill = this._billRepository.create(createdBill);
 
         try {
