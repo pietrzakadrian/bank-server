@@ -36,25 +36,18 @@ export class BillService {
                             `COALESCE(
                                 TRUNC(
                                     SUM(
-                                        CASE
-                                            WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id"
-                                                AND "recipientAccountBill"."user_id" = :userId
-                                            THEN 1
+                                        CASE WHEN "transactions"."recipient_account_bill_id" = "bills"."id"
+                                            THEN 1 / CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
+                                                    THEN 1
+                                                    ELSE CASE WHEN "recipientAccountBillCurrency"."base"
+                                                            THEN "senderAccountBillCurrency"."current_exchange_rate"::decimal
+                                                            ELSE "senderAccountBillCurrency"."current_exchange_rate"::decimal
+                                                                * "recipientAccountBillCurrency"."current_exchange_rate"::decimal
+                                                            END
+                                                        END
                                             ELSE -1
-                                        END * "transactions"."amount_money" *
-                                            CASE
-                                                WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
-                                                THEN 1
-                                                ELSE CASE
-                                                        WHEN "recipientAccountBillCurrency"."base"
-                                                        THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
-                                                        ELSE "recipientAccountBillCurrency"."current_exchange_rate"
-                                                            / "senderAccountBillCurrency"."current_exchange_rate"
-                                                    END
-                                            END
-                                    ),
-                                2),
-                            0) AS amountMoney`,
+                                        END * "transactions"."amount_money"
+                                ), 2), 0) AS total`,
                         )
                         .from(TransactionEntity, 'transactions')
                         .leftJoin(
@@ -76,6 +69,7 @@ export class BillService {
                         .where(
                             `"bills"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
                         )
+                        .andWhere('transactions.authorization_status = true')
                         .setParameter('userId', user.id),
                 'bills_amount_money',
             )
@@ -156,52 +150,30 @@ export class BillService {
         return queryBuilder.getOne();
     }
 
-    public async getAmountMoney(bill: BillEntity): Promise<any> {
+    public async getOutgoingFundsSum(user: UserEntity) {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
 
         queryBuilder
-            .select(
-                `COALESCE(
-                                TRUNC(
-                                    SUM(
-                                        CASE
-                                            WHEN "transactions"."recipient_account_bill_id" = "recipientAccountBill"."id"
-                                    AND "recipientAccountBill"."user_id" = :userId
-                                        THEN 1
-                                        ELSE -1
-                                        END * "transactions"."amount_money" *
-                                            CASE
-                                                WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id"
-                                                THEN 1
-                                                ELSE CASE
-                                                        WHEN "recipientAccountBillCurrency"."base"
-                                                        THEN 1 / "senderAccountBillCurrency"."current_exchange_rate"
-                                                        ELSE "recipientAccountBillCurrency"."current_exchange_rate"
-                                                            / "senderAccountBillCurrency"."current_exchange_rate"
-                                                        END
-                                            END
-                                    ),
-                                2),
-                            0) AS amountMoney`,
+            .leftJoinAndSelect(
+                'transactions.senderAccountBill',
+                'senderAccountBill',
             )
-            .leftJoin(
-                'transactions.recipientAccountBill',
-                'recipientAccountBill',
-            )
-            .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
-            .leftJoin(
-                'recipientAccountBill.currency',
-                'recipientAccountBillCurrency',
-            )
-            .leftJoin('senderAccountBill.currency', 'senderAccountBillCurrency')
-            .where(
-                `:billId IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
-            )
-            .setParameter('userId', bill.user.id)
-            .setParameter('billId', bill.id);
+            .leftJoinAndSelect('senderAccountBill.user', 'user')
+            .leftJoinAndSelect('user.currency', 'currency')
+            .where('user = :user', { user: user.id });
 
         return queryBuilder.execute();
     }
+
+    // public async getIncomingFundsSum(user: UserEntity) {
+    //     const queryBuilder = this._transactionRepository.createQueryBuilder(
+    //         'transactions',
+    //     );
+
+    //     return queryBuilder.execute();
+    // }
+
+    // public async getAccountBalanceHistory(user: UserEntity) {}
 }

@@ -10,7 +10,6 @@ import * as RateLimit from 'express-rate-limit';
 import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
 import * as helmet from 'helmet';
 import { CurrencyCron } from 'modules/currency/crons';
-import { UserService } from 'modules/user/services';
 import * as morgan from 'morgan';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
@@ -84,13 +83,13 @@ async function bootstrap() {
 
     await app.get(CurrencyCron).setCurrencyForeignExchangeRates();
 
-    await app.get(UserService).createUser({
-        firstName: 'Adrian',
-        lastName: 'Pietrzak',
-        email: `test@test.com`,
-        password: '123456789',
-        currencyName: 'USD',
-    });
+    // await app.get(UserService).createUser({
+    //     firstName: 'Adrian',
+    //     lastName: 'Pietrzak',
+    //     email: `test@test.com`,
+    //     password: '123456789',
+    //     currencyName: 'USD',
+    // });
     // await app.get(UserService).createUser({
     //     firstName: 'Mateusz',
     //     lastName: 'Polaszek',
