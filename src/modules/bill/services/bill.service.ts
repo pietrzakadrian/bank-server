@@ -47,7 +47,7 @@ export class BillService {
                                                         END
                                             ELSE -1
                                         END * "transactions"."amount_money"
-                                ), 2), 0) AS total`,
+                                ), 2), 0)::float`,
                         )
                         .from(TransactionEntity, 'transactions')
                         .leftJoin(
@@ -69,8 +69,7 @@ export class BillService {
                         .where(
                             `"bills"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
                         )
-                        .andWhere('transactions.authorization_status = true')
-                        .setParameter('userId', user.id),
+                        .andWhere('transactions.authorization_status = true'),
                 'bills_amount_money',
             )
 

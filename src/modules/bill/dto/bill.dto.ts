@@ -10,14 +10,14 @@ export class BillDto extends AbstractDto {
     readonly accountBillNumber: string;
 
     @ApiProperty()
-    readonly amountNumber: number;
+    readonly amountMoney: number;
 
     @ApiProperty({ type: CurrencyDto })
     readonly currency: CurrencyDto;
 
     constructor(bill: BillEntity) {
         super(bill);
-        this.amountNumber = bill.amountMoney;
+        this.amountMoney = bill.amountMoney;
         this.accountBillNumber = bill.accountBillNumber;
         this.currency = bill.currency.toDto();
     }
