@@ -49,7 +49,7 @@ export class BillService {
                                                 END
                                             END
                                         ELSE -1 
-                                    END * "transactions"."amount_money"), 2), 0) :: float`,
+                                    END * "transactions"."amount_money"), 2), 0) :: numeric`,
                         )
                         .from(TransactionEntity, 'transactions')
                         .leftJoin(
@@ -267,7 +267,7 @@ export class BillService {
                                     END 
                                 END 
                             END * "transactions"."amount_money"
-                        ), 2), 0) :: float`,
+                        ), 2), 0) :: numeric`,
                 'amountMoney',
             )
             .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
@@ -309,7 +309,7 @@ export class BillService {
                                 END * "transactions"."amount_money"
                         ) FILTER (
                             WHERE "recipientUser"."id" = 2
-                        ), 2), 0) :: float`,
+                        ), 2), 0) :: numeric`,
                 `revenues`,
             )
             .addSelect(
@@ -326,7 +326,7 @@ export class BillService {
                                 END * "transactions"."amount_money"
                         ) FILTER (
                             WHERE "senderUser"."id" = 2
-                        ), 2), 0) :: float`,
+                        ), 2), 0) :: numeric`,
                 `expenses`,
             )
             .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
