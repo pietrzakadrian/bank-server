@@ -17,8 +17,8 @@ import { UserEntity } from 'modules/user/entities';
 
 import { UserDto } from '../dto';
 
-@Controller('Users')
-@ApiTags('Users')
+@Controller('User')
+@ApiTags('User')
 @UseGuards(AuthGuard, RolesGuard)
 @UseInterceptors(AuthUserInterceptor)
 @ApiBearerAuth()

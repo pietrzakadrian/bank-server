@@ -43,17 +43,38 @@ export class BillController {
         return this._billService.getBills(user, pageOptionsDto);
     }
 
-    // @Post('/')
-    // @Roles(RoleType.USER, RoleType.ADMIN)
-    // @HttpCode(HttpStatus.OK)
-    // @ApiResponse({
-    //     status: HttpStatus.OK,
-    //     description: `Get User's bills list`,
-    // })
-    // async createBill(
-    //     @AuthUser() user: UserEntity,
-    //     @Body() createBillDto: CreateBillDto,
-    // ): Promise<any> {
-    //     return this._billService.createAccountBill(user, createBillDto);
-    // }
+    @Get('/amountMoney')
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: `Get User's amount money`,
+    })
+    async userAmountMoney(@AuthUser() user: UserEntity): Promise<any> {
+        return this._billService.getAmountMoney(user);
+    }
+
+    @Get('/accountBalanceHistory')
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: `Get User's account balance history`,
+    })
+    async userAccountBalanceHistory(
+        @AuthUser() user: UserEntity,
+    ): Promise<any> {
+        return this._billService.getAccountBalanceHistory(user);
+    }
+
+    @Get('/savings')
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: `Get User's account balance history`,
+    })
+    async userSavings(@AuthUser() user: UserEntity): Promise<any> {
+        return this._billService.getSavings(user);
+    }
 }
