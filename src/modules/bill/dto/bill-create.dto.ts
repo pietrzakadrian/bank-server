@@ -7,5 +7,5 @@ export class CreateBillDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly currencyName: string;
+    readonly currency: string;
 }

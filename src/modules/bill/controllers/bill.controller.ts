@@ -15,7 +15,12 @@ import { RoleType } from 'common/constants';
 import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
-import { BillsPageDto, BillsPageOptionsDto } from 'modules/bill/dto';
+import {
+    AccountBalanceDto,
+    AccountBalanceHistoryDto,
+    BillsPageDto,
+    BillsPageOptionsDto,
+} from 'modules/bill/dto';
 import { BillService } from 'modules/bill/services';
 import { UserEntity } from 'modules/user/entities';
 
@@ -54,27 +59,31 @@ export class BillController {
         return this._billService.getAmountMoney(user);
     }
 
+    @Get('/accountBalance')
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: `Get User's account balance history`,
+        type: AccountBalanceDto,
+    })
+    async userAccountBalance(
+        @AuthUser() user: UserEntity,
+    ): Promise<AccountBalanceDto> {
+        return this._billService.getAccountBalance(user);
+    }
+
     @Get('/accountBalanceHistory')
     @Roles(RoleType.USER, RoleType.ADMIN)
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's account balance history`,
+        type: AccountBalanceHistoryDto,
     })
     async userAccountBalanceHistory(
         @AuthUser() user: UserEntity,
-    ): Promise<any> {
+    ): Promise<AccountBalanceHistoryDto> {
         return this._billService.getAccountBalanceHistory(user);
-    }
-
-    @Get('/savings')
-    @Roles(RoleType.USER, RoleType.ADMIN)
-    @HttpCode(HttpStatus.OK)
-    @ApiResponse({
-        status: HttpStatus.OK,
-        description: `Get User's account balance history`,
-    })
-    async userSavings(@AuthUser() user: UserEntity): Promise<any> {
-        return this._billService.getSavings(user);
     }
 }

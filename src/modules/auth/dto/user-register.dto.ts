@@ -7,7 +7,6 @@ import {
     IsOptional,
     IsPhoneNumber,
     IsString,
-    Length,
     MinLength,
 } from 'class-validator';
 
@@ -35,9 +34,8 @@ export class UserRegisterDto {
 
     @IsString()
     @IsNotEmpty()
-    @Length(3)
     @ApiProperty()
-    readonly currencyName: string;
+    readonly currency: string;
 
     @IsPhoneNumber('ZZ')
     @IsOptional()

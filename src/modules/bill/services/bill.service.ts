@@ -87,71 +87,7 @@ export class BillService {
         return new BillsPageDto(bills.toDtos(), pageMetaDto);
     }
 
-    public async createAccountBill(createdUser): Promise<BillEntity> {
-        const { currencyName } = createdUser;
-        const [accountBillNumber, currency] = await Promise.all([
-            this._createAccountBillNumber(),
-            this._currencyService.findCurrencyByName(currencyName),
-        ]);
-
-        if (!currency) {
-            throw new CurrencyNotFoundException();
-        }
-
-        const createdBill: BillEntity = {
-            ...createdUser,
-            accountBillNumber,
-            currency,
-        };
-
-        const bill = this._billRepository.create(createdBill);
-
-        try {
-            return this._billRepository.save(bill);
-        } catch (error) {
-            throw new CreateFailedException(error);
-        }
-    }
-
-    private async _createAccountBillNumber(): Promise<string> {
-        const accountBillNumber = this._generateAccountBillNumber();
-        const billEntity = await this._findBillByAccountBillNumber(
-            accountBillNumber,
-        );
-
-        try {
-            return billEntity
-                ? await this._createAccountBillNumber()
-                : accountBillNumber;
-        } catch (error) {
-            throw new AccountBillNumberGenerationIncorrect(error);
-        }
-    }
-
-    private _generateAccountBillNumber(): string {
-        const checksum = UtilsService.generateRandomInteger(10, 99);
-        const bankOrganizationalUnitNumber = 28229297;
-        const customerAccountNumber = UtilsService.generateRandomInteger(
-            1e15,
-            9e15,
-        );
-
-        return `${checksum}${bankOrganizationalUnitNumber}${customerAccountNumber}`;
-    }
-
-    private async _findBillByAccountBillNumber(
-        accountBillNumber: string,
-    ): Promise<BillEntity | undefined> {
-        const queryBuilder = this._billRepository.createQueryBuilder('bill');
-
-        queryBuilder.where('bill.accountBillNumber = :accountBillNumber', {
-            accountBillNumber,
-        });
-
-        return queryBuilder.getOne();
-    }
-
-    public async getAccountBalanceHistory(user: UserEntity) {
+    public async getAccountBalanceHistory(user: UserEntity): Promise<any> {
         const queryBuilder = await getConnection().createQueryBuilder();
 
         queryBuilder
@@ -237,7 +173,7 @@ export class BillService {
         return queryBuilder.execute();
     }
 
-    public async getAmountMoney(user: UserEntity) {
+    public async getAmountMoney(user: UserEntity): Promise<any> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
@@ -289,7 +225,7 @@ export class BillService {
         return queryBuilder.execute();
     }
 
-    public async getSavings(user: UserEntity) {
+    public async getAccountBalance(user: UserEntity): Promise<any> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
@@ -346,5 +282,69 @@ export class BillService {
             .setParameter('userId', user.id);
 
         return queryBuilder.execute();
+    }
+
+    public async createAccountBill(createdUser): Promise<BillEntity> {
+        const { currency } = createdUser;
+        const [createdAccountBillNumber, createdCurrency] = await Promise.all([
+            this._createAccountBillNumber(),
+            this._currencyService.findCurrency(currency),
+        ]);
+
+        if (!createdCurrency) {
+            throw new CurrencyNotFoundException();
+        }
+
+        const createdBill: BillEntity = {
+            ...createdUser,
+            createdAccountBillNumber,
+            createdCurrency,
+        };
+
+        const bill = this._billRepository.create(createdBill);
+
+        try {
+            return this._billRepository.save(bill);
+        } catch (error) {
+            throw new CreateFailedException(error);
+        }
+    }
+
+    private async _createAccountBillNumber(): Promise<string> {
+        const accountBillNumber = this._generateAccountBillNumber();
+        const billEntity = await this._findBillByAccountBillNumber(
+            accountBillNumber,
+        );
+
+        try {
+            return billEntity
+                ? await this._createAccountBillNumber()
+                : accountBillNumber;
+        } catch (error) {
+            throw new AccountBillNumberGenerationIncorrect(error);
+        }
+    }
+
+    private _generateAccountBillNumber(): string {
+        const checksum = UtilsService.generateRandomInteger(10, 99);
+        const bankOrganizationalUnitNumber = 28229297;
+        const customerAccountNumber = UtilsService.generateRandomInteger(
+            1e15,
+            9e15,
+        );
+
+        return `${checksum}${bankOrganizationalUnitNumber}${customerAccountNumber}`;
+    }
+
+    private async _findBillByAccountBillNumber(
+        accountBillNumber: string,
+    ): Promise<BillEntity | undefined> {
+        const queryBuilder = this._billRepository.createQueryBuilder('bill');
+
+        queryBuilder.where('bill.accountBillNumber = :accountBillNumber', {
+            accountBillNumber,
+        });
+
+        return queryBuilder.getOne();
     }
 }

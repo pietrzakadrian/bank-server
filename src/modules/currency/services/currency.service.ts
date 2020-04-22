@@ -11,14 +11,14 @@ export class CurrencyService {
         private readonly _httpService: HttpService,
     ) {}
 
-    public async findCurrencyByName(
-        name: string,
+    public async findCurrency(
+        uuid: string,
     ): Promise<CurrencyEntity | undefined> {
         const queryBuilder = this._currencyRepository.createQueryBuilder(
             'currency',
         );
 
-        queryBuilder.where('currency.name = :name', { name });
+        queryBuilder.where('currency.uuid = :uuid', { uuid });
 
         return queryBuilder.getOne();
     }

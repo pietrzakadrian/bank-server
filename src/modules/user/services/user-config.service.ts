@@ -13,18 +13,18 @@ export class UserConfigService {
     ) {}
 
     public async createUserConfig(createdUser): Promise<UserConfigEntity[]> {
-        const { currencyName } = createdUser;
-        const currency = await this._currencyService.findCurrencyByName(
-            currencyName,
+        const { currency } = createdUser;
+        const createdCurrency = await this._currencyService.findCurrency(
+            currency,
         );
 
-        if (!currency) {
+        if (!createdCurrency) {
             throw new CurrencyNotFoundException();
         }
 
         const config = this._userConfigRepository.create({
             ...createdUser,
-            currency,
+            createdCurrency,
         });
 
         try {
