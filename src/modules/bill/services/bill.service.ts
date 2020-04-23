@@ -11,7 +11,13 @@ import { UserEntity } from 'modules/user/entities';
 import { UtilsService } from 'providers';
 import { getConnection } from 'typeorm';
 
-import { BillsPageDto, BillsPageOptionsDto } from '../dto';
+import {
+    AccountBalanceHistoryPayloadDto,
+    AccountBalancePayloadDto,
+    AmountMoneyPayloadDto,
+    BillsPageDto,
+    BillsPageOptionsDto,
+} from '../dto';
 import { BillEntity } from '../entities';
 
 @Injectable()
@@ -87,10 +93,12 @@ export class BillService {
         return new BillsPageDto(bills.toDtos(), pageMetaDto);
     }
 
-    public async getAccountBalanceHistory(user: UserEntity): Promise<any> {
+    public async getAccountBalanceHistory(
+        user: UserEntity,
+    ): Promise<AccountBalanceHistoryPayloadDto> {
         const queryBuilder = await getConnection().createQueryBuilder();
 
-        queryBuilder
+        const [{ accountBalanceHistory }] = await queryBuilder
             .select(
                 `array_agg(balance ORDER BY id ${Order.ASC})`,
                 'accountBalanceHistory',
@@ -168,19 +176,28 @@ export class BillService {
                         .limit(50)
                         .setParameter('userId', user.id),
                 'transactions',
-            );
+            )
+            .execute();
 
-        return queryBuilder.execute();
+        return new AccountBalanceHistoryPayloadDto(accountBalanceHistory);
     }
 
-    public async getAmountMoney(user: UserEntity): Promise<any> {
+    public async getAmountMoney(
+        user: UserEntity,
+    ): Promise<AmountMoneyPayloadDto> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
 
-        queryBuilder
+        const [amountMoney] = await queryBuilder
             .select(
-                `COALESCE(
+                `
+                (
+                    SELECT c.name AS "currencyName" FROM currency AS c
+                    LEFT JOIN users_config AS uc ON uc.main_currency_id = c.id
+                    WHERE uc.user_id = :userId
+                ),
+                COALESCE(
                     TRUNC(
                         SUM(
                             CASE WHEN "recipientUser"."id" = :userId 
@@ -220,19 +237,27 @@ export class BillService {
             .leftJoin('senderUserConfig.currency', 'senderCurrencyMain')
             .where(':userId IN ("recipientUser"."id", "senderUser"."id")')
             .andWhere('transactions.authorization_status = true')
-            .setParameter('userId', user.id);
+            .setParameter('userId', user.id)
+            .execute();
 
-        return queryBuilder.execute();
+        return new AmountMoneyPayloadDto(amountMoney);
     }
 
-    public async getAccountBalance(user: UserEntity): Promise<any> {
+    public async getAccountBalance(
+        user: UserEntity,
+    ): Promise<AccountBalancePayloadDto> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
 
-        queryBuilder
+        const [accountBalance] = await queryBuilder
             .select(
-                `COALESCE(
+                `(
+                    SELECT c.name AS "currencyName" FROM currency AS c
+                    LEFT JOIN users_config AS uc ON uc.main_currency_id = c.id
+                    WHERE uc.user_id = :userId
+                ),
+                COALESCE(
                     TRUNC(
                         SUM(
                             1 / CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id"
@@ -279,9 +304,10 @@ export class BillService {
             .leftJoin('senderUserConfig.currency', 'senderCurrencyMain')
             .where(':userId IN ("recipientUser"."id", "senderUser"."id")')
             .andWhere('transactions.authorization_status = true')
-            .setParameter('userId', user.id);
+            .setParameter('userId', user.id)
+            .execute();
 
-        return queryBuilder.execute();
+        return new AccountBalancePayloadDto(accountBalance);
     }
 
     public async createAccountBill(createdUser): Promise<BillEntity> {

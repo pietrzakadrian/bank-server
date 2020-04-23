@@ -16,8 +16,9 @@ import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import {
-    AccountBalanceDto,
-    AccountBalanceHistoryDto,
+    AccountBalanceHistoryPayloadDto,
+    AccountBalancePayloadDto,
+    AmountMoneyPayloadDto,
     BillsPageDto,
     BillsPageOptionsDto,
 } from 'modules/bill/dto';
@@ -54,8 +55,11 @@ export class BillController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's amount money`,
+        type: AmountMoneyPayloadDto,
     })
-    async userAmountMoney(@AuthUser() user: UserEntity): Promise<any> {
+    async userAmountMoney(
+        @AuthUser() user: UserEntity,
+    ): Promise<AmountMoneyPayloadDto> {
         return this._billService.getAmountMoney(user);
     }
 
@@ -65,11 +69,11 @@ export class BillController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's account balance history`,
-        type: AccountBalanceDto,
+        type: AccountBalancePayloadDto,
     })
     async userAccountBalance(
         @AuthUser() user: UserEntity,
-    ): Promise<AccountBalanceDto> {
+    ): Promise<AccountBalancePayloadDto> {
         return this._billService.getAccountBalance(user);
     }
 
@@ -79,11 +83,11 @@ export class BillController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's account balance history`,
-        type: AccountBalanceHistoryDto,
+        type: AccountBalanceHistoryPayloadDto,
     })
     async userAccountBalanceHistory(
         @AuthUser() user: UserEntity,
-    ): Promise<AccountBalanceHistoryDto> {
+    ): Promise<AccountBalanceHistoryPayloadDto> {
         return this._billService.getAccountBalanceHistory(user);
     }
 }
