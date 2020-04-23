@@ -2,7 +2,7 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AmountMoneyPayloadDto {
+export class TotalAmountMoneyPayloadDto {
     @ApiProperty()
     readonly amountMoney: string;
 

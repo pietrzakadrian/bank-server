@@ -16,11 +16,11 @@ import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import {
-    AccountBalanceHistoryPayloadDto,
-    AccountBalancePayloadDto,
-    AmountMoneyPayloadDto,
     BillsPageDto,
     BillsPageOptionsDto,
+    TotalAccountBalanceHistoryPayloadDto,
+    TotalAccountBalancePayloadDto,
+    TotalAmountMoneyPayloadDto,
 } from 'modules/bill/dto';
 import { BillService } from 'modules/bill/services';
 import { UserEntity } from 'modules/user/entities';
@@ -45,7 +45,7 @@ export class BillController {
         @Query(new ValidationPipe({ transform: true }))
         pageOptionsDto: BillsPageOptionsDto,
         @AuthUser() user: UserEntity,
-    ): Promise<BillsPageDto> {
+    ): Promise<BillsPageDto | any> {
         return this._billService.getBills(user, pageOptionsDto);
     }
 
@@ -55,12 +55,12 @@ export class BillController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's amount money`,
-        type: AmountMoneyPayloadDto,
+        type: TotalAmountMoneyPayloadDto,
     })
     async userAmountMoney(
         @AuthUser() user: UserEntity,
-    ): Promise<AmountMoneyPayloadDto> {
-        return this._billService.getAmountMoney(user);
+    ): Promise<TotalAmountMoneyPayloadDto> {
+        return this._billService.getTotalAmountMoney(user);
     }
 
     @Get('/accountBalance')
@@ -69,12 +69,12 @@ export class BillController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's account balance history`,
-        type: AccountBalancePayloadDto,
+        type: TotalAccountBalancePayloadDto,
     })
     async userAccountBalance(
         @AuthUser() user: UserEntity,
-    ): Promise<AccountBalancePayloadDto> {
-        return this._billService.getAccountBalance(user);
+    ): Promise<TotalAccountBalancePayloadDto> {
+        return this._billService.getTotalAccountBalance(user);
     }
 
     @Get('/accountBalanceHistory')
@@ -83,11 +83,11 @@ export class BillController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: `Get User's account balance history`,
-        type: AccountBalanceHistoryPayloadDto,
+        type: TotalAccountBalanceHistoryPayloadDto,
     })
     async userAccountBalanceHistory(
         @AuthUser() user: UserEntity,
-    ): Promise<AccountBalanceHistoryPayloadDto> {
-        return this._billService.getAccountBalanceHistory(user);
+    ): Promise<TotalAccountBalanceHistoryPayloadDto> {
+        return this._billService.getTotalAccountBalanceHistory(user);
     }
 }

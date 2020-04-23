@@ -1,8 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Order } from 'common/constants';
 import { PageMetaDto } from 'common/dto';
-import { CreateFailedException, CurrencyNotFoundException } from 'exceptions';
-import { AccountBillNumberGenerationIncorrect } from 'exceptions/account-bill-number-generation-incorrect.exception';
+import {
+    AccountBillNumberGenerationIncorrect,
+    CreateFailedException,
+    CurrencyNotFoundException,
+} from 'exceptions';
+import {
+    BillsPageDto,
+    BillsPageOptionsDto,
+    TotalAccountBalanceHistoryPayloadDto,
+    TotalAccountBalancePayloadDto,
+    TotalAmountMoneyPayloadDto,
+} from 'modules/bill/dto';
+import { BillEntity } from 'modules/bill/entities';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyService } from 'modules/currency/services';
 import { TransactionEntity } from 'modules/transaction/entities';
@@ -10,15 +21,6 @@ import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
 import { UtilsService } from 'providers';
 import { getConnection } from 'typeorm';
-
-import {
-    AccountBalanceHistoryPayloadDto,
-    AccountBalancePayloadDto,
-    AmountMoneyPayloadDto,
-    BillsPageDto,
-    BillsPageOptionsDto,
-} from '../dto';
-import { BillEntity } from '../entities';
 
 @Injectable()
 export class BillService {
@@ -93,9 +95,9 @@ export class BillService {
         return new BillsPageDto(bills.toDtos(), pageMetaDto);
     }
 
-    public async getAccountBalanceHistory(
+    public async getTotalAccountBalanceHistory(
         user: UserEntity,
-    ): Promise<AccountBalanceHistoryPayloadDto> {
+    ): Promise<TotalAccountBalanceHistoryPayloadDto> {
         const queryBuilder = await getConnection().createQueryBuilder();
 
         const [{ accountBalanceHistory }] = await queryBuilder
@@ -179,12 +181,12 @@ export class BillService {
             )
             .execute();
 
-        return new AccountBalanceHistoryPayloadDto(accountBalanceHistory);
+        return new TotalAccountBalanceHistoryPayloadDto(accountBalanceHistory);
     }
 
-    public async getAmountMoney(
+    public async getTotalAmountMoney(
         user: UserEntity,
-    ): Promise<AmountMoneyPayloadDto> {
+    ): Promise<TotalAmountMoneyPayloadDto> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
@@ -240,12 +242,12 @@ export class BillService {
             .setParameter('userId', user.id)
             .execute();
 
-        return new AmountMoneyPayloadDto(amountMoney);
+        return new TotalAmountMoneyPayloadDto(amountMoney);
     }
 
-    public async getAccountBalance(
+    public async getTotalAccountBalance(
         user: UserEntity,
-    ): Promise<AccountBalancePayloadDto> {
+    ): Promise<TotalAccountBalancePayloadDto> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transactions',
         );
@@ -307,7 +309,7 @@ export class BillService {
             .setParameter('userId', user.id)
             .execute();
 
-        return new AccountBalancePayloadDto(accountBalance);
+        return new TotalAccountBalancePayloadDto(accountBalance);
     }
 
     public async createAccountBill(createdUser): Promise<BillEntity> {
@@ -336,11 +338,80 @@ export class BillService {
         }
     }
 
+    public async findBillByUuidOrAccountBillNumber(
+        options: Partial<{ uuid: string; accountBillNumber: string }>,
+        user?: UserEntity,
+    ): Promise<BillEntity | undefined> {
+        const { uuid, accountBillNumber } = options;
+        const queryBuilder = this._billRepository.createQueryBuilder('bill');
+
+        if (uuid && user) {
+            queryBuilder
+                .orWhere('bill.uuid = :uuid', { uuid })
+                .andWhere('bill.user = :user', { user: user.id })
+                .leftJoinAndSelect('bill.currency', 'currency')
+                .addSelect(
+                    (subQuery) =>
+                        subQuery
+                            .select(
+                                `COALESCE(
+                                TRUNC(
+                                    SUM(
+                                        CASE WHEN "transactions"."recipient_account_bill_id" = "bill"."id" 
+                                        THEN 1 / 
+                                            CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
+                                            THEN 1 
+                                            ELSE 
+                                                CASE WHEN "recipientAccountBillCurrency"."base" 
+                                                THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                END
+                                            END
+                                        ELSE -1 
+                                    END * "transactions"."amount_money"), 2), 0) :: numeric`,
+                            )
+                            .from(TransactionEntity, 'transactions')
+                            .leftJoin(
+                                'transactions.recipientAccountBill',
+                                'recipientAccountBill',
+                            )
+                            .leftJoin(
+                                'transactions.senderAccountBill',
+                                'senderAccountBill',
+                            )
+                            .leftJoin(
+                                'recipientAccountBill.currency',
+                                'recipientAccountBillCurrency',
+                            )
+                            .leftJoin(
+                                'senderAccountBill.currency',
+                                'senderAccountBillCurrency',
+                            )
+                            .where(
+                                `"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+                            )
+                            .andWhere(
+                                'transactions.authorization_status = true',
+                            ),
+                    'bill_amount_money',
+                );
+        }
+
+        if (accountBillNumber) {
+            queryBuilder.orWhere(
+                'bill.accountBillNumber = :accountBillNumber',
+                { accountBillNumber },
+            );
+        }
+
+        return queryBuilder.getOne();
+    }
+
     private async _createAccountBillNumber(): Promise<string> {
         const accountBillNumber = this._generateAccountBillNumber();
-        const billEntity = await this._findBillByAccountBillNumber(
+        const billEntity = await this.findBillByUuidOrAccountBillNumber({
             accountBillNumber,
-        );
+        });
 
         try {
             return billEntity
@@ -360,17 +431,5 @@ export class BillService {
         );
 
         return `${checksum}${bankOrganizationalUnitNumber}${customerAccountNumber}`;
-    }
-
-    private async _findBillByAccountBillNumber(
-        accountBillNumber: string,
-    ): Promise<BillEntity | undefined> {
-        const queryBuilder = this._billRepository.createQueryBuilder('bill');
-
-        queryBuilder.where('bill.accountBillNumber = :accountBillNumber', {
-            accountBillNumber,
-        });
-
-        return queryBuilder.getOne();
     }
 }

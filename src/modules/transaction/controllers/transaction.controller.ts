@@ -1,45 +1,31 @@
-// 'use strict';
+'use strict';
 
-// import {
-//     Body,
-//     Controller,
-//     HttpCode,
-//     HttpStatus,
-//     Post,
-//     UseGuards,
-//     UseInterceptors,
-// } from '@nestjs/common';
-// import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-// import { RoleType } from 'common/constants';
-// import { AuthUser, Roles } from 'decorators';
-// import { AuthGuard, RolesGuard } from 'guards';
-// import { AuthUserInterceptor } from 'interceptors';
-// import { UsersPageDto, UsersPageOptionsDto } from 'modules/user/dto';
-// import { UserEntity } from 'modules/user/entities';
-// import { UserService } from 'modules/user/services';
+import { Controller, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard, RolesGuard } from 'guards';
+import { AuthUserInterceptor } from 'interceptors';
 
-// import { ConfirmTransactionDto, CreateTransactionDto } from '../dto';
-// import { ConfirmTransactionPayloadDto } from '../dto/confirm-transaction-payload.dto';
-// import { CreateTransactionPayloadDto } from '../dto/create-transaction-payload.dto';
-// import { TransactionService } from '../services/transaction.service';
+import { TransactionService } from '../services/transaction.service';
 
-// @Controller('transactions')
-// @ApiTags('transactions')
-// @UseGuards(AuthGuard, RolesGuard)
-// @UseInterceptors(AuthUserInterceptor)
-// @ApiBearerAuth()
-// export class TransactionController {
-//     constructor(private readonly _transactionService: TransactionService) {}
+@Controller('transactions')
+@ApiTags('transactions')
+@UseGuards(AuthGuard, RolesGuard)
+@UseInterceptors(AuthUserInterceptor)
+@ApiBearerAuth()
+export class TransactionController {
+    constructor(private readonly _transactionService: TransactionService) {}
 
-//     @Post('create')
-//     @HttpCode(HttpStatus.OK)
-//     async createTransaction(
-//         @Body() createTransactionDto: CreateTransactionDto,
-//     ): Promise<CreateTransactionPayloadDto | void> {}
+    // @Post('create')
+    // @HttpCode(HttpStatus.OK)
+    // async createTransaction(
+    //     @AuthUser() user: UserEntity,
+    //     @Body() createTransactionDto: CreateTransactionDto,
+    // ): Promise<CreateTransactionPayloadDto | any> {}
 
-//     @Post('confirm')
-//     @HttpCode(HttpStatus.OK)
-//     async confirmTransaction(
-//         @Body() confirmTransactionDto: ConfirmTransactionDto,
-//     ): Promise<ConfirmTransactionPayloadDto | void> {}
-// }
+    // @Post('confirm')
+    // @HttpCode(HttpStatus.OK)
+    // async confirmTransaction(
+    //     @AuthUser() user: UserEntity,
+    //     @Body() confirmTransactionDto: ConfirmTransactionDto,
+    // ): Promise<ConfirmTransactionPayloadDto | any> {}
+}

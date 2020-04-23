@@ -1,5 +1,6 @@
 export * from './file-not-image.exception';
 export * from './user-not-found.exception';
+export * from './bill-not-found.exception';
 export * from './account-bill-number-generation-incorrect.exception';
 export * from './pin-code-generation-incorrect.exception';
 export * from './create-failed.exception';
@@ -8,3 +9,5 @@ export * from './user-password-not-valid.exception';
 export * from './last-present-logged-date-not-found.exception';
 export * from './foreign-exchange-rates-not-found.exception';
 export * from './currency-not-found.exception';
+export * from './attempt-make-transfer-to-myself.exception';
+export * from './amount-money-not-enough.exception';
