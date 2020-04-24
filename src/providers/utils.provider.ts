@@ -72,4 +72,20 @@ export class UtilsService {
             .toUpperCase()
             .substr(0, length);
     }
+
+    /**
+     * comparison which number is greater
+     * @param {number | string} firstNumber
+     * @param {number | string} secondNumber
+     * @returns {number | string}
+     */
+    static compareNumbers(
+        firstNumber: number | string,
+        secondNumber: number | string,
+    ): number | string | any {
+        if (firstNumber > secondNumber) {
+            return firstNumber;
+        }
+        return secondNumber;
+    }
 }

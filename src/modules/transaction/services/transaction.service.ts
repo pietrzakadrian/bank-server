@@ -9,13 +9,15 @@ import {
 } from 'exceptions';
 import { BillRepository } from 'modules/bill/repositories';
 import { BillService } from 'modules/bill/services';
+import {
+    ConfirmTransactionDto,
+    CreateTransactionDto,
+} from 'modules/transaction/dto';
+import { TransactionEntity } from 'modules/transaction/entities';
+import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
 import { UtilsService } from 'providers';
 import { UpdateResult } from 'typeorm';
-
-import { ConfirmTransactionDto, CreateTransactionDto } from '../dto';
-import { TransactionEntity } from '../entities';
-import { TransactionRepository } from '../repositories';
 
 @Injectable()
 export class TransactionService {
@@ -47,7 +49,12 @@ export class TransactionService {
             throw new AttemptMakeTransferToMyselfException();
         }
 
-        if (senderAccountBill.amountMoney < createTransactionDto.amountMoney) {
+        const largerAmountMoney = UtilsService.compareNumbers(
+            senderAccountBill.amountMoney,
+            createTransactionDto.amountMoney,
+        );
+
+        if (largerAmountMoney === createTransactionDto.amountMoney) {
             throw new AmountMoneyNotEnoughException();
         }
 
@@ -81,10 +88,12 @@ export class TransactionService {
             throw new TransactionNotFoundException();
         }
 
-        if (
-            createdTransaction.senderAccountBill[0].amountMoney <
-            createdTransaction.amountMoney
-        ) {
+        const largerAmountMoney = UtilsService.compareNumbers(
+            createdTransaction.senderAccountBill[0].amountMoney,
+            createdTransaction.amountMoney,
+        );
+
+        if (largerAmountMoney === createdTransaction.amountMoney) {
             throw new AmountMoneyNotEnoughException();
         }
 
