@@ -336,22 +336,47 @@ export class BillService {
         }
     }
 
-    public async findBillByUuidOrAccountBillNumber(
-        options: Partial<{ uuid: string; accountBillNumber: string }>,
+    public async searchBill(
+        accountBillNumber: string,
+        user?: UserEntity,
+    ): Promise<BillEntity[]> {
+        const queryBuilder = this._billRepository.createQueryBuilder('bills');
+
+        queryBuilder
+            .select([
+                'bills',
+                'currency',
+                'user.firstName',
+                'user.lastName',
+                'user.avatar',
+            ])
+            .leftJoin('bills.currency', 'currency')
+            .leftJoin('bills.user', 'user')
+            .where('bills.accountBillNumber LIKE :accountBillNumber', {
+                accountBillNumber: `${accountBillNumber}%`,
+            });
+
+        if (user) {
+            queryBuilder.andWhere('user.id != :user', { user: user.id });
+        }
+
+        return queryBuilder.getMany();
+    }
+
+    public async findBill(
+        uuid: string,
         user?: UserEntity,
     ): Promise<BillEntity | undefined> {
-        const { uuid, accountBillNumber } = options;
         const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
-        if (uuid) {
-            queryBuilder
-                .orWhere('bill.uuid = :uuid', { uuid })
-                .leftJoinAndSelect('bill.currency', 'currency')
-                .addSelect(
-                    (subQuery) =>
-                        subQuery
-                            .select(
-                                `COALESCE(
+        queryBuilder
+            .where('bill.uuid = :uuid', { uuid })
+            .leftJoinAndSelect('bill.currency', 'currency')
+            .addSelect(
+                (subQuery) =>
+                    subQuery
+                        .select(
+                            `COALESCE(
                                 TRUNC(
                                     SUM(
                                         CASE WHEN "transactions"."recipient_account_bill_id" = "bill"."id" 
@@ -366,54 +391,44 @@ export class BillService {
                                             END
                                         ELSE -1 
                                     END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
-                            )
-                            .from(TransactionEntity, 'transactions')
-                            .leftJoin(
-                                'transactions.recipientAccountBill',
-                                'recipientAccountBill',
-                            )
-                            .leftJoin(
-                                'transactions.senderAccountBill',
-                                'senderAccountBill',
-                            )
-                            .leftJoin(
-                                'recipientAccountBill.currency',
-                                'recipientAccountBillCurrency',
-                            )
-                            .leftJoin(
-                                'senderAccountBill.currency',
-                                'senderAccountBillCurrency',
-                            )
-                            .where(
-                                `"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
-                            )
-                            .andWhere(
-                                'transactions.authorization_status = true',
-                            ),
-                    'bill_amount_money',
-                );
-            if (user) {
-                queryBuilder.andWhere('bill.user = :user', { user: user.id });
-            }
+                        )
+                        .from(TransactionEntity, 'transactions')
+                        .leftJoin(
+                            'transactions.recipientAccountBill',
+                            'recipientAccountBill',
+                        )
+                        .leftJoin(
+                            'transactions.senderAccountBill',
+                            'senderAccountBill',
+                        )
+                        .leftJoin(
+                            'recipientAccountBill.currency',
+                            'recipientAccountBillCurrency',
+                        )
+                        .leftJoin(
+                            'senderAccountBill.currency',
+                            'senderAccountBillCurrency',
+                        )
+                        .where(
+                            `"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+                        )
+                        .andWhere('transactions.authorization_status = true'),
+                'bill_amount_money',
+            );
+
+        if (user) {
+            queryBuilder.andWhere('bill.user = :user', { user: user.id });
         }
 
-        if (accountBillNumber) {
-            queryBuilder.orWhere(
-                'bill.accountBillNumber = :accountBillNumber',
-                { accountBillNumber },
-            );
-        }
         return queryBuilder.getOne();
     }
 
     private async _createAccountBillNumber(): Promise<string> {
         const accountBillNumber = this._generateAccountBillNumber();
-        const billEntity = await this.findBillByUuidOrAccountBillNumber({
-            accountBillNumber,
-        });
+        const bill = await this.searchBill(accountBillNumber);
 
         try {
-            return billEntity
+            return bill
                 ? await this._createAccountBillNumber()
                 : accountBillNumber;
         } catch (error) {

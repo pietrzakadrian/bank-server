@@ -5,6 +5,7 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
     Query,
     UseGuards,
     UseInterceptors,
@@ -18,6 +19,7 @@ import { AuthUserInterceptor } from 'interceptors';
 import {
     BillsPageDto,
     BillsPageOptionsDto,
+    SearchBillsPayloadDto,
     TotalAccountBalanceHistoryPayloadDto,
     TotalAccountBalancePayloadDto,
     TotalAmountMoneyPayloadDto,
@@ -89,5 +91,24 @@ export class BillController {
         @AuthUser() user: UserEntity,
     ): Promise<TotalAccountBalanceHistoryPayloadDto> {
         return this._billService.getTotalAccountBalanceHistory(user);
+    }
+
+    @Get('/:accountBillNumber/search')
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: `Get User's account balance history`,
+        type: SearchBillsPayloadDto,
+    })
+    async searchBills(
+        @Param('accountBillNumber') accountBillNumber: string,
+        @AuthUser() user: UserEntity,
+    ): Promise<SearchBillsPayloadDto> {
+        const bills = await this._billService.searchBill(
+            accountBillNumber,
+            user,
+        );
+        return new SearchBillsPayloadDto(bills.toDtos());
     }
 }

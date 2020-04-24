@@ -100,11 +100,11 @@ export class TransactionService {
         createTransactionDto: CreateTransactionDto,
     ): Promise<TransactionEntity> {
         const [recipientAccountBill, senderAccountBill] = await Promise.all([
-            this._billService.findBillByUuidOrAccountBillNumber({
-                uuid: createTransactionDto.recipientAccountBill,
-            }),
-            this._billService.findBillByUuidOrAccountBillNumber(
-                { uuid: createTransactionDto.senderAccountBill },
+            this._billService.findBill(
+                createTransactionDto.recipientAccountBill,
+            ),
+            this._billService.findBill(
+                createTransactionDto.senderAccountBill,
                 user,
             ),
         ]);
