@@ -2,6 +2,7 @@ import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'modules/auth/modules';
 
+import { CurrencyController } from '../controllers';
 import { CurrencyCron } from '../crons';
 import { CurrencyRepository } from '../repositories';
 import { CurrencyService } from '../services';
@@ -12,7 +13,7 @@ import { CurrencyService } from '../services';
         forwardRef(() => AuthModule),
         TypeOrmModule.forFeature([CurrencyRepository]),
     ],
-    controllers: [],
+    controllers: [CurrencyController],
     exports: [CurrencyService],
     providers: [CurrencyService, CurrencyCron],
 })

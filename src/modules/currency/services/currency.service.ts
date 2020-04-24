@@ -1,6 +1,8 @@
 import { HttpService, Injectable } from '@nestjs/common';
+import { PageMetaDto } from 'common/dto';
 import { ForeignExchangeRatesNotFoundException } from 'exceptions';
 
+import { CurrenciesPageDto, CurrenciesPageOptionsDto } from '../dto';
 import { CurrencyEntity } from '../entities';
 import { CurrencyRepository } from '../repositories';
 
@@ -10,6 +12,26 @@ export class CurrencyService {
         private readonly _currencyRepository: CurrencyRepository,
         private readonly _httpService: HttpService,
     ) {}
+
+    public async getCurrencies(
+        pageOptionsDto: CurrenciesPageOptionsDto,
+    ): Promise<CurrenciesPageDto | undefined> {
+        const queryBuilder = this._currencyRepository.createQueryBuilder(
+            'currency',
+        );
+
+        const [currencies, currenciesCount] = await queryBuilder
+            .skip(pageOptionsDto.skip)
+            .take(pageOptionsDto.take)
+            .getManyAndCount();
+
+        const pageMetaDto = new PageMetaDto({
+            pageOptionsDto,
+            itemCount: currenciesCount,
+        });
+
+        return new CurrenciesPageDto(currencies.toDtos(), pageMetaDto);
+    }
 
     public async findCurrency(
         uuid: string,
