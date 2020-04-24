@@ -3,53 +3,83 @@
 import {
     Body,
     Controller,
+    Get,
     HttpCode,
     HttpStatus,
     Patch,
     Post,
+    Query,
     UseGuards,
     UseInterceptors,
+    ValidationPipe,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiNoContentResponse,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { AuthUser } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { UserEntity } from 'modules/user/entities';
 
-import { ConfirmTransactionDto, CreateTransactionDto } from '../dto';
-import { ConfirmTransactionPayloadDto } from '../dto/confirm-transaction-payload.dto';
-import { CreateTransactionPayloadDto } from '../dto/create-transaction-payload.dto';
+import {
+    ConfirmTransactionDto,
+    CreateTransactionDto,
+    TransactionsPageDto,
+    TransactionsPageOptionsDto,
+} from '../dto';
 import { TransactionService } from '../services/transaction.service';
 
-@Controller('Transaction')
-@ApiTags('Transaction')
+@Controller('Transactions')
+@ApiTags('Transactions')
 @UseGuards(AuthGuard, RolesGuard)
 @UseInterceptors(AuthUserInterceptor)
 @ApiBearerAuth()
 export class TransactionController {
     constructor(private readonly _transactionService: TransactionService) {}
 
-    @Post('create')
+    @Get('/')
     @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Get transactions',
+        type: TransactionsPageDto,
+    })
+    async getTransactions(
+        @Query(new ValidationPipe({ transform: true }))
+        pageOptionsDto: TransactionsPageOptionsDto,
+        @AuthUser() user: UserEntity,
+    ): Promise<TransactionsPageDto | any> {
+        return this._transactionService.getTransactions(user, pageOptionsDto);
+    }
+
+    @Post('create')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({
+        description: 'create transfer',
+    })
     async createTransaction(
         @AuthUser() user: UserEntity,
         @Body() createTransactionDto: CreateTransactionDto,
-    ): Promise<CreateTransactionPayloadDto | any> {
-        const transaction = await this._transactionService.createTransaction(
+    ): Promise<void> {
+        await this._transactionService.createTransaction(
             user,
             createTransactionDto,
         );
-
-        return transaction.toDto();
     }
 
     @Patch('confirm')
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({
+        description: 'confirm transfer',
+    })
     async confirmTransaction(
         @AuthUser() user: UserEntity,
         @Body() confirmTransactionDto: ConfirmTransactionDto,
-    ): Promise<ConfirmTransactionPayloadDto | any> {
-        return this._transactionService.confirmTransaction(
+    ): Promise<void> {
+        await this._transactionService.confirmTransaction(
             user,
             confirmTransactionDto,
         );

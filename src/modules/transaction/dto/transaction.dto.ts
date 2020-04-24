@@ -18,11 +18,14 @@ export class TransactionDto extends AbstractDto {
     @ApiProperty()
     readonly authorizationStatus: boolean;
 
-    @ApiProperty({ type: BillDto })
-    readonly recipientAccountBill: BillDto;
+    @ApiProperty()
+    readonly updatedAt: Date;
 
     @ApiProperty({ type: BillDto })
-    readonly senderAccountBill: BillDto;
+    readonly recipientAccountBill: BillDto['accountBillNumber'];
+
+    @ApiProperty({ type: BillDto })
+    readonly senderAccountBill: BillDto['accountBillNumber'];
 
     constructor(transaction: TransactionEntity) {
         super(transaction);
@@ -30,6 +33,7 @@ export class TransactionDto extends AbstractDto {
         this.transferTitle = transaction.transferTitle;
         this.authorizationKey = transaction.authorizationKey;
         this.authorizationStatus = transaction.authorizationStatus;
+        this.updatedAt = transaction.updatedAt;
         this.recipientAccountBill = transaction.recipientAccountBill.toDto();
         this.senderAccountBill = transaction.senderAccountBill.toDto();
     }

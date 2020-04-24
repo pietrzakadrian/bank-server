@@ -10,15 +10,11 @@ import {
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import {
-    CurrenciesPageDto,
-    CurrenciesPageOptionsDto,
-    CurrencyDto,
-} from '../dto';
+import { CurrenciesPageDto, CurrenciesPageOptionsDto } from '../dto';
 import { CurrencyService } from '../services';
 
-@Controller('Currency')
-@ApiTags('Currency')
+@Controller('Currencies')
+@ApiTags('Currencies')
 export class CurrencyController {
     constructor(private readonly _currencyService: CurrencyService) {}
 
@@ -27,7 +23,7 @@ export class CurrencyController {
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'Get currency',
-        type: CurrencyDto,
+        type: CurrenciesPageDto,
     })
     async getAvailableCurrencies(
         @Query(new ValidationPipe({ transform: true }))

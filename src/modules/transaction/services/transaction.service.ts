@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Order } from 'common/constants';
+import { PageMetaDto } from 'common/dto';
 import {
     AmountMoneyNotEnoughException,
     AttemptMakeTransferToMyselfException,
@@ -12,6 +13,8 @@ import { BillService } from 'modules/bill/services';
 import {
     ConfirmTransactionDto,
     CreateTransactionDto,
+    TransactionsPageDto,
+    TransactionsPageOptionsDto,
 } from 'modules/transaction/dto';
 import { TransactionEntity } from 'modules/transaction/entities';
 import { TransactionRepository } from 'modules/transaction/repositories';
@@ -26,6 +29,52 @@ export class TransactionService {
         private readonly _billRepository: BillRepository,
         private readonly _billService: BillService,
     ) {}
+
+    public async getTransactions(
+        user: UserEntity,
+        pageOptionsDto: TransactionsPageOptionsDto,
+    ): Promise<TransactionsPageDto | undefined> {
+        const queryBuilder = this._transactionRepository.createQueryBuilder(
+            'transactions',
+        );
+
+        const [
+            transactions,
+            transactionsCount,
+        ] = await queryBuilder
+            .leftJoinAndSelect(
+                'transactions.senderAccountBill',
+                'senderAccountBill',
+            )
+            .leftJoinAndSelect(
+                'transactions.recipientAccountBill',
+                'recipientAccountBill',
+            )
+            .leftJoinAndSelect('recipientAccountBill.user', 'recipientUser')
+            .leftJoinAndSelect(
+                'recipientAccountBill.currency',
+                'recipientAccountBillCurrency',
+            )
+            .leftJoinAndSelect('senderAccountBill.user', 'senderUser')
+            .leftJoinAndSelect(
+                'senderAccountBill.currency',
+                'senderAccountBillCurrency',
+            )
+            .where(':user IN ("senderUser"."id", "recipientUser"."id")')
+            .andWhere('transactions.authorizationStatus = true')
+            .orderBy('transactions.updatedAt', Order.DESC)
+            .setParameter('user', user.id)
+            .skip(pageOptionsDto.skip)
+            .take(pageOptionsDto.take)
+            .getManyAndCount();
+
+        const pageMetaDto = new PageMetaDto({
+            pageOptionsDto,
+            itemCount: transactionsCount,
+        });
+
+        return new TransactionsPageDto(transactions.toDtos(), pageMetaDto);
+    }
 
     public async createTransaction(
         user: UserEntity,
