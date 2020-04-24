@@ -54,7 +54,10 @@ export class TransactionService {
             createTransactionDto.amountMoney,
         );
 
-        if (largerAmountMoney === createTransactionDto.amountMoney) {
+        if (
+            largerAmountMoney === createTransactionDto.amountMoney ||
+            createTransactionDto.amountMoney <= 0
+        ) {
             throw new AmountMoneyNotEnoughException();
         }
 
