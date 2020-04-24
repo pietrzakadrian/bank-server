@@ -28,6 +28,9 @@ export class UserAuthEntity extends AbstractEntity<UserAuthDto> {
     @Column({ nullable: true })
     lastFailedLoggedDate: Date;
 
+    @Column({ nullable: true })
+    lastLogoutDate: Date;
+
     @UpdateDateColumn({
         type: 'timestamp with time zone',
         nullable: true,

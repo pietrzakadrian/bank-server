@@ -1,6 +1,7 @@
 'use strict';
 
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsOptional } from 'class-validator';
 import { AbstractDto } from 'common/dto';
 import { UserEntity } from 'modules/user/entities';
 
@@ -18,25 +19,23 @@ export class UserDto extends AbstractDto {
     readonly email: string;
 
     @ApiProperty()
-    readonly phone: string;
-
-    @ApiProperty()
     readonly avatar: string;
 
-    @ApiProperty({ type: UserAuthDto })
-    readonly userAuth: UserAuthDto;
+    @ApiPropertyOptional({ type: UserAuthDto })
+    @IsOptional()
+    readonly userAuth?: UserAuthDto;
 
-    @ApiProperty({ type: UserConfigDto })
-    readonly userConfig: UserConfigDto;
+    @ApiPropertyOptional({ type: UserConfigDto })
+    @IsOptional()
+    readonly userConfig?: UserConfigDto;
 
     constructor(user: UserEntity) {
         super(user);
         this.firstName = user.firstName;
         this.lastName = user.lastName;
         this.email = user.email;
-        this.phone = user.phone;
         this.avatar = user.avatar;
-        this.userAuth = user.userAuth.toDto();
-        this.userConfig = user.userConfig.toDto();
+        this.userAuth = user.userAuth?.toDto();
+        this.userConfig = user.userConfig?.toDto();
     }
 }

@@ -22,10 +22,10 @@ export class TransactionDto extends AbstractDto {
     readonly updatedAt: Date;
 
     @ApiProperty({ type: BillDto })
-    readonly recipientAccountBill: BillDto['accountBillNumber'];
+    readonly recipientAccountBill: BillDto;
 
     @ApiProperty({ type: BillDto })
-    readonly senderAccountBill: BillDto['accountBillNumber'];
+    readonly senderAccountBill: BillDto;
 
     constructor(transaction: TransactionEntity) {
         super(transaction);

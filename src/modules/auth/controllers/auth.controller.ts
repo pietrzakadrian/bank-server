@@ -1,5 +1,13 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+    Body,
+    Controller,
+    HttpCode,
+    HttpStatus,
+    Patch,
+    Post,
+} from '@nestjs/common';
+import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { AuthUser } from 'decorators';
 import {
     LoginPayloadDto,
     UserLoginDto,
@@ -7,13 +15,15 @@ import {
 } from 'modules/auth/dto';
 import { AuthService } from 'modules/auth/services';
 import { UserDto } from 'modules/user/dto';
-import { UserService } from 'modules/user/services';
+import { UserEntity } from 'modules/user/entities';
+import { UserAuthService, UserService } from 'modules/user/services';
 
 @Controller('Auth')
 @ApiTags('Auth')
 export class AuthController {
     constructor(
         private readonly _userService: UserService,
+        private readonly _userAuthService: UserAuthService,
         private readonly _authService: AuthService,
     ) {}
 
@@ -42,7 +52,15 @@ export class AuthController {
         @Body() userRegisterDto: UserRegisterDto,
     ): Promise<UserDto> {
         const user = await this._userService.createUser(userRegisterDto);
-
         return user.toDto();
+    }
+
+    @Patch('logout')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({
+        description: 'Successfully Logout',
+    })
+    async userLogout(@AuthUser() user: UserEntity): Promise<void> {
+        await this._userAuthService.updateLastLogoutDate(user.userAuth);
     }
 }

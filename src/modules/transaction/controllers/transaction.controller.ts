@@ -16,6 +16,7 @@ import {
 import {
     ApiBearerAuth,
     ApiNoContentResponse,
+    ApiOkResponse,
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
@@ -27,6 +28,7 @@ import { UserEntity } from 'modules/user/entities';
 import {
     ConfirmTransactionDto,
     CreateTransactionDto,
+    CreateTransactionPayloadDto,
     TransactionsPageDto,
     TransactionsPageOptionsDto,
 } from '../dto';
@@ -56,18 +58,22 @@ export class TransactionController {
     }
 
     @Post('create')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiNoContentResponse({
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({
+        status: HttpStatus.OK,
         description: 'create transfer',
+        type: CreateTransactionPayloadDto,
     })
     async createTransaction(
         @AuthUser() user: UserEntity,
         @Body() createTransactionDto: CreateTransactionDto,
-    ): Promise<void> {
-        await this._transactionService.createTransaction(
+    ): Promise<CreateTransactionPayloadDto> {
+        const { uuid } = await this._transactionService.createTransaction(
             user,
             createTransactionDto,
         );
+
+        return new CreateTransactionPayloadDto(uuid);
     }
 
     @Patch('confirm')

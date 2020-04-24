@@ -58,6 +58,14 @@ export class UserAuthService {
         return this._userService.getUser(user.uuid);
     }
 
+    public async updateLastLogoutDate(
+        userAuth: UserAuthEntity,
+    ): Promise<UpdateResult> {
+        return this._userAuthRepository.update(userAuth.id, {
+            lastLogoutDate: new Date(),
+        });
+    }
+
     public async createUserAuth(createdUser): Promise<UserAuthEntity[]> {
         const pinCode = await this._createPinCode();
         const auth = this._userAuthRepository.create({
