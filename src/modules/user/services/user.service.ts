@@ -40,7 +40,7 @@ export class UserService {
         }
     }
 
-    public async getUser(uuid: string): Promise<UserEntity> {
+    public async getUser(uuid: string): Promise<UserEntity | undefined> {
         const queryBuilder = this._userRepository.createQueryBuilder('user');
 
         queryBuilder

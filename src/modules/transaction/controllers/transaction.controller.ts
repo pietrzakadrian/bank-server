@@ -6,6 +6,7 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
     Patch,
     Post,
     Query,
@@ -29,6 +30,7 @@ import {
     ConfirmTransactionDto,
     CreateTransactionDto,
     CreateTransactionPayloadDto,
+    TransactionAuthorizationKeyPayloadDto,
     TransactionsPageDto,
     TransactionsPageOptionsDto,
 } from '../dto';
@@ -89,5 +91,23 @@ export class TransactionController {
             user,
             confirmTransactionDto,
         );
+    }
+
+    @Get('/:uuid/key')
+    @HttpCode(HttpStatus.OK)
+    @ApiOkResponse({
+        status: HttpStatus.OK,
+        description: 'create transfer',
+        type: TransactionAuthorizationKeyPayloadDto,
+    })
+    async getAuthorizationKey(
+        @Param('uuid') uuid: string,
+        @AuthUser() user: UserEntity,
+    ) {
+        const {
+            authorizationKey,
+        } = await this._transactionService.getTransaction(uuid, user);
+
+        return new TransactionAuthorizationKeyPayloadDto(authorizationKey);
     }
 }

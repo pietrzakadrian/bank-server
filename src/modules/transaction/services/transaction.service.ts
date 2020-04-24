@@ -76,6 +76,25 @@ export class TransactionService {
         return new TransactionsPageDto(transactions.toDtos(), pageMetaDto);
     }
 
+    public async getTransaction(
+        uuid: string,
+        user: UserEntity,
+    ): Promise<TransactionEntity | undefined> {
+        const queryBuilder = this._transactionRepository.createQueryBuilder(
+            'transaction',
+        );
+
+        queryBuilder
+            .leftJoin('transaction.senderAccountBill', 'senderAccountBill')
+            .leftJoin('senderAccountBill.user', 'senderUser')
+            .where('transaction.uuid = :uuid', { uuid })
+            .andWhere('senderUser.id = :user', { user: user.id })
+            .andWhere('transaction.authorizationStatus = false')
+            .orderBy('transaction.id', Order.DESC);
+
+        return queryBuilder.getOne();
+    }
+
     public async createTransaction(
         user: UserEntity,
         createTransactionDto: CreateTransactionDto,
