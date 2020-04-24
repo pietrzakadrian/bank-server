@@ -57,7 +57,7 @@ export class BillService {
                                                 END
                                             END
                                         ELSE -1 
-                                    END * "transactions"."amount_money"), 2), 0) :: numeric`,
+                                    END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
                         )
                         .from(TransactionEntity, 'transactions')
                         .leftJoin(
@@ -222,7 +222,7 @@ export class BillService {
                                     END 
                                 END 
                             END * "transactions"."amount_money"
-                        ), 2), 0) :: numeric`,
+                        ), 2), '0.00') :: numeric`,
                 'amountMoney',
             )
             .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
@@ -345,10 +345,9 @@ export class BillService {
         const { uuid, accountBillNumber } = options;
         const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
-        if (uuid && user) {
+        if (uuid) {
             queryBuilder
                 .orWhere('bill.uuid = :uuid', { uuid })
-                .andWhere('bill.user = :user', { user: user.id })
                 .leftJoinAndSelect('bill.currency', 'currency')
                 .addSelect(
                     (subQuery) =>
@@ -368,7 +367,7 @@ export class BillService {
                                                 END
                                             END
                                         ELSE -1 
-                                    END * "transactions"."amount_money"), 2), 0) :: numeric`,
+                                    END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
                             )
                             .from(TransactionEntity, 'transactions')
                             .leftJoin(
@@ -395,6 +394,9 @@ export class BillService {
                             ),
                     'bill_amount_money',
                 );
+            if (user) {
+                queryBuilder.andWhere('bill.user = :user', { user: user.id });
+            }
         }
 
         if (accountBillNumber) {
@@ -403,7 +405,6 @@ export class BillService {
                 { accountBillNumber },
             );
         }
-
         return queryBuilder.getOne();
     }
 

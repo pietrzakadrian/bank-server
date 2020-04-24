@@ -69,6 +69,7 @@ export class UtilsService {
         return Math.random()
             .toString(36)
             .replace(/[^a-zA-Z0-9]+/g, '')
+            .toUpperCase()
             .substr(0, length);
     }
 }
