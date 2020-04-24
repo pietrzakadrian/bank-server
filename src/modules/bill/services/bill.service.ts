@@ -313,22 +313,20 @@ export class BillService {
     }
 
     public async createAccountBill(createdUser): Promise<BillEntity> {
-        const { currency } = createdUser;
-        const [createdAccountBillNumber, createdCurrency] = await Promise.all([
+        const [accountBillNumber, currency] = await Promise.all([
             this._createAccountBillNumber(),
-            this._currencyService.findCurrency(currency),
+            this._currencyService.findCurrency(createdUser.currency),
         ]);
 
-        if (!createdCurrency) {
+        if (!currency) {
             throw new CurrencyNotFoundException();
         }
 
         const createdBill: BillEntity = {
             ...createdUser,
-            createdAccountBillNumber,
-            createdCurrency,
+            accountBillNumber,
+            currency,
         };
-
         const bill = this._billRepository.create(createdBill);
 
         try {

@@ -35,7 +35,7 @@ export class AuthService {
 
     public async validateUser(userLoginDto: UserLoginDto): Promise<UserEntity> {
         const { pinCode, password } = userLoginDto;
-        const user = await this._userService.findUserByPinCode(pinCode);
+        let user = await this._userService.findUserByPinCode(pinCode);
 
         if (!user) {
             throw new UserNotFoundException();
@@ -46,7 +46,10 @@ export class AuthService {
             user.userAuth.password,
         );
 
-        await this._userAuthService.updateLastLoggedDate(user, isPasswordValid);
+        user = await this._userAuthService.updateLastLoggedDate(
+            user,
+            isPasswordValid,
+        );
 
         if (!isPasswordValid) {
             throw new UserPasswordNotValidException();

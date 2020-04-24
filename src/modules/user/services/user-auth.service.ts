@@ -26,7 +26,7 @@ export class UserAuthService {
     public async updateLastLoggedDate(
         user: UserEntity,
         isSuccessiveLogged: boolean,
-    ): Promise<void> {
+    ): Promise<UserEntity> {
         const { userAuth, userConfig } = user;
 
         if (!isSuccessiveLogged) {
@@ -54,6 +54,8 @@ export class UserAuthService {
                 );
             }
         }
+
+        return this._userService.getUser(user.uuid);
     }
 
     public async createUserAuth(createdUser): Promise<UserAuthEntity[]> {

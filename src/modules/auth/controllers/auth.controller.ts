@@ -29,7 +29,7 @@ export class AuthController {
         const user = await this._authService.validateUser(userLoginDto);
         const token = await this._authService.createToken(user);
 
-        return new LoginPayloadDto(token);
+        return new LoginPayloadDto(user.toDto(), token);
     }
 
     @Post('register')

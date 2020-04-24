@@ -12,20 +12,17 @@ export class UserConfigService {
         private readonly _currencyService: CurrencyService,
     ) {}
 
-    public async createUserConfig(createdUser): Promise<UserConfigEntity[]> {
-        const { currency } = createdUser;
-        const createdCurrency = await this._currencyService.findCurrency(
-            currency,
+    public async createUserConfig(createdUser): Promise<UserConfigEntity> {
+        const currency = await this._currencyService.findCurrency(
+            createdUser.currency,
         );
 
-        if (!createdCurrency) {
+        if (!currency) {
             throw new CurrencyNotFoundException();
         }
 
-        const config = this._userConfigRepository.create({
-            ...createdUser,
-            createdCurrency,
-        });
+        const createdCurrency: UserConfigEntity = { ...createdUser, currency };
+        const config = this._userConfigRepository.create(createdCurrency);
 
         try {
             return this._userConfigRepository.save(config);
