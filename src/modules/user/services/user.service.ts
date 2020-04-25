@@ -34,20 +34,30 @@ export class UserService {
                 this._billService.createAccountBill(createdUser),
             ]);
 
-            return this.getUser(user.uuid);
+            return this.getUser({ uuid: user.uuid });
         } catch (error) {
             throw new CreateFailedException(error);
         }
     }
 
-    public async getUser(uuid: string): Promise<UserEntity | undefined> {
+    public async getUser(
+        options: Partial<{ uuid: string; email: string }>,
+    ): Promise<UserEntity | undefined> {
         const queryBuilder = this._userRepository.createQueryBuilder('user');
 
-        queryBuilder
-            .leftJoinAndSelect('user.userAuth', 'userAuth')
-            .leftJoinAndSelect('user.userConfig', 'userConfig')
-            .leftJoinAndSelect('userConfig.currency', 'currency')
-            .where('user.uuid = :uuid', { uuid });
+        if (options.uuid) {
+            queryBuilder
+                .leftJoinAndSelect('user.userAuth', 'userAuth')
+                .leftJoinAndSelect('user.userConfig', 'userConfig')
+                .leftJoinAndSelect('userConfig.currency', 'currency')
+                .orWhere('user.uuid = :uuid', { uuid: options.uuid });
+        }
+
+        if (options.email) {
+            queryBuilder.orWhere('user.email = :email', {
+                email: options.email,
+            });
+        }
 
         return queryBuilder.getOne();
     }

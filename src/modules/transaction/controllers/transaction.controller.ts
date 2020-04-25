@@ -93,7 +93,7 @@ export class TransactionController {
         );
     }
 
-    @Get('/:uuid/key')
+    @Get('/:uuid/authorizationKey')
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({
         status: HttpStatus.OK,

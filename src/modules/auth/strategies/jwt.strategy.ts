@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             throw new UnauthorizedException();
         }
 
-        const user = await this._userService.getUser(uuid);
+        const user = await this._userService.getUser({ uuid });
 
         if (!user) {
             throw new UnauthorizedException();

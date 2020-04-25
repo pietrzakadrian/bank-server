@@ -55,7 +55,7 @@ export class UserAuthService {
             }
         }
 
-        return this._userService.getUser(user.uuid);
+        return this._userService.getUser({ uuid: user.uuid });
     }
 
     public async updateLastLogoutDate(

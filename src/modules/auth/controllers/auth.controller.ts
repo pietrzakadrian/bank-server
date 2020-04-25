@@ -30,6 +30,7 @@ export class AuthController {
     @Post('login')
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({
+        status: HttpStatus.OK,
         type: LoginPayloadDto,
         description: 'User info with access token',
     })
@@ -45,6 +46,7 @@ export class AuthController {
     @Post('register')
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({
+        status: HttpStatus.OK,
         type: UserDto,
         description: 'Successfully Registered',
     })

@@ -38,4 +38,22 @@ export class UserConfigService {
             lastPresentLoggedDate: new Date(),
         });
     }
+
+    public async unsetAllNotifications(
+        userConfig: UserConfigEntity,
+    ): Promise<UpdateResult> {
+        return this._userConfigRepository.update(userConfig.id, {
+            notificationStatus: false,
+            notificationCount: 0,
+        });
+    }
+
+    public async unsetAllMessages(
+        userConfig: UserConfigEntity,
+    ): Promise<UpdateResult> {
+        return this._userConfigRepository.update(userConfig.id, {
+            messageStatus: false,
+            messageCount: 0,
+        });
+    }
 }

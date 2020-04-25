@@ -5,33 +5,69 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
+    Patch,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiNoContentResponse,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger';
 import { RoleType } from 'common/constants';
+import { AbstractCheckDto } from 'common/dto';
 import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { UserEntity } from 'modules/user/entities';
 
-import { UserDto } from '../dto';
+import { UserConfigService, UserService } from '../services';
 
-@Controller('User')
-@ApiTags('User')
-@UseGuards(AuthGuard, RolesGuard)
-@UseInterceptors(AuthUserInterceptor)
-@ApiBearerAuth()
+@Controller('Users')
+@ApiTags('Users')
 export class UserController {
-    @Get('/')
-    @Roles(RoleType.USER, RoleType.ADMIN)
+    constructor(
+        private readonly _userService: UserService,
+        private readonly _userConfigService: UserConfigService,
+    ) {}
+
+    @Get('/:email/checkEmail')
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'Get user',
-        type: UserDto,
+        type: AbstractCheckDto,
     })
-    getUser(@AuthUser() user: UserEntity): UserDto {
-        return user.toDto();
+    async checkEmail(@Param('email') email: string) {
+        const userEmail = await this._userService.getUser({ email });
+        return new AbstractCheckDto(userEmail);
+    }
+
+    @Patch('/notifications')
+    @UseGuards(AuthGuard, RolesGuard)
+    @UseInterceptors(AuthUserInterceptor)
+    @ApiBearerAuth()
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({
+        description: 'All notification unset',
+    })
+    async uncheckNotifications(@AuthUser() user: UserEntity): Promise<void> {
+        await this._userConfigService.unsetAllNotifications(user.userConfig);
+    }
+
+    @Patch('/messages')
+    @UseGuards(AuthGuard, RolesGuard)
+    @UseInterceptors(AuthUserInterceptor)
+    @ApiBearerAuth()
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiNoContentResponse({
+        description: 'All messages unset',
+    })
+    async uncheckMessages(@AuthUser() user: UserEntity): Promise<void> {
+        await this._userConfigService.unsetAllMessages(user.userConfig);
     }
 }

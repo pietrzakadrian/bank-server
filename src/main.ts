@@ -10,6 +10,7 @@ import * as RateLimit from 'express-rate-limit';
 import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
 import * as helmet from 'helmet';
 import { CurrencyCron } from 'modules/currency/crons';
+import { LanguageService } from 'modules/language/services';
 import * as morgan from 'morgan';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
@@ -81,7 +82,10 @@ async function bootstrap() {
     const port = configService.getNumber('PORT');
     await app.listen(port);
 
-    await app.get(CurrencyCron).setCurrencyForeignExchangeRates();
+    await Promise.all([
+        app.get(CurrencyCron).setCurrencyForeignExchangeRates(),
+        app.get(LanguageService).setLanguages(),
+    ]);
 
     // await app.get(UserService).createUser({
     //     firstName: 'Adrian',
