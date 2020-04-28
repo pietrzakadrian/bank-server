@@ -3,6 +3,10 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { CurrencyService } from '../services';
 
+type CurrencyForeignExchangeRatesType = {
+    currentExchangeRate: number;
+};
+
 @Injectable()
 export class CurrencyCron {
     private readonly _logger = new Logger(CurrencyCron.name);
@@ -11,13 +15,13 @@ export class CurrencyCron {
 
     @Cron(CronExpression.EVERY_12_HOURS)
     public async setCurrencyForeignExchangeRates(): Promise<void> {
-        const currencyForeignExchangeRates = await this._currencyService.getCurrencyForeignExchangeRates();
+        const currencyForeignExchangeRates: CurrencyForeignExchangeRatesType = await this._currencyService.getCurrencyForeignExchangeRates();
         Object.assign(currencyForeignExchangeRates, { PLN: 1 });
 
-        for (const [name, currentExchangeRate] of Object.entries(
+        for await (const [name, currentExchangeRate] of Object.entries(
             currencyForeignExchangeRates,
         )) {
-            await this._currencyService.upsertCurrencyForeignExchangeRates(
+            this._currencyService.upsertCurrencyForeignExchangeRates(
                 name,
                 currentExchangeRate,
                 currentExchangeRate === 1,

@@ -47,7 +47,7 @@ export class CurrencyService {
 
     public async upsertCurrencyForeignExchangeRates(
         name: string,
-        currentExchangeRate, // todo: type number
+        currentExchangeRate: number,
         base: boolean,
     ): Promise<void> {
         const queryBuilder = this._currencyRepository.createQueryBuilder(

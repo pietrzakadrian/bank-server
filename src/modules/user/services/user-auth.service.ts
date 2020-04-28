@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
     CreateFailedException,
-    LastPresentLoggedDateNotFoundException,
+    // LastPresentLoggedDateNotFoundException,
     PinCodeGenerationIncorrect,
 } from 'exceptions';
 import { UserAuthEntity, UserEntity } from 'modules/user/entities';
@@ -28,38 +28,56 @@ export class UserAuthService {
         user: UserEntity,
         isSuccessiveLogged: boolean,
     ): Promise<UserEntity> {
-        const { userAuth, userConfig } = user;
+        const {
+            userAuth,
+            userConfig,
+            userAuth: { lastSuccessfulLoggedDate },
+            userConfig: { lastPresentLoggedDate },
+        } = user;
 
         if (!isSuccessiveLogged) {
             await this._updateLastFailedLoggedDate(userAuth);
+        } else if (isSuccessiveLogged && !lastSuccessfulLoggedDate) {
+            await Promise.all([
+                this._updateLastSuccessfulLoggedDate(userAuth),
+                this._userConfigService.updateLastPresentLoggedDate(userConfig),
+            ]);
         } else {
-            const { lastSuccessfulLoggedDate } = userAuth;
-
-            if (!lastSuccessfulLoggedDate) {
-                await Promise.all([
-                    this._updateLastSuccessfulLoggedDate(userAuth),
-                    this._userConfigService.updateLastPresentLoggedDate(
-                        userConfig,
-                    ),
-                ]);
-            } else {
-                const { lastPresentLoggedDate } = userConfig;
-
-                if (!lastPresentLoggedDate) {
-                    throw new LastPresentLoggedDateNotFoundException();
-                }
-
-                await Promise.all([
-                    this._updateLastSuccessfulLoggedDate(
-                        userAuth,
-                        lastPresentLoggedDate,
-                    ),
-                    this._userConfigService.updateLastPresentLoggedDate(
-                        userConfig,
-                    ),
-                ]);
-            }
+            await Promise.all([
+                this._updateLastSuccessfulLoggedDate(
+                    userAuth,
+                    lastPresentLoggedDate,
+                ),
+                this._userConfigService.updateLastPresentLoggedDate(userConfig),
+            ]);
         }
+
+        // if (!isSuccessiveLogged) {
+        //     await this._updateLastFailedLoggedDate(userAuth);
+        // } else {
+        //     if (!lastSuccessfulLoggedDate) {
+        //         await Promise.all([
+        //             this._updateLastSuccessfulLoggedDate(userAuth),
+        //             this._userConfigService.updateLastPresentLoggedDate(
+        //                 userConfig,
+        //             ),
+        //         ]);
+        //     } else {
+        //         if (!lastPresentLoggedDate) {
+        //             throw new LastPresentLoggedDateNotFoundException();
+        //         }
+
+        //         await Promise.all([
+        //             this._updateLastSuccessfulLoggedDate(
+        //                 userAuth,
+        //                 lastPresentLoggedDate,
+        //             ),
+        //             this._userConfigService.updateLastPresentLoggedDate(
+        //                 userConfig,
+        //             ),
+        //         ]);
+        //     }
+        // }
 
         return this._userService.getUser({ uuid: user.uuid });
     }

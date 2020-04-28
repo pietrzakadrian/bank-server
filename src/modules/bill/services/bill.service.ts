@@ -33,7 +33,7 @@ export class BillService {
     public async getBills(
         user: UserEntity,
         pageOptionsDto: BillsPageOptionsDto,
-    ): Promise<BillsPageDto | undefined> {
+    ): Promise<BillsPageDto> {
         const queryBuilder = this._billRepository.createQueryBuilder('bills');
 
         const [bills, billsCount] = await queryBuilder

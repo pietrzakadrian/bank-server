@@ -47,7 +47,7 @@ export class BillController {
         @Query(new ValidationPipe({ transform: true }))
         pageOptionsDto: BillsPageOptionsDto,
         @AuthUser() user: UserEntity,
-    ): Promise<BillsPageDto | any> {
+    ): Promise<BillsPageDto> {
         return this._billService.getBills(user, pageOptionsDto);
     }
 

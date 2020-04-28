@@ -130,14 +130,17 @@ export class TransactionService {
         }
 
         const authorizationKey = this._generateAuthrorizationKey();
-
-        const transaction = this._transactionRepository.create({
+        const createdTransaction = {
             recipientAccountBill,
             senderAccountBill,
             authorizationKey,
             amountMoney: createTransactionDto.amountMoney,
             transferTitle: createTransactionDto.transferTitle,
-        });
+        };
+
+        const transaction = this._transactionRepository.create(
+            createdTransaction,
+        );
 
         try {
             return this._transactionRepository.save(transaction);
