@@ -1,11 +1,13 @@
 'use strict';
 
 import {
+    Body,
     Controller,
     Get,
     HttpCode,
     HttpStatus,
     Param,
+    Post,
     Query,
     UseGuards,
     UseInterceptors,
@@ -17,8 +19,10 @@ import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import {
+    BillDto,
     BillsPageDto,
     BillsPageOptionsDto,
+    CreateBillDto,
     SearchBillsPayloadDto,
     TotalAccountBalanceHistoryPayloadDto,
     TotalAccountBalancePayloadDto,
@@ -49,6 +53,25 @@ export class BillController {
         @AuthUser() user: UserEntity,
     ): Promise<BillsPageDto> {
         return this._billService.getBills(user, pageOptionsDto);
+    }
+
+    @Post('/')
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: `Get User's bills list`,
+        type: BillDto,
+    })
+    async createBill(
+        @AuthUser() user: UserEntity,
+        @Body() createBillDto: CreateBillDto,
+    ): Promise<BillDto> {
+        const bill = await this._billService.createAccountBill({
+            user,
+            currency: createBillDto.currency,
+        });
+        return bill.toDto();
     }
 
     @Get('/amountMoney')
