@@ -1,11 +1,10 @@
 import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'modules/auth/modules';
-
-import { CurrencyController } from '../controllers';
-import { CurrencyCron } from '../crons';
-import { CurrencyRepository } from '../repositories';
-import { CurrencyService } from '../services';
+import { CurrencyController } from 'modules/currency/controllers';
+import { CurrencyCron } from 'modules/currency/crons';
+import { CurrencyRepository } from 'modules/currency/repositories';
+import { CurrencyService } from 'modules/currency/services';
 
 @Module({
     imports: [

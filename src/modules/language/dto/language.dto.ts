@@ -2,8 +2,7 @@
 
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dto';
-
-import { LanguageEntity } from '../entities';
+import { LanguageEntity } from 'modules/language/entities';
 
 export class LanguageDto extends AbstractDto {
     @ApiProperty()

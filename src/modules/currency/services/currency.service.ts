@@ -1,10 +1,12 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { PageMetaDto } from 'common/dto';
 import { ForeignExchangeRatesNotFoundException } from 'exceptions';
-
-import { CurrenciesPageDto, CurrenciesPageOptionsDto } from '../dto';
-import { CurrencyEntity } from '../entities';
-import { CurrencyRepository } from '../repositories';
+import {
+    CurrenciesPageDto,
+    CurrenciesPageOptionsDto,
+} from 'modules/currency/dto';
+import { CurrencyEntity } from 'modules/currency/entities';
+import { CurrencyRepository } from 'modules/currency/repositories';
 
 @Injectable()
 export class CurrencyService {

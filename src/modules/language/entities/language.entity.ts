@@ -1,7 +1,6 @@
 import { AbstractEntity } from 'common/entities';
+import { LanguageDto } from 'modules/language/dto';
 import { Column, Entity } from 'typeorm';
-
-import { LanguageDto } from '../dto';
 
 @Entity({ name: 'languages' })
 export class LanguageEntity extends AbstractEntity<LanguageDto> {

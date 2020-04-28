@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { LanguageRepository } from 'modules/language/repositories';
 import { InsertResult } from 'typeorm';
-
-import { LanguageRepository } from '../repositories';
 
 @Injectable()
 export class LanguageService {

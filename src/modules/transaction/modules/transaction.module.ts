@@ -5,10 +5,9 @@ import { BillRepository } from 'modules/bill/repositories';
 import { BillService } from 'modules/bill/services';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { CurrencyService } from 'modules/currency/services';
+import { TransactionController } from 'modules/transaction/controllers';
 import { TransactionRepository } from 'modules/transaction/repositories';
-
-import { TransactionController } from '../controllers';
-import { TransactionService } from '../services/transaction.service';
+import { TransactionService } from 'modules/transaction/services';
 
 @Module({
     imports: [

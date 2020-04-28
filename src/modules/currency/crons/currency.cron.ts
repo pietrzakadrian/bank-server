@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-
-import { CurrencyService } from '../services';
+import { CurrencyService } from 'modules/currency/services';
 
 type CurrencyForeignExchangeRatesType = {
     currentExchangeRate: number;

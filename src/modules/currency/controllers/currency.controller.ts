@@ -9,9 +9,11 @@ import {
     ValidationPipe,
 } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-
-import { CurrenciesPageDto, CurrenciesPageOptionsDto } from '../dto';
-import { CurrencyService } from '../services';
+import {
+    CurrenciesPageDto,
+    CurrenciesPageOptionsDto,
+} from 'modules/currency/dto';
+import { CurrencyService } from 'modules/currency/services';
 
 @Controller('Currencies')
 @ApiTags('Currencies')

@@ -24,8 +24,6 @@ import {
 import { AuthUser } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
-import { UserEntity } from 'modules/user/entities';
-
 import {
     ConfirmTransactionDto,
     CreateTransactionDto,
@@ -33,8 +31,9 @@ import {
     TransactionAuthorizationKeyPayloadDto,
     TransactionsPageDto,
     TransactionsPageOptionsDto,
-} from '../dto';
-import { TransactionService } from '../services/transaction.service';
+} from 'modules/transaction/dto';
+import { TransactionService } from 'modules/transaction/services';
+import { UserEntity } from 'modules/user/entities';
 
 @Controller('Transactions')
 @ApiTags('Transactions')

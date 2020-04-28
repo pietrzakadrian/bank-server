@@ -22,8 +22,7 @@ import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { UserEntity } from 'modules/user/entities';
-
-import { UserConfigService, UserService } from '../services';
+import { UserConfigService, UserService } from 'modules/user/services';
 
 @Controller('Users')
 @ApiTags('Users')

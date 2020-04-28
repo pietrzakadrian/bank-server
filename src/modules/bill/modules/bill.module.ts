@@ -1,13 +1,12 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'modules/auth/modules';
+import { BillController } from 'modules/bill/controllers';
+import { BillRepository } from 'modules/bill/repositories';
+import { BillService } from 'modules/bill/services';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { CurrencyService } from 'modules/currency/services';
 import { TransactionRepository } from 'modules/transaction/repositories';
-
-import { BillController } from '../controllers';
-import { BillRepository } from '../repositories';
-import { BillService } from '../services';
 
 @Module({
     imports: [
