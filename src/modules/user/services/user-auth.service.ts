@@ -5,7 +5,7 @@ import {
     PinCodeGenerationIncorrect,
 } from 'exceptions';
 import { UserAuthEntity, UserEntity } from 'modules/user/entities';
-import { UserAuthRepository } from 'modules/user/repositories';
+import { UserAuthRepository, UserRepository } from 'modules/user/repositories';
 import { UserService } from 'modules/user/services';
 import { UtilsService } from 'providers';
 import { UpdateResult } from 'typeorm';
@@ -17,6 +17,7 @@ import { UserConfigService } from './user-config.service';
 export class UserAuthService {
     constructor(
         private readonly _userAuthRepository: UserAuthRepository,
+        private readonly _userRepository: UserRepository,
         @Inject(forwardRef(() => UserService))
         private readonly _userService: UserService,
         private readonly _userConfigService: UserConfigService,
@@ -35,23 +36,28 @@ export class UserAuthService {
             const { lastSuccessfulLoggedDate } = userAuth;
 
             if (!lastSuccessfulLoggedDate) {
-                await this._updateLastSuccessfulLoggedDate(userAuth);
-                await this._userConfigService.updateLastPresentLoggedDate(
-                    userConfig,
-                );
+                await Promise.all([
+                    this._updateLastSuccessfulLoggedDate(userAuth),
+                    this._userConfigService.updateLastPresentLoggedDate(
+                        userConfig,
+                    ),
+                ]);
             } else {
                 const { lastPresentLoggedDate } = userConfig;
+
                 if (!lastPresentLoggedDate) {
                     throw new LastPresentLoggedDateNotFoundException();
                 }
 
-                await this._updateLastSuccessfulLoggedDate(
-                    userAuth,
-                    lastPresentLoggedDate,
-                );
-                await this._userConfigService.updateLastPresentLoggedDate(
-                    userConfig,
-                );
+                await Promise.all([
+                    this._updateLastSuccessfulLoggedDate(
+                        userAuth,
+                        lastPresentLoggedDate,
+                    ),
+                    this._userConfigService.updateLastPresentLoggedDate(
+                        userConfig,
+                    ),
+                ]);
             }
         }
 
@@ -64,6 +70,24 @@ export class UserAuthService {
         return this._userAuthRepository.update(userAuth.id, {
             lastLogoutDate: new Date(),
         });
+    }
+
+    public async findUserAuth(
+        options: Partial<{ pinCode: number }>,
+    ): Promise<UserEntity | undefined> {
+        const queryBuilder = this._userRepository.createQueryBuilder('user');
+
+        if (options.pinCode) {
+            queryBuilder
+                .leftJoinAndSelect('user.userAuth', 'userAuth')
+                .leftJoinAndSelect('user.userConfig', 'userConfig')
+                .leftJoinAndSelect('userConfig.currency', 'currency')
+                .orWhere('userAuth.pinCode = :pinCode', {
+                    pinCode: options.pinCode,
+                });
+        }
+
+        return queryBuilder.getOne();
     }
 
     public async createUserAuth(createdUser): Promise<UserAuthEntity[]> {
@@ -82,10 +106,10 @@ export class UserAuthService {
 
     private async _createPinCode(): Promise<number> {
         const pinCode = this._generatePinCode();
-        const userEntity = await this._userService.findUserByPinCode(pinCode);
+        const user = await this.findUserAuth({ pinCode });
 
         try {
-            return userEntity ? await this._createPinCode() : pinCode;
+            return user ? await this._createPinCode() : pinCode;
         } catch (error) {
             throw new PinCodeGenerationIncorrect(error);
         }

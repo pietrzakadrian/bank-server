@@ -82,16 +82,4 @@ export class UserService {
 
         return new UsersPageDto(users.toDtos(), pageMetaDto);
     }
-
-    public async findUserByPinCode(pinCode: number): Promise<UserEntity> {
-        const queryBuilder = this._userRepository.createQueryBuilder('user');
-
-        queryBuilder
-            .leftJoinAndSelect('user.userAuth', 'userAuth')
-            .leftJoinAndSelect('user.userConfig', 'userConfig')
-            .leftJoinAndSelect('userConfig.currency', 'currency')
-            .where('userAuth.pinCode = :pinCode', { pinCode });
-
-        return queryBuilder.getOne();
-    }
 }

@@ -82,7 +82,7 @@ export class UtilsService {
     static compareNumbers(
         firstNumber: number | string,
         secondNumber: number | string,
-    ): number | string | any {
+    ): number | string {
         if (firstNumber > secondNumber) {
             return firstNumber;
         }

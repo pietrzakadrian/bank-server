@@ -35,7 +35,7 @@ export class AuthService {
 
     public async validateUser(userLoginDto: UserLoginDto): Promise<UserEntity> {
         const { pinCode, password } = userLoginDto;
-        let user = await this._userService.findUserByPinCode(pinCode);
+        let user = await this._userAuthService.findUserAuth({ pinCode });
 
         if (!user) {
             throw new UserNotFoundException();

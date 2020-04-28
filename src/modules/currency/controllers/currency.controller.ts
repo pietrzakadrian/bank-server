@@ -28,7 +28,7 @@ export class CurrencyController {
     async getAvailableCurrencies(
         @Query(new ValidationPipe({ transform: true }))
         pageOptionsDto: CurrenciesPageOptionsDto,
-    ): Promise<CurrenciesPageDto | any> {
+    ): Promise<CurrenciesPageDto> {
         return this._currencyService.getCurrencies(pageOptionsDto);
     }
 }
