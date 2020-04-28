@@ -315,7 +315,7 @@ export class BillService {
     public async createAccountBill(createdUser): Promise<BillEntity> {
         const [accountBillNumber, currency] = await Promise.all([
             this._createAccountBillNumber(),
-            this._currencyService.findCurrency(createdUser.currency),
+            this._currencyService.findCurrency({ uuid: createdUser.currency }),
         ]);
 
         if (!currency) {
@@ -428,7 +428,7 @@ export class BillService {
         const bill = await this.searchBill(accountBillNumber);
 
         try {
-            return bill
+            return bill.length
                 ? await this._createAccountBillNumber()
                 : accountBillNumber;
         } catch (error) {

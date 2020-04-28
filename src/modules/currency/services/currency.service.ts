@@ -34,13 +34,23 @@ export class CurrencyService {
     }
 
     public async findCurrency(
-        uuid: string,
+        options: Partial<{ uuid: string; name: string }>,
     ): Promise<CurrencyEntity | undefined> {
         const queryBuilder = this._currencyRepository.createQueryBuilder(
             'currency',
         );
 
-        queryBuilder.where('currency.uuid = :uuid', { uuid });
+        if (options.uuid) {
+            queryBuilder.orWhere('currency.uuid = :uuid', {
+                uuid: options.uuid,
+            });
+        }
+
+        if (options.name) {
+            queryBuilder.orWhere('currency.name = :name', {
+                name: options.name,
+            });
+        }
 
         return queryBuilder.getOne();
     }

@@ -13,9 +13,9 @@ export class UserConfigService {
     ) {}
 
     public async createUserConfig(createdUser): Promise<UserConfigEntity> {
-        const currency = await this._currencyService.findCurrency(
-            createdUser.currency,
-        );
+        const currency = await this._currencyService.findCurrency({
+            uuid: createdUser.currency,
+        });
 
         if (!currency) {
             throw new CurrencyNotFoundException();
