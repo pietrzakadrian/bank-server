@@ -13,7 +13,7 @@ export class BillDto extends AbstractDto {
 
     @ApiPropertyOptional()
     @IsOptional()
-    readonly amountMoney?: number | string;
+    readonly amountMoney?: string;
 
     @ApiProperty({ type: CurrencyDto })
     readonly currency: CurrencyDto;

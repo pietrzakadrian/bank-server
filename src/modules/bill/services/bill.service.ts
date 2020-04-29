@@ -7,6 +7,7 @@ import {
     CurrencyNotFoundException,
 } from 'exceptions';
 import {
+    BillDto,
     BillsPageDto,
     BillsPageOptionsDto,
     TotalAccountBalanceHistoryPayloadDto,
@@ -47,13 +48,13 @@ export class BillService {
                                 TRUNC(
                                     SUM(
                                         CASE WHEN "transactions"."recipient_account_bill_id" = "bills"."id" 
-                                        THEN 1 / 
+                                        THEN 1 * 
                                             CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
                                                 CASE WHEN "recipientAccountBillCurrency"."base" 
                                                 THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
                                         ELSE -1 
@@ -95,6 +96,61 @@ export class BillService {
         return new BillsPageDto(bills.toDtos(), pageMetaDto);
     }
 
+    public async getBill(user: UserEntity): Promise<BillDto> {
+        const queryBuilder = this._billRepository.createQueryBuilder('bill');
+
+        const bill = await queryBuilder
+            .leftJoinAndSelect('bill.currency', 'currency')
+            .where('bill.user = :user', { user: user.id })
+            .orderBy('bill.id', Order.ASC)
+            .addSelect(
+                (subQuery) =>
+                    subQuery
+                        .select(
+                            `COALESCE(
+                                TRUNC(
+                                    SUM(
+                                        CASE WHEN "transaction"."recipient_account_bill_id" = "bill"."id" 
+                                        THEN 1 * 
+                                            CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
+                                            THEN 1 
+                                            ELSE 
+                                                CASE WHEN "recipientAccountBillCurrency"."base" 
+                                                THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                END
+                                            END
+                                        ELSE -1 
+                                    END * "transaction"."amount_money"), 2), '0.00') :: numeric`,
+                        )
+                        .from(TransactionEntity, 'transaction')
+                        .leftJoin(
+                            'transaction.recipientAccountBill',
+                            'recipientAccountBill',
+                        )
+                        .leftJoin(
+                            'transaction.senderAccountBill',
+                            'senderAccountBill',
+                        )
+                        .leftJoin(
+                            'recipientAccountBill.currency',
+                            'recipientAccountBillCurrency',
+                        )
+                        .leftJoin(
+                            'senderAccountBill.currency',
+                            'senderAccountBillCurrency',
+                        )
+                        .where(
+                            `"bill"."id" IN ("transaction"."sender_account_bill_id", "transaction"."recipient_account_bill_id")`,
+                        )
+                        .andWhere('transaction.authorization_status = true'),
+                'bill_amount_money',
+            )
+            .getOne();
+
+        return bill.toDto();
+    }
+
     public async getTotalAccountBalanceHistory(
         user: UserEntity,
     ): Promise<TotalAccountBalanceHistoryPayloadDto> {
@@ -119,22 +175,22 @@ export class BillService {
                                     TRUNC(
                                         SUM(
                                             CASE WHEN "recipientUser"."id" = :userId 
-                                            THEN 1 / 
+                                            THEN 1 * 
                                                 CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id" 
                                                 THEN 1 
                                                 ELSE 
                                                     CASE WHEN "recipientCurrencyMain"."base" 
                                                     THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                    ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
+                                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                                     END 
                                                 END 
-                                            ELSE -1 / 
+                                            ELSE -1 *
                                                 CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
                                                 THEN 1 
                                                 ELSE 
                                                     CASE WHEN "senderCurrencyMain"."base" 
                                                         THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                        ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
+                                                        ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                                         END 
                                                     END 
                                                 END * "transactions"."amount_money"
@@ -203,22 +259,22 @@ export class BillService {
                     TRUNC(
                         SUM(
                             CASE WHEN "recipientUser"."id" = :userId 
-                            THEN 1 / 
+                            THEN 1 * 
                                 CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id" 
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "recipientCurrencyMain"."base" 
                                     THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END 
-                            ELSE -1 / 
+                            ELSE -1 * 
                                 CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "senderCurrencyMain"."base" 
                                     THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END 
                             END * "transactions"."amount_money"
@@ -262,12 +318,12 @@ export class BillService {
                 COALESCE(
                     TRUNC(
                         SUM(
-                            1 / CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id"
+                            1 * CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id"
                                 THEN 1 
                                 ELSE
                                     CASE WHEN "recipientCurrencyMain"."base" 
                                     THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END * "transactions"."amount_money"
                         ) FILTER (
@@ -279,12 +335,12 @@ export class BillService {
                 `COALESCE(
                     TRUNC(
                         SUM(
-                            1 / CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
+                            1 * CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "senderCurrencyMain"."base"
                                     THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END * "transactions"."amount_money"
                         ) FILTER (
@@ -381,13 +437,13 @@ export class BillService {
                                 TRUNC(
                                     SUM(
                                         CASE WHEN "transactions"."recipient_account_bill_id" = "bill"."id" 
-                                        THEN 1 / 
+                                        THEN 1 * 
                                             CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
                                                 CASE WHEN "recipientAccountBillCurrency"."base" 
                                                 THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
                                         ELSE -1 

@@ -1,4 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { RoleType } from 'common/constants';
 import {
     CreateFailedException,
     // LastPresentLoggedDateNotFoundException,
@@ -91,18 +92,25 @@ export class UserAuthService {
     }
 
     public async findUserAuth(
-        options: Partial<{ pinCode: number }>,
+        options: Partial<{ pinCode: number; role: RoleType }>,
     ): Promise<UserEntity | undefined> {
         const queryBuilder = this._userRepository.createQueryBuilder('user');
 
+        queryBuilder
+            .leftJoinAndSelect('user.userAuth', 'userAuth')
+            .leftJoinAndSelect('user.userConfig', 'userConfig')
+            .leftJoinAndSelect('userConfig.currency', 'currency');
+
         if (options.pinCode) {
-            queryBuilder
-                .leftJoinAndSelect('user.userAuth', 'userAuth')
-                .leftJoinAndSelect('user.userConfig', 'userConfig')
-                .leftJoinAndSelect('userConfig.currency', 'currency')
-                .orWhere('userAuth.pinCode = :pinCode', {
-                    pinCode: options.pinCode,
-                });
+            queryBuilder.orWhere('userAuth.pinCode = :pinCode', {
+                pinCode: options.pinCode,
+            });
+        }
+
+        if (options.role) {
+            queryBuilder.orWhere('userAuth.role = :role', {
+                role: options.role,
+            });
         }
 
         return queryBuilder.getOne();

@@ -8,6 +8,7 @@ import {
     CreateFailedException,
     TransactionNotFoundException,
 } from 'exceptions';
+import { BillEntity } from 'modules/bill/entities';
 import { BillRepository } from 'modules/bill/repositories';
 import { BillService } from 'modules/bill/services';
 import {
@@ -77,20 +78,54 @@ export class TransactionService {
     }
 
     public async getTransaction(
-        uuid: string,
-        user: UserEntity,
+        options: Partial<{
+            uuid: string;
+            authorizationKey: string;
+            recipientUser: UserEntity;
+            senderUser: UserEntity;
+        }>,
     ): Promise<TransactionEntity | undefined> {
         const queryBuilder = this._transactionRepository.createQueryBuilder(
             'transaction',
         );
 
         queryBuilder
-            .leftJoin('transaction.senderAccountBill', 'senderAccountBill')
-            .leftJoin('senderAccountBill.user', 'senderUser')
-            .where('transaction.uuid = :uuid', { uuid })
-            .andWhere('senderUser.id = :user', { user: user.id })
             .andWhere('transaction.authorizationStatus = false')
             .orderBy('transaction.id', Order.DESC);
+
+        if (options.recipientUser) {
+            queryBuilder
+                .leftJoin(
+                    'transaction.recipientAccountBill',
+                    'recipientAccountBill',
+                )
+                .leftJoin('recipientAccountBill.user', 'recipientUser')
+                .orWhere('recipientUser.id = :user', {
+                    user: options.recipientUser.id,
+                });
+        }
+
+        if (options.senderUser) {
+            queryBuilder
+                .leftJoin('transaction.senderAccountBill', 'senderAccountBill')
+                .leftJoin('senderAccountBill.user', 'senderUser')
+                .orWhere('senderUser.id = :user', {
+                    user: options.senderUser.id,
+                });
+        }
+
+        if (options.uuid) {
+            queryBuilder.orWhere('transaction.uuid = :uuid', {
+                uuid: options.uuid,
+            });
+        }
+
+        if (options.authorizationKey) {
+            queryBuilder.orWhere(
+                'transaction.authorizationKey = :authorizationKey',
+                { authorizationKey: options.authorizationKey },
+            );
+        }
 
         return queryBuilder.getOne();
     }
@@ -98,6 +133,7 @@ export class TransactionService {
     public async createTransaction(
         user: UserEntity,
         createTransactionDto: CreateTransactionDto,
+        promotionKey?: string,
     ): Promise<TransactionEntity> {
         const [recipientAccountBill, senderAccountBill] = await Promise.all([
             this._billService.findBill(
@@ -123,17 +159,17 @@ export class TransactionService {
         );
 
         if (
-            largerAmountMoney === createTransactionDto.amountMoney ||
-            createTransactionDto.amountMoney <= 0
+            (largerAmountMoney === createTransactionDto.amountMoney ||
+                createTransactionDto.amountMoney <= 0) &&
+            !promotionKey
         ) {
             throw new AmountMoneyNotEnoughException();
         }
 
-        const authorizationKey = this._generateAuthrorizationKey();
         const createdTransaction = {
             recipientAccountBill,
             senderAccountBill,
-            authorizationKey,
+            authorizationKey: promotionKey ?? this._generateAuthrorizationKey(),
             amountMoney: createTransactionDto.amountMoney,
             transferTitle: createTransactionDto.transferTitle,
         };
@@ -152,6 +188,7 @@ export class TransactionService {
     public async confirmTransaction(
         user: UserEntity,
         confirmTransactionDto: ConfirmTransactionDto,
+        hasPromotion?: boolean,
     ): Promise<UpdateResult> {
         const createdTransaction = await this._findTransactionByAuthorizationKey(
             confirmTransactionDto.authorizationKey,
@@ -167,7 +204,10 @@ export class TransactionService {
             createdTransaction.amountMoney,
         );
 
-        if (largerAmountMoney === createdTransaction.amountMoney) {
+        if (
+            !hasPromotion &&
+            largerAmountMoney === createdTransaction.amountMoney
+        ) {
             throw new AmountMoneyNotEnoughException();
         }
 
@@ -176,22 +216,12 @@ export class TransactionService {
         );
     }
 
-    private async _updateTransactionAuthorizationStatus(
-        transaction: TransactionEntity,
-    ): Promise<UpdateResult> {
-        return this._transactionRepository.update(transaction.id, {
-            authorizationStatus: true,
-        });
-    }
-
-    private _generateAuthrorizationKey() {
-        return UtilsService.generateRandomString(5);
-    }
-
     private async _findTransactionByAuthorizationKey(
         authorizationKey: string,
         user: UserEntity,
-    ): Promise<any | undefined> {
+    ): Promise<BillEntity | undefined> {
+        // return sender's
+
         const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
         queryBuilder
@@ -250,5 +280,17 @@ export class TransactionService {
             .orderBy('transaction.id', Order.DESC);
 
         return queryBuilder.getOne();
+    }
+
+    private async _updateTransactionAuthorizationStatus(
+        transaction: TransactionEntity,
+    ): Promise<UpdateResult> {
+        return this._transactionRepository.update(transaction.id, {
+            authorizationStatus: true,
+        });
+    }
+
+    private _generateAuthrorizationKey() {
+        return UtilsService.generateRandomString(5);
     }
 }

@@ -101,11 +101,11 @@ export class TransactionController {
     })
     async getAuthorizationKey(
         @Param('uuid') uuid: string,
-        @AuthUser() user: UserEntity,
+        @AuthUser() senderUser: UserEntity,
     ) {
         const {
             authorizationKey,
-        } = await this._transactionService.getTransaction(uuid, user);
+        } = await this._transactionService.getTransaction({ uuid, senderUser });
 
         return new TransactionAuthorizationKeyPayloadDto(authorizationKey);
     }

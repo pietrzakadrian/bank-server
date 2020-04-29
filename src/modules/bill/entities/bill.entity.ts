@@ -15,7 +15,7 @@ export class BillEntity extends AbstractEntity<BillDto> {
      * used only to map entity correctly using the .getManyAndCount() method.
      */
     @Column({ select: false, insert: false, update: false, nullable: true })
-    readonly amountMoney: number;
+    readonly amountMoney: string;
 
     @ManyToOne(() => UserEntity, (user: UserEntity) => user.bills, {
         nullable: false,
