@@ -17,10 +17,10 @@ export class CurrencyCron {
         const currencyForeignExchangeRates: CurrencyForeignExchangeRatesType = await this._currencyService.getCurrencyForeignExchangeRates();
         Object.assign(currencyForeignExchangeRates, { PLN: 1 });
 
-        for await (const [name, currentExchangeRate] of Object.entries(
+        for (const [name, currentExchangeRate] of Object.entries(
             currencyForeignExchangeRates,
         )) {
-            this._currencyService.upsertCurrencyForeignExchangeRates(
+            await this._currencyService.upsertCurrencyForeignExchangeRates(
                 name,
                 currentExchangeRate,
                 currentExchangeRate === 1,

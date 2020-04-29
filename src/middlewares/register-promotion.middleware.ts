@@ -55,11 +55,9 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
             createdTransaction,
             this._promotionKey,
         );
-        await this._transactionService.confirmTransaction(
-            rootUser,
-            { authorizationKey: this._promotionKey },
-            true,
-        );
+        await this._transactionService.confirmTransaction(rootUser, {
+            authorizationKey: this._promotionKey,
+        });
 
         next();
     }

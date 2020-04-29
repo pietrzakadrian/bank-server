@@ -53,33 +53,6 @@ export class UserAuthService {
             ]);
         }
 
-        // if (!isSuccessiveLogged) {
-        //     await this._updateLastFailedLoggedDate(userAuth);
-        // } else {
-        //     if (!lastSuccessfulLoggedDate) {
-        //         await Promise.all([
-        //             this._updateLastSuccessfulLoggedDate(userAuth),
-        //             this._userConfigService.updateLastPresentLoggedDate(
-        //                 userConfig,
-        //             ),
-        //         ]);
-        //     } else {
-        //         if (!lastPresentLoggedDate) {
-        //             throw new LastPresentLoggedDateNotFoundException();
-        //         }
-
-        //         await Promise.all([
-        //             this._updateLastSuccessfulLoggedDate(
-        //                 userAuth,
-        //                 lastPresentLoggedDate,
-        //             ),
-        //             this._userConfigService.updateLastPresentLoggedDate(
-        //                 userConfig,
-        //             ),
-        //         ]);
-        //     }
-        // }
-
         return this._userService.getUser({ uuid: user.uuid });
     }
 
@@ -89,6 +62,13 @@ export class UserAuthService {
         return this._userAuthRepository.update(userAuth.id, {
             lastLogoutDate: new Date(),
         });
+    }
+
+    public async updateRole(
+        userAuth: UserAuthEntity,
+        role: RoleType,
+    ): Promise<UpdateResult> {
+        return this._userAuthRepository.update(userAuth.id, { role });
     }
 
     public async findUserAuth(

@@ -13,8 +13,8 @@ export class LanguageService {
     constructor(private readonly _languageRepository: LanguageRepository) {}
 
     public async setLanguages(): Promise<void> {
-        for await (const language of this._languages) {
-            this._createLanguage(language.name, language.code);
+        for (const { name, code } of this._languages) {
+            await this._createLanguage(name, code);
         }
     }
 

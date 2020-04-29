@@ -11,15 +11,15 @@ export class AwsS3Service {
     private readonly _s3: AWS.S3;
 
     constructor(
-        public configService: ConfigService,
-        public generatorService: GeneratorService,
+        private readonly _configService: ConfigService,
+        private readonly _generatorService: GeneratorService,
     ) {
         const options: AWS.S3.Types.ClientConfiguration = {
             apiVersion: '2010-12-01',
             region: 'eu-central-1',
         };
 
-        const awsS3Config = configService.awsS3Config;
+        const awsS3Config = _configService.awsS3Config;
         if (awsS3Config.accessKeyId && awsS3Config.secretAccessKey) {
             options.credentials = awsS3Config;
         }
@@ -28,13 +28,13 @@ export class AwsS3Service {
     }
 
     async uploadImage(file: IFile) {
-        const fileName = this.generatorService.fileName(
+        const fileName = this._generatorService.fileName(
             <string>mime.extension(file.mimetype),
         );
         const key = 'images/' + fileName;
         await this._s3
             .putObject({
-                Bucket: this.configService.awsS3Config.bucketName,
+                Bucket: this._configService.awsS3Config.bucketName,
                 Body: file.buffer,
                 ACL: 'public-read',
                 Key: key,

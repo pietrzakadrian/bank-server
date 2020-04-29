@@ -4,7 +4,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { contextMiddleware, RegisterPromotionMiddleware } from 'middlewares';
-import { AuthController } from 'modules/auth/controllers';
 import { AuthModule } from 'modules/auth/modules';
 import { BillModule } from 'modules/bill/modules';
 import { CurrencyModule } from 'modules/currency/modules';
@@ -34,6 +33,6 @@ import { ConfigService } from 'shared/services';
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
         consumer.apply(contextMiddleware).forRoutes('*');
-        consumer.apply(RegisterPromotionMiddleware).forRoutes(AuthController);
+        consumer.apply(RegisterPromotionMiddleware).forRoutes('/Auth/login');
     }
 }

@@ -48,12 +48,12 @@ export class BillService {
                                 TRUNC(
                                     SUM(
                                         CASE WHEN "transactions"."recipient_account_bill_id" = "bills"."id" 
-                                        THEN 1 * 
+                                        THEN 1 *
                                             CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
                                                 CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
@@ -116,7 +116,7 @@ export class BillService {
                                             THEN 1 
                                             ELSE 
                                                 CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
@@ -180,7 +180,7 @@ export class BillService {
                                                 THEN 1 
                                                 ELSE 
                                                     CASE WHEN "recipientCurrencyMain"."base" 
-                                                    THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                     ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                                     END 
                                                 END 
@@ -264,7 +264,7 @@ export class BillService {
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "recipientCurrencyMain"."base" 
-                                    THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                     ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END 
@@ -273,7 +273,7 @@ export class BillService {
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "senderCurrencyMain"."base" 
-                                    THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                     ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END 
@@ -322,7 +322,7 @@ export class BillService {
                                 THEN 1 
                                 ELSE
                                     CASE WHEN "recipientCurrencyMain"."base" 
-                                    THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                     ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END * "transactions"."amount_money"
@@ -339,7 +339,7 @@ export class BillService {
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "senderCurrencyMain"."base"
-                                    THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                     ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END * "transactions"."amount_money"
@@ -442,7 +442,7 @@ export class BillService {
                                             THEN 1 
                                             ELSE 
                                                 CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END

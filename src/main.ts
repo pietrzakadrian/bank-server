@@ -5,11 +5,14 @@ import {
     ExpressAdapter,
     NestExpressApplication,
 } from '@nestjs/platform-express';
+import { RoleType } from 'common/constants';
 import * as compression from 'compression';
 import * as RateLimit from 'express-rate-limit';
 import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
 import * as helmet from 'helmet';
 import { CurrencyCron } from 'modules/currency/crons';
+import { CurrencyService } from 'modules/currency/services';
+import { UserAuthService, UserService } from 'modules/user/services';
 import * as morgan from 'morgan';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
@@ -27,7 +30,9 @@ async function bootstrap() {
     const app = await NestFactory.create<NestExpressApplication>(
         AppModule,
         new ExpressAdapter(),
-        { cors: true },
+        {
+            cors: true,
+        },
     );
     app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
     app.use(helmet());
@@ -81,7 +86,28 @@ async function bootstrap() {
     const port = configService.getNumber('PORT');
     await app.listen(port);
 
+    // todo: przerobic to na osobny serwis
     await app.get(CurrencyCron).setCurrencyForeignExchangeRates();
+
+    const { uuid } = await app
+        .get(CurrencyService)
+        .findCurrency({ name: 'USD' });
+
+    const isUser = await app.get(UserService).getUser({
+        email: 'root@bank.pietrzakadrian.com',
+    });
+
+    if (!isUser) {
+        const userAuth = await app.get(UserService).createUser({
+            firstName: 'Bank',
+            lastName: 'Application',
+            email: 'root@bank.pietrzakadrian.com',
+            password: '123456789',
+            currency: uuid,
+        });
+        await app.get(UserAuthService).updateRole(userAuth, RoleType.ADMIN);
+    }
+    // todo: przerobic to na osobny serwiss
 
     console.info(`server running on port ${port}`);
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Order } from 'common/constants';
+import { Order, RoleType } from 'common/constants';
 import { PageMetaDto } from 'common/dto';
 import {
     AmountMoneyNotEnoughException,
@@ -133,7 +133,7 @@ export class TransactionService {
     public async createTransaction(
         user: UserEntity,
         createTransactionDto: CreateTransactionDto,
-        promotionKey?: string,
+        authorizationKey?: string,
     ): Promise<TransactionEntity> {
         const [recipientAccountBill, senderAccountBill] = await Promise.all([
             this._billService.findBill(
@@ -159,9 +159,9 @@ export class TransactionService {
         );
 
         if (
+            user.userAuth.role !== RoleType.ADMIN &&
             (largerAmountMoney === createTransactionDto.amountMoney ||
-                createTransactionDto.amountMoney <= 0) &&
-            !promotionKey
+                createTransactionDto.amountMoney <= 0)
         ) {
             throw new AmountMoneyNotEnoughException();
         }
@@ -169,7 +169,8 @@ export class TransactionService {
         const createdTransaction = {
             recipientAccountBill,
             senderAccountBill,
-            authorizationKey: promotionKey ?? this._generateAuthrorizationKey(),
+            authorizationKey:
+                authorizationKey ?? this._generateAuthrorizationKey(),
             amountMoney: createTransactionDto.amountMoney,
             transferTitle: createTransactionDto.transferTitle,
         };
@@ -188,7 +189,6 @@ export class TransactionService {
     public async confirmTransaction(
         user: UserEntity,
         confirmTransactionDto: ConfirmTransactionDto,
-        hasPromotion?: boolean,
     ): Promise<UpdateResult> {
         const createdTransaction = await this._findTransactionByAuthorizationKey(
             confirmTransactionDto.authorizationKey,
@@ -205,8 +205,8 @@ export class TransactionService {
         );
 
         if (
-            !hasPromotion &&
-            largerAmountMoney === createdTransaction.amountMoney
+            largerAmountMoney === createdTransaction.amountMoney &&
+            user.userAuth.role !== RoleType.ADMIN
         ) {
             throw new AmountMoneyNotEnoughException();
         }
