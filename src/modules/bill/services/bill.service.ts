@@ -328,7 +328,7 @@ export class BillService {
                                 END * "transactions"."amount_money"
                         ) FILTER (
                             WHERE "recipientUser"."id" = :userId
-                        ), 2), 0) :: numeric`,
+                        ), 2), '0.00') :: numeric`,
                 `revenues`,
             )
             .addSelect(
@@ -345,7 +345,7 @@ export class BillService {
                                 END * "transactions"."amount_money"
                         ) FILTER (
                             WHERE "senderUser"."id" = :userId
-                        ), 2), 0) :: numeric`,
+                        ), 2), '0.00') :: numeric`,
                 `expenses`,
             )
             .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
