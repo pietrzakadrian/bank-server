@@ -327,7 +327,7 @@ export class BillService {
                                     END 
                                 END * "transactions"."amount_money"
                         ) FILTER (
-                            WHERE "recipientUser"."id" = 2
+                            WHERE "recipientUser"."id" = :userId
                         ), 2), 0) :: numeric`,
                 `revenues`,
             )
@@ -344,7 +344,7 @@ export class BillService {
                                     END 
                                 END * "transactions"."amount_money"
                         ) FILTER (
-                            WHERE "senderUser"."id" = 2
+                            WHERE "senderUser"."id" = :userId
                         ), 2), 0) :: numeric`,
                 `expenses`,
             )

@@ -8,6 +8,8 @@ import { UserAuthService } from 'modules/user/services';
 
 @Injectable()
 export class RegisterPromotionMiddleware implements NestMiddleware {
+    private readonly _promotionValue = 10;
+    private readonly _promotionTransferTitle = `Create an account`;
     private readonly _promotionKey = `PROMO10`;
 
     constructor(
@@ -42,8 +44,8 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
         ]);
 
         const createdTransaction = {
-            amountMoney: 10,
-            transferTitle: 'Create an account',
+            amountMoney: this._promotionValue,
+            transferTitle: this._promotionTransferTitle,
             recipientAccountBill: recipientBill.uuid,
             senderAccountBill: senderBill.uuid,
         };

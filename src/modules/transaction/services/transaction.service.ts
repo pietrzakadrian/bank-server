@@ -90,7 +90,7 @@ export class TransactionService {
         );
 
         queryBuilder
-            .andWhere('transaction.authorizationStatus = false')
+            // .andWhere('transaction.authorizationStatus = false')
             .orderBy('transaction.id', Order.DESC);
 
         if (options.recipientUser) {
