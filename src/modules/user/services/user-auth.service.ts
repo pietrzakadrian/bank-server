@@ -18,7 +18,7 @@ import { UserConfigService } from './user-config.service';
 export class UserAuthService {
     constructor(
         private readonly _userAuthRepository: UserAuthRepository,
-        private readonly _userRepository: UserRepository,
+        private readonly _userRepostiory: UserRepository,
         @Inject(forwardRef(() => UserService))
         private readonly _userService: UserService,
         private readonly _userConfigService: UserConfigService,
@@ -74,7 +74,7 @@ export class UserAuthService {
     public async findUserAuth(
         options: Partial<{ pinCode: number; role: RoleType }>,
     ): Promise<UserEntity | undefined> {
-        const queryBuilder = this._userRepository.createQueryBuilder('user');
+        const queryBuilder = this._userRepostiory.createQueryBuilder('user');
 
         queryBuilder
             .leftJoinAndSelect('user.userAuth', 'userAuth')

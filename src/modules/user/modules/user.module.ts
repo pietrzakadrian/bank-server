@@ -31,7 +31,7 @@ import {
         ]),
     ],
     controllers: [UserController],
-    exports: [UserService, UserAuthService, UserConfigService, BillService],
+    exports: [UserService, BillService, UserAuthService, UserConfigService],
     providers: [
         UserService,
         UserAuthService,

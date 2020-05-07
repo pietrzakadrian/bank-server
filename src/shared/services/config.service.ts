@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
-import { IAwsConfig } from 'interfaces';
+import { IApplicationConfig, IAwsConfig } from 'interfaces';
 
 import { SnakeNamingStrategy } from '../../snake-naming.strategy';
 
@@ -78,6 +78,17 @@ export class ConfigService {
             accessKeyId: this.get('AWS_S3_ACCESS_KEY_ID'),
             secretAccessKey: this.get('AWS_S3_SECRET_ACCESS_KEY'),
             bucketName: this.get('S3_BUCKET_NAME'),
+        };
+    }
+
+    get applicationConfig(): IApplicationConfig {
+        return {
+            rootEmail: this.get('BANK_ROOT_EMAIL'),
+            rootPassword: this.get('BANK_ROOT_PASSWORD'),
+            authorEmail: this.get('BANK_AUTHOR_EMAIL'),
+            authorPassword: this.get('BANK_AUTHOR_PASSWORD'),
+            authorFirstName: this.get('BANK_AUTHOR_FIRSTNAME'),
+            authorLastName: this.get('BANK_AUTHOR_LASTNAME'),
         };
     }
 }
