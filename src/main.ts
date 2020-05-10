@@ -5,10 +5,14 @@ import {
     ExpressAdapter,
     NestExpressApplication,
 } from '@nestjs/platform-express';
+import { RoleType } from 'common/constants';
 import * as compression from 'compression';
 import * as RateLimit from 'express-rate-limit';
 import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
 import * as helmet from 'helmet';
+import { CurrencyCron } from 'modules/currency/crons';
+import { CurrencyService } from 'modules/currency/services';
+import { UserAuthService, UserService } from 'modules/user/services';
 import * as morgan from 'morgan';
 import { SharedModule } from 'shared/modules';
 import { ConfigService } from 'shared/services';
@@ -83,6 +87,58 @@ async function bootstrap() {
     await app.listen(port);
 
     console.info(`server running on port ${port}`);
+
+    await app.get(CurrencyCron).setCurrencyForeignExchangeRates();
+
+    const { rootEmail, rootPassword } = configService.applicationConfig;
+    const isRootUserExist = await app.get(UserService).getUser({
+        email: rootEmail,
+    });
+
+    if (isRootUserExist) {
+        return;
+    }
+
+    const currency = await app.get(CurrencyService).findCurrency({
+        name: 'USD',
+    });
+
+    const user = await app.get(UserService).createUser({
+        firstName: 'Bank',
+        lastName: 'Application',
+        email: rootEmail,
+        password: rootPassword,
+        currency: currency.uuid,
+    });
+    await app.get(UserAuthService).updateRole(user.userAuth, RoleType.ADMIN);
+
+    const {
+        authorEmail,
+        authorPassword,
+        authorFirstName,
+        authorLastName,
+    } = configService.applicationConfig;
+
+    const isAuthorExist = await app.get(UserService).getUser({
+        email: authorEmail,
+    });
+
+    if (isAuthorExist) {
+        return;
+    }
+
+    const { uuid } = await app.get(CurrencyService).findCurrency({
+        name: 'USD',
+    });
+
+    const { userAuth } = await app.get(UserService).createUser({
+        firstName: authorFirstName,
+        lastName: authorLastName,
+        email: authorEmail,
+        password: authorPassword,
+        currency: uuid,
+    });
+    await app.get(UserAuthService).updateRole(userAuth, RoleType.ADMIN);
 }
 
 bootstrap();
