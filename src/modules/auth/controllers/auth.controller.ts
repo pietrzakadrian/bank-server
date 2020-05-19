@@ -5,9 +5,19 @@ import {
     HttpStatus,
     Patch,
     Post,
+    UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
-import { ApiNoContentResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { AuthUser } from 'decorators';
+import {
+    ApiBearerAuth,
+    ApiNoContentResponse,
+    ApiOkResponse,
+    ApiTags,
+} from '@nestjs/swagger';
+import { RoleType } from 'common/constants';
+import { AuthUser, Roles } from 'decorators';
+import { AuthGuard, RolesGuard } from 'guards';
+import { AuthUserInterceptor } from 'interceptors';
 import {
     LoginPayloadDto,
     UserLoginDto,
@@ -62,6 +72,10 @@ export class AuthController {
     @ApiNoContentResponse({
         description: 'Successfully Logout',
     })
+    @UseGuards(AuthGuard, RolesGuard)
+    @UseInterceptors(AuthUserInterceptor)
+    @ApiBearerAuth()
+    @Roles(RoleType.USER, RoleType.ADMIN)
     async userLogout(@AuthUser() user: UserEntity): Promise<void> {
         await this._userAuthService.updateLastLogoutDate(user.userAuth);
     }
