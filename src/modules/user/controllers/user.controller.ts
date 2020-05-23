@@ -24,6 +24,8 @@ import { AuthUserInterceptor } from 'interceptors';
 import { UserEntity } from 'modules/user/entities';
 import { UserConfigService, UserService } from 'modules/user/services';
 
+import { UserDto } from '../dto';
+
 @Controller('Users')
 @ApiTags('Users')
 export class UserController {
@@ -31,6 +33,21 @@ export class UserController {
         private readonly _userService: UserService,
         private readonly _userConfigService: UserConfigService,
     ) {}
+
+    @Get('/')
+    @UseGuards(AuthGuard, RolesGuard)
+    @UseInterceptors(AuthUserInterceptor)
+    @ApiBearerAuth()
+    @Roles(RoleType.USER, RoleType.ADMIN)
+    @HttpCode(HttpStatus.OK)
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Get user',
+        type: UserDto,
+    })
+    async getUserData(@AuthUser() user: UserEntity): Promise<void> {
+        return user.toDto();
+    }
 
     @Get('/:email/checkEmail')
     @HttpCode(HttpStatus.OK)
