@@ -63,7 +63,7 @@ export class TransactionService {
             )
             .where(':user IN ("senderUser"."id", "recipientUser"."id")')
             .andWhere('transactions.authorizationStatus = true')
-            .orderBy('transactions.updatedAt', Order.DESC)
+            .orderBy('transactions.updatedAt', pageOptionsDto.order)
             .setParameter('user', user.id)
             .skip(pageOptionsDto.skip)
             .take(pageOptionsDto.take)
