@@ -12,3 +12,4 @@ export * from './currency-not-found.exception';
 export * from './attempt-make-transfer-to-myself.exception';
 export * from './amount-money-not-enough.exception';
 export * from './transaction-not-found.exception';
+export * from './create-new-bill-failed.exception';

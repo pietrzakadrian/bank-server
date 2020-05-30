@@ -4,6 +4,7 @@ import { PageMetaDto } from 'common/dto';
 import {
     AccountBillNumberGenerationIncorrect,
     CreateFailedException,
+    CreateNewBillFailedException,
     CurrencyNotFoundException,
 } from 'exceptions';
 import {
@@ -376,6 +377,14 @@ export class BillService {
 
         if (!currency) {
             throw new CurrencyNotFoundException();
+        }
+
+        const {
+            meta: { itemCount },
+        } = await this.getBills(createdUser.user, { skip: 0 });
+
+        if (itemCount >= 5) {
+            throw new CreateNewBillFailedException();
         }
 
         const createdBill: BillEntity = {
