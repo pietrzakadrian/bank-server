@@ -8,7 +8,7 @@
         "build": "tsc -p tsconfig.build.json",
         "format": "prettier --write \"src/**/*.ts\"",
         "start:hmr": "node dist/main",
-        "start:dev": "ts-node -r tsconfig-paths/register src/main.ts",
+        "start:dev": "ts-node src/main.ts",
         "migration:generate": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:generate -f ormconfig -d src/migrations -n",
         "migration:revert": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:revert -f ormconfig",
         "watch:dev": "nodemon --config nodemon.json",
@@ -22,7 +22,7 @@
         "test": "jest",
         "test:watch": "jest --watch",
         "test:cov": "jest --coverage",
-        "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+        "test:debug": "node --inspect-brk -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./test/jest-e2e.json"
     },
     "dependencies": {
