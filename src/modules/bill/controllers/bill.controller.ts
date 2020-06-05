@@ -44,7 +44,7 @@ export class BillController {
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
-        description: `Get User's bills list`,
+        description: "Get User's bills list",
         type: BillsPageDto,
     })
     async userBills(
@@ -60,7 +60,7 @@ export class BillController {
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
-        description: `Get User's bills list`,
+        description: "Get User's bills list",
         type: BillDto,
     })
     async createBill(
@@ -79,7 +79,7 @@ export class BillController {
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
-        description: `Get User's amount money`,
+        description: "Get User's amount money",
         type: TotalAmountMoneyPayloadDto,
     })
     async userAmountMoney(
@@ -93,7 +93,7 @@ export class BillController {
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
-        description: `Get User's account balance history`,
+        description: "Get User's account balance history",
         type: TotalAccountBalancePayloadDto,
     })
     async userAccountBalance(
@@ -107,7 +107,7 @@ export class BillController {
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
-        description: `Get User's account balance history`,
+        description: "Get User's account balance history",
         type: TotalAccountBalanceHistoryPayloadDto,
     })
     async userAccountBalanceHistory(
@@ -121,17 +121,19 @@ export class BillController {
     @HttpCode(HttpStatus.OK)
     @ApiResponse({
         status: HttpStatus.OK,
-        description: `Get User's account balance history`,
-        type: SearchBillsPayloadDto,
+        description: 'Get bills',
+        type: BillsPageDto,
     })
     async searchBills(
         @Param('accountBillNumber') accountBillNumber: string,
+        @Query(new ValidationPipe({ transform: true }))
+        pageOptionsDto: BillsPageOptionsDto,
         @AuthUser() user: UserEntity,
     ): Promise<SearchBillsPayloadDto> {
-        const bills = await this._billService.searchBill(
+        return this._billService.searchBill(
             accountBillNumber,
+            pageOptionsDto,
             user,
         );
-        return new SearchBillsPayloadDto(bills.toDtos());
     }
 }

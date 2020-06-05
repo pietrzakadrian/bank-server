@@ -10,6 +10,7 @@ module.exports = {
     parserOptions: {
         project: path.resolve(__dirname, './tsconfig.json'),
         sourceType: 'module',
+        createDefaultProgram: true,
     },
     extends: [
         'plugin:import/errors',
@@ -17,22 +18,14 @@ module.exports = {
         'plugin:import/typescript',
         'prettier/@typescript-eslint',
         'plugin:prettier/recommended',
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        'plugin:@typescript-eslint/eslint-recommended',
-        'plugin:@typescript-eslint/recommended',
     ],
     plugins: [
         '@typescript-eslint',
         '@typescript-eslint/tslint',
         'prettier',
         'simple-import-sort',
-        'eslint-plugin-import',
-        'eslint-plugin-import-helpers',
-        'import',
     ],
     settings: {
-        'import/parsers': { '@typescript-eslint/parser': ['.ts'] },
         'import/resolver': {
             node: {
                 extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -42,8 +35,6 @@ module.exports = {
     },
     ignorePatterns: ['migrations'],
     rules: {
-        'simple-import-sort/sort': 'error',
-        '@typescript-eslint/camelcase': 'off',
         '@typescript-eslint/no-unused-vars': [
             'error',
             { argsIgnorePattern: '^_' },
@@ -60,7 +51,6 @@ module.exports = {
             },
         ],
         '@typescript-eslint/indent': 'off',
-        '@typescript-eslint/consistent-type-definitions': 'error',
         '@typescript-eslint/member-delimiter-style': [
             'error',
             {
@@ -75,7 +65,6 @@ module.exports = {
             },
         ],
         'simple-import-sort/sort': 'error',
-        '@typescript-eslint/no-use-before-define': 'error',
         '@typescript-eslint/member-ordering': 'off',
         '@typescript-eslint/no-angle-bracket-type-assertion': 'off',
         '@typescript-eslint/no-empty-function': 'error',
@@ -92,21 +81,19 @@ module.exports = {
         '@typescript-eslint/prefer-function-type': 'error',
         '@typescript-eslint/prefer-namespace-keyword': 'error',
         '@typescript-eslint/quotes': [
-            'error',
+            'off',
             'single',
             {
                 avoidEscape: true,
             },
         ],
         '@typescript-eslint/semi': ['error', 'always'],
-
         '@typescript-eslint/type-annotation-spacing': 'error',
         '@typescript-eslint/unified-signatures': 'error',
-        '@typescript-eslint/no-non-null-assertion': 'error',
-        'object-curly-spacing': ['error', 'always'],
-        'no-multi-spaces': ['error'],
         'arrow-body-style': 'error',
-        complexity: ['off'],
+        'arrow-parens': ['error', 'always'],
+        camelcase: 'error',
+        complexity: 'off',
         'constructor-super': 'error',
         curly: 'error',
         'dot-notation': 'error',
@@ -177,8 +164,6 @@ module.exports = {
         'no-redeclare': 'error',
         'no-return-await': 'error',
         'no-sequences': 'error',
-        'no-sparse-arrays': 'error',
-        'no-template-curly-in-string': 'error',
         'no-shadow': [
             'error',
             {

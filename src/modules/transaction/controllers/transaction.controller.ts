@@ -54,7 +54,7 @@ export class TransactionController {
         @Query(new ValidationPipe({ transform: true }))
         pageOptionsDto: TransactionsPageOptionsDto,
         @AuthUser() user: UserEntity,
-    ): Promise<TransactionsPageDto | any> {
+    ): Promise<TransactionsPageDto> {
         return this._transactionService.getTransactions(user, pageOptionsDto);
     }
 

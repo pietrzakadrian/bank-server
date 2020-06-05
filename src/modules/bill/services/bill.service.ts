@@ -79,7 +79,7 @@ export class BillService {
                             'senderAccountBillCurrency',
                         )
                         .where(
-                            `"bills"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+                            '"bills"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")',
                         )
                         .andWhere('transactions.authorization_status = true'),
                 'bills_amount_money',
@@ -142,7 +142,7 @@ export class BillService {
                             'senderAccountBillCurrency',
                         )
                         .where(
-                            `"bill"."id" IN ("transaction"."sender_account_bill_id", "transaction"."recipient_account_bill_id")`,
+                            '"bill"."id" IN ("transaction"."sender_account_bill_id", "transaction"."recipient_account_bill_id")',
                         )
                         .andWhere('transaction.authorization_status = true'),
                 'bill_amount_money',
@@ -330,7 +330,7 @@ export class BillService {
                         ) FILTER (
                             WHERE "recipientUser"."id" = :userId
                         ), 2), '0.00') :: numeric`,
-                `revenues`,
+                'revenues',
             )
             .addSelect(
                 `COALESCE(
@@ -347,7 +347,7 @@ export class BillService {
                         ) FILTER (
                             WHERE "senderUser"."id" = :userId
                         ), 2), '0.00') :: numeric`,
-                `expenses`,
+                'expenses',
             )
             .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
             .leftJoin(
@@ -404,8 +404,9 @@ export class BillService {
 
     public async searchBill(
         accountBillNumber: string,
+        pageOptionsDto: BillsPageOptionsDto,
         user?: UserEntity,
-    ): Promise<BillEntity[]> {
+    ): Promise<BillsPageDto | undefined> {
         const queryBuilder = this._billRepository.createQueryBuilder('bills');
 
         queryBuilder
@@ -420,13 +421,23 @@ export class BillService {
             .leftJoin('bills.user', 'user')
             .where('bills.accountBillNumber LIKE :accountBillNumber', {
                 accountBillNumber: `${accountBillNumber}%`,
-            });
+            })
+            .skip(pageOptionsDto.skip)
+            .take(pageOptionsDto.take)
+            .getManyAndCount();
 
         if (user) {
             queryBuilder.andWhere('user.id != :user', { user: user.id });
         }
 
-        return queryBuilder.getMany();
+        const [bills, billsCount] = await queryBuilder.getManyAndCount();
+
+        const pageMetaDto = new PageMetaDto({
+            pageOptionsDto,
+            itemCount: billsCount,
+        });
+
+        return new BillsPageDto(bills.toDtos(), pageMetaDto);
     }
 
     public async findBill(
@@ -476,7 +487,7 @@ export class BillService {
                             'senderAccountBillCurrency',
                         )
                         .where(
-                            `"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+                            '"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")',
                         )
                         .andWhere('transactions.authorization_status = true'),
                 'bill_amount_money',
@@ -491,10 +502,10 @@ export class BillService {
 
     private async _createAccountBillNumber(): Promise<string> {
         const accountBillNumber = this._generateAccountBillNumber();
-        const bill = await this.searchBill(accountBillNumber);
+        const bill = await this.searchBill(accountBillNumber, { skip: 0 });
 
         try {
-            return bill.length
+            return bill.data.length
                 ? await this._createAccountBillNumber()
                 : accountBillNumber;
         } catch (error) {
