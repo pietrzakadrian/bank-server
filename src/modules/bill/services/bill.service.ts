@@ -391,6 +391,7 @@ export class BillService {
             ...createdUser,
             accountBillNumber,
             currency,
+            amountMoney: '0.00', // this value is not saved to the database. It is only used to display correctly in payload
         };
 
         const bill = this._billRepository.create(createdBill);
@@ -502,10 +503,10 @@ export class BillService {
 
     private async _createAccountBillNumber(): Promise<string> {
         const accountBillNumber = this._generateAccountBillNumber();
-        const bill = await this.searchBill(accountBillNumber, { skip: 0 });
+        const { data } = await this.searchBill(accountBillNumber, { skip: 0 });
 
         try {
-            return bill.data.length
+            return data.length
                 ? await this._createAccountBillNumber()
                 : accountBillNumber;
         } catch (error) {

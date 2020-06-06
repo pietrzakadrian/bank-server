@@ -24,7 +24,7 @@ export class BillDto extends AbstractDto {
 
     constructor(bill: BillEntity) {
         super(bill);
-        this.amountMoney = bill.amountMoney || '0.00';
+        this.amountMoney = bill.amountMoney;
         this.accountBillNumber = bill.accountBillNumber;
         this.currency = bill.currency.toDto();
         this.user = bill.user?.toDto();

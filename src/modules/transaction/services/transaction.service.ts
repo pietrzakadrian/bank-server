@@ -39,10 +39,15 @@ export class TransactionService {
             'transactions',
         );
 
-        const [
-            transactions,
-            transactionsCount,
-        ] = await queryBuilder
+        const [transactions, transactionsCount] = await queryBuilder
+            .addSelect([
+                'recipientUser.firstName',
+                'recipientUser.lastName',
+                'recipientUser.avatar',
+                'senderUser.firstName',
+                'senderUser.lastName',
+                'senderUser.avatar',
+            ])
             .leftJoinAndSelect(
                 'transactions.senderAccountBill',
                 'senderAccountBill',
@@ -51,12 +56,12 @@ export class TransactionService {
                 'transactions.recipientAccountBill',
                 'recipientAccountBill',
             )
-            .leftJoinAndSelect('recipientAccountBill.user', 'recipientUser')
+            .leftJoin('recipientAccountBill.user', 'recipientUser')
             .leftJoinAndSelect(
                 'recipientAccountBill.currency',
                 'recipientAccountBillCurrency',
             )
-            .leftJoinAndSelect('senderAccountBill.user', 'senderUser')
+            .leftJoin('senderAccountBill.user', 'senderUser')
             .leftJoinAndSelect(
                 'senderAccountBill.currency',
                 'senderAccountBillCurrency',
