@@ -140,26 +140,21 @@ export class TransactionService {
         createTransactionDto: CreateTransactionDto,
         authorizationKey?: string,
     ): Promise<TransactionEntity> {
-        const [recipientAccountBill, senderAccountBill] = await Promise.all([
-            this._billService.findBill(
-                createTransactionDto.recipientAccountBill,
-            ),
-            this._billService.findBill(
-                createTransactionDto.senderAccountBill,
-                user,
-            ),
+        const [recipientBill, senderBill] = await Promise.all([
+            this._billService.findBill(createTransactionDto.recipientBill),
+            this._billService.findBill(createTransactionDto.senderBill, user),
         ]);
 
-        if (!recipientAccountBill || !senderAccountBill) {
+        if (!recipientBill || !senderBill) {
             throw new BillNotFoundException();
         }
 
-        if (recipientAccountBill === senderAccountBill) {
+        if (recipientBill === senderBill) {
             throw new AttemptMakeTransferToMyselfException();
         }
 
         const largerAmountMoney = UtilsService.compareNumbers(
-            senderAccountBill.amountMoney,
+            recipientBill.amountMoney,
             createTransactionDto.amountMoney,
         );
 
@@ -172,8 +167,8 @@ export class TransactionService {
         }
 
         const createdTransaction = {
-            recipientAccountBill,
-            senderAccountBill,
+            recipientBill,
+            senderBill,
             authorizationKey:
                 authorizationKey ?? this._generateAuthrorizationKey(),
             amountMoney: createTransactionDto.amountMoney,

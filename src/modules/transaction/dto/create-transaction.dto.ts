@@ -17,10 +17,10 @@ export class CreateTransactionDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly senderAccountBill: string;
+    readonly senderBill: string;
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    readonly recipientAccountBill: string;
+    readonly recipientBill: string;
 }
