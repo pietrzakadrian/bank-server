@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { RoleType } from 'common/constants';
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { IUserLoginBodyRequest } from 'interfaces';
 import { BillService } from 'modules/bill/services';
 import { TransactionService } from 'modules/transaction/services';
@@ -18,7 +18,7 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
         private readonly _userAuthService: UserAuthService,
     ) {}
 
-    async use(req: IUserLoginBodyRequest, res: Response, next: Function) {
+    async use(req: IUserLoginBodyRequest, res: Response, next: NextFunction) {
         const { pinCode } = req.body;
         const [user, rootUser] = await Promise.all([
             this._userAuthService.findUserAuth({ pinCode }),
@@ -46,8 +46,8 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
         const createdTransaction = {
             amountMoney: this._promotionValue,
             transferTitle: this._promotionTransferTitle,
-            recipientAccountBill: recipientBill.uuid,
-            senderAccountBill: senderBill.uuid,
+            recipientBill: recipientBill.uuid,
+            senderBill: senderBill.uuid,
         };
 
         await this._transactionService.createTransaction(
