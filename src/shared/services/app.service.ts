@@ -11,6 +11,7 @@ import { ConfigService } from './config.service';
 @Injectable()
 export class AppService implements OnModuleInit {
     private readonly _logger = new Logger(AppService.name);
+    private readonly _moduleOptions = { strict: false };
 
     private _currencyCron: CurrencyCron;
     private _currencyService: CurrencyService;
@@ -22,22 +23,30 @@ export class AppService implements OnModuleInit {
     constructor(private readonly _moduleRef: ModuleRef) {}
 
     async onModuleInit() {
-        this._currencyCron = this._moduleRef.get(CurrencyCron, {
-            strict: false,
-        });
-        this._languageService = this._moduleRef.get(LanguageService, {
-            strict: false,
-        });
-        this._configService = this._moduleRef.get(ConfigService, {
-            strict: false,
-        });
-        this._userService = this._moduleRef.get(UserService, { strict: false });
-        this._userAuthService = this._moduleRef.get(UserAuthService, {
-            strict: false,
-        });
-        this._currencyService = this._moduleRef.get(CurrencyService, {
-            strict: false,
-        });
+        this._currencyCron = this._moduleRef.get(
+            CurrencyCron,
+            this._moduleOptions,
+        );
+        this._languageService = this._moduleRef.get(
+            LanguageService,
+            this._moduleOptions,
+        );
+        this._configService = this._moduleRef.get(
+            ConfigService,
+            this._moduleOptions,
+        );
+        this._userService = this._moduleRef.get(
+            UserService,
+            this._moduleOptions,
+        );
+        this._userAuthService = this._moduleRef.get(
+            UserAuthService,
+            this._moduleOptions,
+        );
+        this._currencyService = this._moduleRef.get(
+            CurrencyService,
+            this._moduleOptions,
+        );
 
         await this.initLanguage();
         await this.initExchangeRates();
