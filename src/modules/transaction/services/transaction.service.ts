@@ -48,24 +48,15 @@ export class TransactionService {
                 'senderUser.lastName',
                 'senderUser.avatar',
             ])
+            .leftJoinAndSelect('transactions.senderBill', 'senderBill')
+            .leftJoinAndSelect('transactions.recipientBill', 'recipientBill')
+            .leftJoin('recipientBill.user', 'recipientUser')
             .leftJoinAndSelect(
-                'transactions.senderAccountBill',
-                'senderAccountBill',
+                'recipientBill.currency',
+                'recipientBillCurrency',
             )
-            .leftJoinAndSelect(
-                'transactions.recipientAccountBill',
-                'recipientAccountBill',
-            )
-            .leftJoin('recipientAccountBill.user', 'recipientUser')
-            .leftJoinAndSelect(
-                'recipientAccountBill.currency',
-                'recipientAccountBillCurrency',
-            )
-            .leftJoin('senderAccountBill.user', 'senderUser')
-            .leftJoinAndSelect(
-                'senderAccountBill.currency',
-                'senderAccountBillCurrency',
-            )
+            .leftJoin('senderBill.user', 'senderUser')
+            .leftJoinAndSelect('senderBill.currency', 'senderBillCurrency')
             .where(':user IN ("senderUser"."id", "recipientUser"."id")')
             .andWhere('transactions.authorizationStatus = true')
             .orderBy('transactions.updatedAt', pageOptionsDto.order)
@@ -100,11 +91,8 @@ export class TransactionService {
 
         if (options.recipientUser) {
             queryBuilder
-                .leftJoin(
-                    'transaction.recipientAccountBill',
-                    'recipientAccountBill',
-                )
-                .leftJoin('recipientAccountBill.user', 'recipientUser')
+                .leftJoin('transaction.recipientBill', 'recipientBill')
+                .leftJoin('recipientBill.user', 'recipientUser')
                 .orWhere('recipientUser.id = :user', {
                     user: options.recipientUser.id,
                 });
@@ -112,8 +100,8 @@ export class TransactionService {
 
         if (options.senderUser) {
             queryBuilder
-                .leftJoin('transaction.senderAccountBill', 'senderAccountBill')
-                .leftJoin('senderAccountBill.user', 'senderUser')
+                .leftJoin('transaction.senderBill', 'senderBill')
+                .leftJoin('senderBill.user', 'senderUser')
                 .orWhere('senderUser.id = :user', {
                     user: options.senderUser.id,
                 });
@@ -154,7 +142,7 @@ export class TransactionService {
         }
 
         const largerAmountMoney = UtilsService.compareNumbers(
-            recipientBill.amountMoney,
+            senderBill.amountMoney,
             createTransactionDto.amountMoney,
         );
 
@@ -200,7 +188,7 @@ export class TransactionService {
         }
 
         const largerAmountMoney = UtilsService.compareNumbers(
-            createdTransaction.senderAccountBill[0].amountMoney,
+            createdTransaction.senderBill[0].amountMoney,
             createdTransaction.amountMoney,
         );
 
@@ -212,7 +200,7 @@ export class TransactionService {
         }
 
         return this._updateTransactionAuthorizationStatus(
-            createdTransaction.senderAccountBill[0],
+            createdTransaction.senderBill[0],
         );
     }
 
@@ -232,43 +220,34 @@ export class TransactionService {
                             `COALESCE(
                                 TRUNC(
                                     SUM(
-                                        CASE WHEN "transactions"."recipient_account_bill_id" = "bill"."id" 
+                                        CASE WHEN "transactions"."recipient_bill_id" = "bill"."id" 
                                         THEN 1 / 
-                                            CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
+                                            CASE WHEN "senderBillCurrency"."id" = "recipientBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
-                                                CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                CASE WHEN "recipientBillCurrency"."base" 
+                                                THEN "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
                                         ELSE -1 
                                     END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
                         )
                         .from(TransactionEntity, 'transactions')
+                        .leftJoin('transactions.recipientBill', 'recipientBill')
+                        .leftJoin('transactions.senderBill', 'senderBill')
                         .leftJoin(
-                            'transactions.recipientAccountBill',
-                            'recipientAccountBill',
+                            'recipientBill.currency',
+                            'recipientBillCurrency',
                         )
-                        .leftJoin(
-                            'transactions.senderAccountBill',
-                            'senderAccountBill',
-                        )
-                        .leftJoin(
-                            'recipientAccountBill.currency',
-                            'recipientAccountBillCurrency',
-                        )
-                        .leftJoin(
-                            'senderAccountBill.currency',
-                            'senderAccountBillCurrency',
-                        )
+                        .leftJoin('senderBill.currency', 'senderBillCurrency')
                         .where(
-                            `"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")`,
+                            `"bill"."id" IN ("transactions"."sender_bill_id", "transactions"."recipient_bill_id")`,
                         )
                         .andWhere('transactions.authorization_status = true'),
                 'bill_amount_money',
             )
-            .leftJoinAndSelect('bill.senderAccountBill', 'transaction')
+            .leftJoinAndSelect('bill.senderBill', 'transaction')
             .leftJoinAndSelect('bill.currency', 'currency')
             .where('transaction.authorizationKey = :authorizationKey', {
                 authorizationKey,

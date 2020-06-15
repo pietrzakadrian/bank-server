@@ -32,21 +32,21 @@ export class BillEntity extends AbstractEntity<BillDto> {
 
     @OneToMany(
         () => TransactionEntity,
-        (transaction: TransactionEntity) => transaction.recipientAccountBill,
+        (transaction: TransactionEntity) => transaction.recipientBill,
         {
             nullable: false,
         },
     )
-    recipientAccountBill: TransactionEntity[];
+    recipientBill: TransactionEntity[];
 
     @OneToMany(
         () => TransactionEntity,
-        (transaction: TransactionEntity) => transaction.senderAccountBill,
+        (transaction: TransactionEntity) => transaction.senderBill,
         {
             nullable: false,
         },
     )
-    senderAccountBill: TransactionEntity[];
+    senderBill: TransactionEntity[];
 
     dtoClass = BillDto;
 }

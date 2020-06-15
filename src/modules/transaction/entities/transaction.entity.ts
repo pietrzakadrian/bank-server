@@ -34,21 +34,17 @@ export class TransactionEntity extends AbstractEntity<TransactionDto> {
     })
     updatedAt: Date;
 
-    @ManyToOne(() => BillEntity, (bill: BillEntity) => bill.senderAccountBill, {
+    @ManyToOne(() => BillEntity, (bill: BillEntity) => bill.senderBill, {
         nullable: false,
         onDelete: 'CASCADE',
     })
-    senderAccountBill: BillEntity;
+    senderBill: BillEntity;
 
-    @ManyToOne(
-        () => BillEntity,
-        (bill: BillEntity) => bill.recipientAccountBill,
-        {
-            nullable: false,
-            onDelete: 'CASCADE',
-        },
-    )
-    recipientAccountBill: BillEntity;
+    @ManyToOne(() => BillEntity, (bill: BillEntity) => bill.recipientBill, {
+        nullable: false,
+        onDelete: 'CASCADE',
+    })
+    recipientBill: BillEntity;
 
     dtoClass = TransactionDto;
 }

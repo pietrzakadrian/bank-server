@@ -21,7 +21,8 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { AuthUser } from 'decorators';
+import { RoleType } from 'common/constants';
+import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import {
@@ -45,6 +46,7 @@ export class TransactionController {
 
     @Get('/')
     @HttpCode(HttpStatus.OK)
+    @Roles(RoleType.USER, RoleType.ADMIN)
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'Get transactions',
@@ -60,6 +62,7 @@ export class TransactionController {
 
     @Post('create')
     @HttpCode(HttpStatus.OK)
+    @Roles(RoleType.USER, RoleType.ADMIN)
     @ApiOkResponse({
         status: HttpStatus.OK,
         description: 'create transfer',
@@ -68,7 +71,7 @@ export class TransactionController {
     async createTransaction(
         @AuthUser() user: UserEntity,
         @Body() createTransactionDto: CreateTransactionDto,
-    ): Promise<CreateTransactionPayloadDto> {
+    ): Promise<CreateTransactionPayloadDto | any> {
         const { uuid } = await this._transactionService.createTransaction(
             user,
             createTransactionDto,
@@ -79,6 +82,7 @@ export class TransactionController {
 
     @Patch('confirm')
     @HttpCode(HttpStatus.NO_CONTENT)
+    @Roles(RoleType.USER, RoleType.ADMIN)
     @ApiNoContentResponse({
         description: 'confirm transfer',
     })
@@ -94,9 +98,10 @@ export class TransactionController {
 
     @Get('/:uuid/authorizationKey')
     @HttpCode(HttpStatus.OK)
+    @Roles(RoleType.USER, RoleType.ADMIN)
     @ApiOkResponse({
         status: HttpStatus.OK,
-        description: 'create transfer',
+        description: 'get authorization key',
         type: TransactionAuthorizationKeyPayloadDto,
     })
     async getAuthorizationKey(

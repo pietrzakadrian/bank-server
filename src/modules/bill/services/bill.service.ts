@@ -48,38 +48,29 @@ export class BillService {
                             `COALESCE(
                                 TRUNC(
                                     SUM(
-                                        CASE WHEN "transactions"."recipient_account_bill_id" = "bills"."id" 
+                                        CASE WHEN "transactions"."recipient_bill_id" = "bills"."id" 
                                         THEN 1 *
-                                            CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
+                                            CASE WHEN "senderBillCurrency"."id" = "recipientBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
-                                                CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                CASE WHEN "recipientBillCurrency"."base" 
+                                                THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
                                         ELSE -1 
                                     END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
                         )
                         .from(TransactionEntity, 'transactions')
+                        .leftJoin('transactions.recipientBill', 'recipientBill')
+                        .leftJoin('transactions.senderBill', 'senderBill')
                         .leftJoin(
-                            'transactions.recipientAccountBill',
-                            'recipientAccountBill',
+                            'recipientBill.currency',
+                            'recipientBillCurrency',
                         )
-                        .leftJoin(
-                            'transactions.senderAccountBill',
-                            'senderAccountBill',
-                        )
-                        .leftJoin(
-                            'recipientAccountBill.currency',
-                            'recipientAccountBillCurrency',
-                        )
-                        .leftJoin(
-                            'senderAccountBill.currency',
-                            'senderAccountBillCurrency',
-                        )
+                        .leftJoin('senderBill.currency', 'senderBillCurrency')
                         .where(
-                            '"bills"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")',
+                            '"bills"."id" IN ("transactions"."sender_bill_id", "transactions"."recipient_bill_id")',
                         )
                         .andWhere('transactions.authorization_status = true'),
                 'bills_amount_money',
@@ -111,38 +102,29 @@ export class BillService {
                             `COALESCE(
                                 TRUNC(
                                     SUM(
-                                        CASE WHEN "transaction"."recipient_account_bill_id" = "bill"."id" 
+                                        CASE WHEN "transaction"."recipient_bill_id" = "bill"."id" 
                                         THEN 1 * 
-                                            CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
+                                            CASE WHEN "senderBillCurrency"."id" = "recipientBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
-                                                CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                CASE WHEN "recipientBillCurrency"."base" 
+                                                THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
                                         ELSE -1 
                                     END * "transaction"."amount_money"), 2), '0.00') :: numeric`,
                         )
                         .from(TransactionEntity, 'transaction')
+                        .leftJoin('transaction.recipientBill', 'recipientBill')
+                        .leftJoin('transaction.senderBill', 'senderBill')
                         .leftJoin(
-                            'transaction.recipientAccountBill',
-                            'recipientAccountBill',
+                            'recipientBill.currency',
+                            'recipientBillCurrency',
                         )
-                        .leftJoin(
-                            'transaction.senderAccountBill',
-                            'senderAccountBill',
-                        )
-                        .leftJoin(
-                            'recipientAccountBill.currency',
-                            'recipientAccountBillCurrency',
-                        )
-                        .leftJoin(
-                            'senderAccountBill.currency',
-                            'senderAccountBillCurrency',
-                        )
+                        .leftJoin('senderBill.currency', 'senderBillCurrency')
                         .where(
-                            '"bill"."id" IN ("transaction"."sender_account_bill_id", "transaction"."recipient_account_bill_id")',
+                            '"bill"."id" IN ("transaction"."sender_bill_id", "transaction"."recipient_bill_id")',
                         )
                         .andWhere('transaction.authorization_status = true'),
                 'bill_amount_money',
@@ -177,21 +159,21 @@ export class BillService {
                                         SUM(
                                             CASE WHEN "recipientUser"."id" = :userId 
                                             THEN 1 * 
-                                                CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id" 
+                                                CASE WHEN "senderBillCurrency"."id" = "recipientCurrencyMain"."id" 
                                                 THEN 1 
                                                 ELSE 
                                                     CASE WHEN "recipientCurrencyMain"."base" 
-                                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
+                                                    THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                                    ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                                     END 
                                                 END 
                                             ELSE -1 *
-                                                CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
+                                                CASE WHEN "senderBillCurrency"."id" = "senderCurrencyMain"."id" 
                                                 THEN 1 
                                                 ELSE 
                                                     CASE WHEN "senderCurrencyMain"."base" 
-                                                        THEN "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                        ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
+                                                        THEN "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                                        ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                                         END 
                                                     END 
                                                 END * "transactions"."amount_money"
@@ -200,20 +182,11 @@ export class BillService {
                                         ), 2), 0) AS balance`,
                         )
                         .from(TransactionEntity, 'transactions')
-                        .leftJoin(
-                            'transactions.senderAccountBill',
-                            'senderAccountBill',
-                        )
-                        .leftJoin(
-                            'transactions.recipientAccountBill',
-                            'recipientAccountBill',
-                        )
-                        .leftJoin(
-                            'senderAccountBill.currency',
-                            'senderAccountBillCurrency',
-                        )
-                        .leftJoin('senderAccountBill.user', 'senderUser')
-                        .leftJoin('recipientAccountBill.user', 'recipientUser')
+                        .leftJoin('transactions.senderBill', 'senderBill')
+                        .leftJoin('transactions.recipientBill', 'recipientBill')
+                        .leftJoin('senderBill.currency', 'senderBillCurrency')
+                        .leftJoin('senderBill.user', 'senderUser')
+                        .leftJoin('recipientBill.user', 'recipientUser')
                         .leftJoin(
                             'recipientUser.userConfig',
                             'recipientUserConfig',
@@ -261,35 +234,32 @@ export class BillService {
                         SUM(
                             CASE WHEN "recipientUser"."id" = :userId 
                             THEN 1 * 
-                                CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id" 
+                                CASE WHEN "senderBillCurrency"."id" = "recipientCurrencyMain"."id" 
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "recipientCurrencyMain"."base" 
-                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END 
                             ELSE -1 * 
-                                CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
+                                CASE WHEN "senderBillCurrency"."id" = "senderCurrencyMain"."id" 
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "senderCurrencyMain"."base" 
-                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END 
                             END * "transactions"."amount_money"
                         ), 2), '0.00') :: numeric`,
                 'amountMoney',
             )
-            .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
-            .leftJoin(
-                'transactions.recipientAccountBill',
-                'recipientAccountBill',
-            )
-            .leftJoin('senderAccountBill.currency', 'senderAccountBillCurrency')
-            .leftJoin('senderAccountBill.user', 'senderUser')
-            .leftJoin('recipientAccountBill.user', 'recipientUser')
+            .leftJoin('transactions.senderBill', 'senderBill')
+            .leftJoin('transactions.recipientBill', 'recipientBill')
+            .leftJoin('senderBill.currency', 'senderBillCurrency')
+            .leftJoin('senderBill.user', 'senderUser')
+            .leftJoin('recipientBill.user', 'recipientUser')
             .leftJoin('recipientUser.userConfig', 'recipientUserConfig')
             .leftJoin('senderUser.userConfig', 'senderUserConfig')
             .leftJoin('recipientUserConfig.currency', 'recipientCurrencyMain')
@@ -319,12 +289,12 @@ export class BillService {
                 COALESCE(
                     TRUNC(
                         SUM(
-                            1 * CASE WHEN "senderAccountBillCurrency"."id" = "recipientCurrencyMain"."id"
+                            1 * CASE WHEN "senderBillCurrency"."id" = "recipientCurrencyMain"."id"
                                 THEN 1 
                                 ELSE
                                     CASE WHEN "recipientCurrencyMain"."base" 
-                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END * "transactions"."amount_money"
                         ) FILTER (
@@ -336,12 +306,12 @@ export class BillService {
                 `COALESCE(
                     TRUNC(
                         SUM(
-                            1 * CASE WHEN "senderAccountBillCurrency"."id" = "senderCurrencyMain"."id" 
+                            1 * CASE WHEN "senderBillCurrency"."id" = "senderCurrencyMain"."id" 
                                 THEN 1 
                                 ELSE 
                                     CASE WHEN "senderCurrencyMain"."base"
-                                    THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                    ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
+                                    THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                    ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "senderCurrencyMain"."current_exchange_rate" :: decimal 
                                     END 
                                 END * "transactions"."amount_money"
                         ) FILTER (
@@ -349,14 +319,11 @@ export class BillService {
                         ), 2), '0.00') :: numeric`,
                 'expenses',
             )
-            .leftJoin('transactions.senderAccountBill', 'senderAccountBill')
-            .leftJoin(
-                'transactions.recipientAccountBill',
-                'recipientAccountBill',
-            )
-            .leftJoin('senderAccountBill.currency', 'senderAccountBillCurrency')
-            .leftJoin('senderAccountBill.user', 'senderUser')
-            .leftJoin('recipientAccountBill.user', 'recipientUser')
+            .leftJoin('transactions.senderBill', 'senderBill')
+            .leftJoin('transactions.recipientBill', 'recipientBill')
+            .leftJoin('senderBill.currency', 'senderBillCurrency')
+            .leftJoin('senderBill.user', 'senderUser')
+            .leftJoin('recipientBill.user', 'recipientUser')
             .leftJoin('recipientUser.userConfig', 'recipientUserConfig')
             .leftJoin('senderUser.userConfig', 'senderUserConfig')
             .leftJoin('recipientUserConfig.currency', 'recipientCurrencyMain')
@@ -371,7 +338,7 @@ export class BillService {
 
     public async createAccountBill(createdUser): Promise<BillEntity> {
         const [accountBillNumber, currency] = await Promise.all([
-            this._createAccountBillNumber(),
+            this._createBillNumber(),
             this._currencyService.findCurrency({ uuid: createdUser.currency }),
         ]);
 
@@ -457,38 +424,29 @@ export class BillService {
                             `COALESCE(
                                 TRUNC(
                                     SUM(
-                                        CASE WHEN "transactions"."recipient_account_bill_id" = "bill"."id" 
+                                        CASE WHEN "transactions"."recipient_bill_id" = "bill"."id" 
                                         THEN 1 * 
-                                            CASE WHEN "senderAccountBillCurrency"."id" = "recipientAccountBillCurrency"."id" 
+                                            CASE WHEN "senderBillCurrency"."id" = "recipientBillCurrency"."id" 
                                             THEN 1 
                                             ELSE 
-                                                CASE WHEN "recipientAccountBillCurrency"."base" 
-                                                THEN 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE 1 / "senderAccountBillCurrency"."current_exchange_rate" :: decimal * "recipientAccountBillCurrency"."current_exchange_rate" :: decimal 
+                                                CASE WHEN "recipientBillCurrency"."base" 
+                                                THEN 1 / "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                                ELSE 1 / "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientBillCurrency"."current_exchange_rate" :: decimal 
                                                 END
                                             END
                                         ELSE -1 
                                     END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
                         )
                         .from(TransactionEntity, 'transactions')
+                        .leftJoin('transactions.recipientBill', 'recipientBill')
+                        .leftJoin('transactions.senderBill', 'senderBill')
                         .leftJoin(
-                            'transactions.recipientAccountBill',
-                            'recipientAccountBill',
+                            'recipientBill.currency',
+                            'recipientBillCurrency',
                         )
-                        .leftJoin(
-                            'transactions.senderAccountBill',
-                            'senderAccountBill',
-                        )
-                        .leftJoin(
-                            'recipientAccountBill.currency',
-                            'recipientAccountBillCurrency',
-                        )
-                        .leftJoin(
-                            'senderAccountBill.currency',
-                            'senderAccountBillCurrency',
-                        )
+                        .leftJoin('senderBill.currency', 'senderBillCurrency')
                         .where(
-                            '"bill"."id" IN ("transactions"."sender_account_bill_id", "transactions"."recipient_account_bill_id")',
+                            '"bill"."id" IN ("transactions"."sender_bill_id", "transactions"."recipient_bill_id")',
                         )
                         .andWhere('transactions.authorization_status = true'),
                 'bill_amount_money',
@@ -501,20 +459,20 @@ export class BillService {
         return queryBuilder.getOne();
     }
 
-    private async _createAccountBillNumber(): Promise<string> {
-        const accountBillNumber = this._generateAccountBillNumber();
+    private async _createBillNumber(): Promise<string> {
+        const accountBillNumber = this._generateBillNumber();
         const { data } = await this.searchBill(accountBillNumber, { skip: 0 });
 
         try {
             return data.length
-                ? await this._createAccountBillNumber()
+                ? await this._createBillNumber()
                 : accountBillNumber;
         } catch (error) {
             throw new AccountBillNumberGenerationIncorrect(error);
         }
     }
 
-    private _generateAccountBillNumber(): string {
+    private _generateBillNumber(): string {
         const checksum = UtilsService.generateRandomInteger(10, 99);
         const bankOrganizationalUnitNumber = 28229297;
         const customerAccountNumber = UtilsService.generateRandomInteger(
