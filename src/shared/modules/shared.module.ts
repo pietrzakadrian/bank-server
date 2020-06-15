@@ -1,6 +1,7 @@
 import { Global, HttpModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import {
+    AppService,
     AwsS3Service,
     ConfigService,
     GeneratorService,
@@ -8,6 +9,7 @@ import {
 } from 'shared/services';
 
 const providers = [
+    AppService,
     ConfigService,
     ValidatorService,
     AwsS3Service,
