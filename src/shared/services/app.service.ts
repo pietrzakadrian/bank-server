@@ -19,7 +19,7 @@ export class AppService implements OnModuleInit {
     private _userService: UserService;
     private _userAuthService: UserAuthService;
 
-    constructor(private _moduleRef: ModuleRef) {}
+    constructor(private readonly _moduleRef: ModuleRef) {}
 
     async onModuleInit() {
         this._currencyCron = this._moduleRef.get(CurrencyCron, {
