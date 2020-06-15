@@ -114,7 +114,7 @@ export class TransactionService {
         }
 
         if (options.authorizationKey) {
-            queryBuilder.orWhere(
+            queryBuilder.andWhere(
                 'transaction.authorizationKey = :authorizationKey',
                 { authorizationKey: options.authorizationKey },
             );
@@ -177,31 +177,33 @@ export class TransactionService {
     public async confirmTransaction(
         user: UserEntity,
         confirmTransactionDto: ConfirmTransactionDto,
-    ): Promise<UpdateResult> {
-        const createdTransaction = await this._findTransactionByAuthorizationKey(
+    ): Promise<UpdateResult | any> {
+        const {
+            amountMoney: senderAmountMoney,
+            senderBill: [{ amountMoney }],
+            senderBill: [transaction],
+        } = await this._findTransactionByAuthorizationKey(
             confirmTransactionDto.authorizationKey,
             user,
         );
 
-        if (!createdTransaction) {
+        if (!senderAmountMoney || !amountMoney) {
             throw new TransactionNotFoundException();
         }
 
         const largerAmountMoney = UtilsService.compareNumbers(
-            createdTransaction.senderBill[0].amountMoney,
-            createdTransaction.amountMoney,
+            amountMoney,
+            senderAmountMoney,
         );
 
         if (
-            largerAmountMoney === createdTransaction.amountMoney &&
+            largerAmountMoney === amountMoney &&
             user.userAuth.role !== RoleType.ADMIN
         ) {
             throw new AmountMoneyNotEnoughException();
         }
 
-        return this._updateTransactionAuthorizationStatus(
-            createdTransaction.senderBill[0],
-        );
+        return this._updateTransactionAuthorizationStatus(transaction);
     }
 
     private async _findTransactionByAuthorizationKey(
