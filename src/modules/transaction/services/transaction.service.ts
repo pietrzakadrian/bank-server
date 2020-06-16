@@ -143,14 +143,10 @@ export class TransactionService {
             throw new AttemptMakeTransferToMyselfException();
         }
 
-        const largerAmountMoney = UtilsService.compareNumbers(
-            senderBill.amountMoney,
-            createTransactionDto.amountMoney,
-        );
-
         if (
             user.userAuth.role !== RoleType.ADMIN &&
-            (largerAmountMoney === createTransactionDto.amountMoney ||
+            (Number(senderBill.amountMoney) <
+                createTransactionDto.amountMoney ||
                 createTransactionDto.amountMoney <= 0)
         ) {
             throw new AmountMoneyNotEnoughException();
@@ -193,13 +189,8 @@ export class TransactionService {
             throw new TransactionNotFoundException();
         }
 
-        const largerAmountMoney = UtilsService.compareNumbers(
-            amountMoney,
-            senderAmountMoney,
-        );
-
         if (
-            largerAmountMoney === amountMoney &&
+            Number(senderAmountMoney) < amountMoney &&
             user.userAuth.role !== RoleType.ADMIN
         ) {
             throw new AmountMoneyNotEnoughException();
