@@ -41,9 +41,11 @@ export class TransactionService {
 
         const [transactions, transactionsCount] = await queryBuilder
             .addSelect([
+                'recipientUser.uuid',
                 'recipientUser.firstName',
                 'recipientUser.lastName',
                 'recipientUser.avatar',
+                'senderUser.uuid',
                 'senderUser.firstName',
                 'senderUser.lastName',
                 'senderUser.avatar',

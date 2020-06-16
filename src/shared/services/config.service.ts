@@ -68,6 +68,7 @@ export class ConfigService {
             password: this.get('POSTGRES_PASSWORD'),
             database: this.get('POSTGRES_DATABASE'),
             migrationsRun: true,
+            synchronize: false,
             logging: this.nodeEnv === 'development',
             namingStrategy: new SnakeNamingStrategy(),
         };
