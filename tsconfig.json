@@ -1,15 +1,23 @@
 {
   "compilerOptions": {
+    "moduleResolution": "classic",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2017",
+    "target": "es2019",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "incremental": true
+    "rootDir": ".",
+    "paths": {
+      "common/*": ["src/common/*"],
+      "providers/*": ["src/providers/*"],
+      "utils/*": ["src/utils/*"]
+    },
+    "incremental": true,
+    "esModuleInterop": true
   }
 }

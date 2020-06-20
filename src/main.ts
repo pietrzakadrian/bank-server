@@ -1,3 +1,4 @@
+import './utils/aliases';
 import { NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
 import { AppModule } from './modules/app/app.module';

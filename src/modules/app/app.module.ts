@@ -1,7 +1,9 @@
+import 'providers/polyfill.provider';
 import { Module } from '@nestjs/common';
 import { AppController } from './controllers/app.controller';
 import { AppService } from './services/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SnakeNamingStrategy } from 'utils/strategies';
 
 @Module({
   imports: [
@@ -14,6 +16,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'admin_banknew22',
       autoLoadEntities: true,
       synchronize: false,
+      namingStrategy: new SnakeNamingStrategy(),
+      logging: true,
+      keepConnectionAlive: true,
+      migrationsRun: true,
     }),
   ],
   controllers: [AppController],
