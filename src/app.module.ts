@@ -1,38 +1,10 @@
-import './boilerplate.polyfill';
-
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ScheduleModule } from '@nestjs/schedule';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { contextMiddleware, RegisterPromotionMiddleware } from 'middlewares';
-import { AuthModule } from 'modules/auth/modules';
-import { BillModule } from 'modules/bill/modules';
-import { CurrencyModule } from 'modules/currency/modules';
-import { LanguageModule } from 'modules/language/modules';
-import { TransactionModule } from 'modules/transaction/modules';
-import { UserModule } from 'modules/user/modules';
-import { SharedModule } from 'shared/modules';
-import { ConfigService } from 'shared/services';
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
-    imports: [
-        AuthModule,
-        UserModule,
-        CurrencyModule,
-        BillModule,
-        TransactionModule,
-        LanguageModule,
-        ScheduleModule.forRoot(),
-        TypeOrmModule.forRootAsync({
-            imports: [SharedModule],
-            useFactory: (configService: ConfigService) =>
-                configService.typeOrmConfig,
-            inject: [ConfigService],
-        }),
-    ],
+  imports: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
-export class AppModule implements NestModule {
-    configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
-        consumer.apply(contextMiddleware).forRoutes('*');
-        consumer.apply(RegisterPromotionMiddleware).forRoutes('/Auth/login');
-    }
-}
+export class AppModule {}
