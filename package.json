@@ -1,9 +1,9 @@
 {
-  "name": "nest-typescript-starter",
-  "private": true,
+  "name": "bank-server",
   "version": "1.0.0",
-  "description": "Nest TypeScript starter repository",
+  "description": "Backend Application",
   "license": "MIT",
+  "author": "Adrian Pietrzak <contact@pietrzakadrian.com>",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -24,13 +24,16 @@
     "@nestjs/core": "^7.2.0",
     "@nestjs/passport": "^7.0.0",
     "@nestjs/platform-express": "^7.2.0",
+    "@nestjs/swagger": "^4.5.10",
     "@nestjs/typeorm": "^7.1.0",
+    "compression": "^1.7.4",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pg": "^8.2.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.5",
+    "swagger-ui-express": "^4.1.4",
     "typeorm": "^0.2.25"
   },
   "devDependencies": {
