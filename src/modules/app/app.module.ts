@@ -1,8 +1,8 @@
 import 'providers/polyfill.provider';
 import { Module } from '@nestjs/common';
-import { AppController } from './controllers/app.controller';
-import { AppService } from './services/app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from 'modules/app/controllers';
+import { AppService } from 'modules/app/services';
 import { SnakeNamingStrategy } from 'utils/strategies';
 
 @Module({

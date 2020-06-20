@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "moduleResolution": "classic",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -11,13 +10,19 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
-    "rootDir": ".",
+    "incremental": true,
     "paths": {
       "common/*": ["src/common/*"],
+      "decorators/*": ["src/decorators/*"],
+      "exceptions/*": ["src/exceptions/*"],
+      "guards/*": ["src/guards/*"],
+      "interceptos/*": ["src/interceptos/*"],
+      "interfaces/*": ["src/interfaces/*"],
+      "middlewares/*": ["src/middlewares/*"],
+      "migrations/*": ["src/migrations/*"],
+      "modules/*": ["src/modules/*"],
       "providers/*": ["src/providers/*"],
       "utils/*": ["src/utils/*"]
-    },
-    "incremental": true,
-    "esModuleInterop": true
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AbstractDto } from '../../../common/dto';
+import { AbstractDto } from '../../../common/dtos';
 import { CurrencyDto } from 'modules/currency/dto';
 import { UserConfigEntity } from '../entities';
 

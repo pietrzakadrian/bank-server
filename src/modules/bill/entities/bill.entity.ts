@@ -1,8 +1,8 @@
 import { AbstractEntity } from 'common/entities';
-// import { BillDto } from 'modules/bill/dto';
-// import { CurrencyEntity } from 'modules/currency/entities';
-// import { TransactionEntity } from 'modules/transaction/entities';
-// import { UserEntity } from 'modules/user/entities';
+import { BillDto } from 'modules/bill/dtos';
+import { CurrencyEntity } from 'modules/currency/entities';
+import { TransactionEntity } from 'modules/transaction/entities';
+import { UserEntity } from 'modules/user/entities';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity({ name: 'bills' })

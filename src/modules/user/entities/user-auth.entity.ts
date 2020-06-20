@@ -1,5 +1,4 @@
-import { RoleType } from '../../../constants';
-import { AbstractEntity } from '../../../common/entities';
+import { AbstractEntity } from 'common/entities';
 import { UserAuthDto } from '../dtos';
 import { UserEntity } from '../entities';
 import {
@@ -9,6 +8,7 @@ import {
   OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
+import { RoleType } from 'common/constants';
 
 @Entity({ name: 'users_auth' })
 export class UserAuthEntity extends AbstractEntity<UserAuthDto> {

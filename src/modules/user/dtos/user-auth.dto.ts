@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AbstractDto } from '../../../common/dto';
+import { AbstractDto } from '../../../common/dtos';
 import { UserAuthEntity } from '../entities';
 
 export class UserAuthDto extends AbstractDto {

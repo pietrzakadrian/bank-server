@@ -1,4 +1,4 @@
-import { AbstractDto } from '../dto';
+import { AbstractDto } from '../dtos';
 import { UtilsService } from '../../utils/services';
 import { Column, Generated, PrimaryGeneratedColumn } from 'typeorm';
 
