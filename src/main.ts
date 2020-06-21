@@ -33,13 +33,13 @@ async function bootstrap() {
   app.use(morgan('combined'));
   app.setGlobalPrefix('api');
 
-  const reflector = app.get(Reflector);
+  // const reflector = app.get(Reflector);
 
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
-  app.useGlobalFilters(
-    new HttpExceptionFilter(reflector),
-    new QueryFailedFilter(reflector),
-  );
+  // app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
+  // app.useGlobalFilters(
+  //   new HttpExceptionFilter(reflector),
+  //   new QueryFailedFilter(reflector),
+  // );
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

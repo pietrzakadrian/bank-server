@@ -9,6 +9,7 @@ import { UserEntity } from 'modules/user/entities';
 import { UserAuthService, UserService } from 'modules/user/services';
 import { ContextService } from 'providers';
 import { UtilsService } from 'utils/services';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +29,7 @@ export class AuthService {
     } = user;
 
     return new TokenPayloadDto({
-      expiresIn: this._configService.getNumber('JWT_EXPIRATION_TIME'),
+      expiresIn: this._configService.get('JWT_EXPIRATION_TIME'),
       accessToken: await this._jwtService.signAsync({ uuid, role }),
     });
   }
