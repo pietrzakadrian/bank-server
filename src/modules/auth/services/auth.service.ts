@@ -7,8 +7,8 @@ import {
 import { TokenPayloadDto, UserLoginDto } from 'modules/auth/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { UserAuthService, UserService } from 'modules/user/services';
-import { ContextService, UtilsService } from 'providers';
-import { ConfigService } from 'utils/services';
+import { ContextService } from 'providers';
+import { UtilsService } from 'utils/services';
 
 @Injectable()
 export class AuthService {

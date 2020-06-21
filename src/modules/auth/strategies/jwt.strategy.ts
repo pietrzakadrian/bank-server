@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { UserService } from 'modules/user/services';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from 'utils/services';
+import { UserEntity } from 'modules/user/entities';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -16,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate({ iat, exp, uuid }) {
+  async validate({ iat, exp, uuid }): Promise<UserEntity> {
     const timeDiff = exp - iat;
 
     if (timeDiff <= 0) {

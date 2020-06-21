@@ -1,9 +1,12 @@
+'use strict';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { AbstractDto } from 'common/dtos';
+import { UserEntity } from 'modules/user/entities';
 
-import { UserEntity } from '../entities';
-import { UserAuthDto, UserConfigDto } from '../dtos';
+import { UserAuthDto } from './user-auth.dto';
+import { UserConfigDto } from './user-config.dto';
 
 export class UserDto extends AbstractDto {
   @ApiProperty()

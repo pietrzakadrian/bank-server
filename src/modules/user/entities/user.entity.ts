@@ -1,7 +1,7 @@
-import { AbstractEntity } from '../../../common/entities';
+import { AbstractEntity } from 'common/entities';
 import { BillEntity } from 'modules/bill/entities/bill.entity';
-import { UserDto } from '../dtos';
-import { UserAuthEntity, UserConfigEntity } from '../entities';
+import { UserDto } from 'modules/user/dtos';
+import { UserAuthEntity, UserConfigEntity } from 'modules/user/entities';
 import {
   Column,
   CreateDateColumn,

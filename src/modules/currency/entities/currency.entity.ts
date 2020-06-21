@@ -1,8 +1,8 @@
-import { Column, Entity, OneToMany, UpdateDateColumn } from 'typeorm';
 import { AbstractEntity } from 'common/entities';
 import { BillEntity } from 'modules/bill/entities';
 import { CurrencyDto } from 'modules/currency/dtos';
 import { UserConfigEntity } from 'modules/user/entities';
+import { Column, Entity, OneToMany, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'currency' })
 export class CurrencyEntity extends AbstractEntity<CurrencyDto> {

@@ -1,18 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PageMetaDto } from 'common/dtos';
-import { TransactionDto } from 'modules/transaction/dtos';
 
-export class TransactionsPageDto {
+import { BillDto } from './bill.dto';
+
+export class BillsPageDto {
   @ApiProperty({
-    type: TransactionDto,
+    type: BillDto,
     isArray: true,
   })
-  readonly data: TransactionDto[];
+  readonly data: BillDto[];
 
   @ApiProperty()
   readonly meta: PageMetaDto;
 
-  constructor(data: TransactionDto[], meta: PageMetaDto) {
+  constructor(data: BillDto[], meta: PageMetaDto) {
     this.data = data;
     this.meta = meta;
   }

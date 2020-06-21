@@ -1,9 +1,11 @@
+'use strict';
+
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { AbstractDto } from 'common/dtos';
+import { BillEntity } from 'modules/bill/entities';
 import { CurrencyDto } from 'modules/currency/dtos';
 import { UserDto } from 'modules/user/dtos';
-import { BillEntity } from 'modules/bill/entities';
 
 export class BillDto extends AbstractDto {
   @ApiProperty()

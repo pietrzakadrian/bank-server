@@ -1,3 +1,5 @@
+'use strict';
+
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { CurrencyDto } from 'modules/currency/dtos';

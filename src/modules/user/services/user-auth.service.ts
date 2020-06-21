@@ -4,7 +4,7 @@ import { CreateFailedException, PinCodeGenerationIncorrect } from 'exceptions';
 import { UserAuthEntity, UserEntity } from 'modules/user/entities';
 import { UserAuthRepository, UserRepository } from 'modules/user/repositories';
 import { UserService } from 'modules/user/services';
-import { UtilsService } from 'providers';
+import { UtilsService } from 'utils/services';
 import { UpdateResult } from 'typeorm';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { UserConfigService } from './user-config.service';

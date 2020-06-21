@@ -1,5 +1,3 @@
-'use strict';
-
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { LanguageEntity } from 'modules/language/entities';

@@ -1,29 +1,30 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2019",
+    "target": "ESNext",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    "baseUrl": "src",
+    "rootDir": "./",
     "incremental": true,
     "paths": {
-      "common/*": ["src/common/*"],
-      "decorators/*": ["src/decorators/*"],
-      "exceptions/*": ["src/exceptions/*"],
-      "filters/*": ["src/filters/*"],
-      "guards/*": ["src/guards/*"],
-      "interceptors/*": ["src/interceptors/*"],
-      "interfaces/*": ["src/interfaces/*"],
-      "middlewares/*": ["src/middlewares/*"],
-      "migrations/*": ["src/migrations/*"],
-      "modules/*": ["src/modules/*"],
-      "providers/*": ["src/providers/*"],
-      "utils/*": ["src/utils/*"]
+      "common/*": ["common/*"],
+      "decorators/*": ["decorators/*"],
+      "exceptions/*": ["exceptions/*"],
+      "filters/*": ["filters/*"],
+      "guards/*": ["guards/*"],
+      "interceptors/*": ["interceptors/*"],
+      "interfaces/*": ["interfaces/*"],
+      "middlewares/*": ["middlewares/*"],
+      "migrations/*": ["migrations/*"],
+      "modules/*": ["modules/*"],
+      "providers/*": ["providers/*"],
+      "utils/*": ["utils/*"]
     }
   }
 }

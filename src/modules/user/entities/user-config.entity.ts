@@ -1,7 +1,7 @@
-import { AbstractEntity } from '../../../common/entities';
+import { AbstractEntity } from 'common/entities';
 import { CurrencyEntity } from 'modules/currency/entities';
-import { UserConfigDto } from '../dtos';
-import { UserEntity } from '../entities';
+import { UserConfigDto } from 'modules/user/dtos';
+import { UserEntity } from 'modules/user/entities';
 import {
   Column,
   Entity,

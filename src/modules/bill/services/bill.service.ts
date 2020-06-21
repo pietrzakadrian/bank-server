@@ -14,14 +14,14 @@ import {
   TotalAccountBalanceHistoryPayloadDto,
   TotalAccountBalancePayloadDto,
   TotalAmountMoneyPayloadDto,
-} from 'modules/bill/dto';
+} from 'modules/bill/dtos';
 import { BillEntity } from 'modules/bill/entities';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyService } from 'modules/currency/services';
 import { TransactionEntity } from 'modules/transaction/entities';
 import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
-import { UtilsService } from 'providers';
+import { UtilsService } from 'utils/services';
 import { getConnection } from 'typeorm';
 
 @Injectable()
