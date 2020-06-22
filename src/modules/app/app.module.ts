@@ -1,18 +1,26 @@
 import 'providers/polyfill.provider';
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppService } from 'modules/app/services';
 import { SnakeNamingStrategy } from 'utils/strategies';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SharedModule } from 'modules/shared/shared.module';
 import { CurrencyModule } from 'modules/currency/currency.module';
 import { LanguageModule } from 'modules/language/language.module';
+import { UserModule } from 'modules/user/user.module';
+import { AuthModule } from 'modules/auth/auth.module';
+import { BillModule } from 'modules/bill/bill.module';
+import { TransactionModule } from 'modules/transaction/transaction.module';
+import { AppService } from './services';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    UserModule,
     CurrencyModule,
+    BillModule,
+    TransactionModule,
     LanguageModule,
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],
@@ -34,7 +42,6 @@ import { LanguageModule } from 'modules/language/language.module';
       inject: [ConfigService],
     }),
   ],
-  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}

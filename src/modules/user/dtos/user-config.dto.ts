@@ -1,5 +1,3 @@
-'use strict';
-
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { CurrencyDto } from 'modules/currency/dtos';
@@ -18,7 +16,7 @@ export class UserConfigDto extends AbstractDto {
   @ApiProperty()
   readonly messageCount: number;
 
-  @ApiProperty({ type: CurrencyDto })
+  @ApiProperty({ type: () => CurrencyDto })
   readonly currency: CurrencyDto;
 
   constructor(userConfig: UserConfigEntity) {

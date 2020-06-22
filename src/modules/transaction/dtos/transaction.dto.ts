@@ -19,10 +19,10 @@ export class TransactionDto extends AbstractDto {
   @ApiProperty()
   readonly updatedAt: Date;
 
-  @ApiProperty({ type: BillDto })
+  @ApiProperty({ type: () => BillDto })
   readonly recipientBill: BillDto;
 
-  @ApiProperty({ type: BillDto })
+  @ApiProperty({ type: () => BillDto })
   readonly senderBill: BillDto;
 
   constructor(transaction: TransactionEntity) {

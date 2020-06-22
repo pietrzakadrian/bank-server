@@ -10,12 +10,12 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AppService implements OnModuleInit {
   private readonly _logger = new Logger(AppService.name);
+  private readonly _configService = new ConfigService();
   private readonly _moduleOptions = { strict: false };
 
   private _currencyCron: CurrencyCron;
   private _currencyService: CurrencyService;
   private _languageService: LanguageService;
-  private _configService: ConfigService;
   private _userService: UserService;
   private _userAuthService: UserAuthService;
 

@@ -4,7 +4,7 @@ import { CurrencyDto } from 'modules/currency/dtos';
 
 export class CurrenciesPageDto {
   @ApiProperty({
-    type: CurrencyDto,
+    type: () => CurrencyDto,
     isArray: true,
   })
   readonly data: CurrencyDto[];
