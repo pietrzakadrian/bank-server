@@ -2,15 +2,20 @@ import 'providers/polyfill.provider';
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from 'modules/app/controllers';
 import { AppService } from 'modules/app/services';
 import { SnakeNamingStrategy } from 'utils/strategies';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SharedModule } from 'modules/shared/shared.module';
+import { CurrencyModule } from 'modules/currency/currency.module';
+import { LanguageModule } from 'modules/language/language.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    CurrencyModule,
+    LanguageModule,
     TypeOrmModule.forRootAsync({
+      imports: [SharedModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('POSTGRES_HOST'),
@@ -29,7 +34,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [AppService],
 })
 export class AppModule {}
