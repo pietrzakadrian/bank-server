@@ -19,7 +19,7 @@
       "filters/*": ["filters/*"],
       "guards/*": ["guards/*"],
       "interceptors/*": ["interceptors/*"],
-      "interfaces/*": ["interfaces/*"],
+      "interfaces/*": ["src/interfaces/*"],
       "middlewares/*": ["middlewares/*"],
       "migrations/*": ["migrations/*"],
       "modules/*": ["modules/*"],

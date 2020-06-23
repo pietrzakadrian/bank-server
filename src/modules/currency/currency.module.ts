@@ -16,7 +16,7 @@ import { TransactionModule } from 'modules/transaction/transaction.module';
     forwardRef(() => BillModule),
     TypeOrmModule.forFeature([CurrencyRepository]),
   ],
-  controllers: [],
+  controllers: [CurrencyController],
   exports: [CurrencyService, CurrencyCron],
   providers: [CurrencyService, CurrencyCron],
 })

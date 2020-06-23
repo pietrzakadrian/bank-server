@@ -15,8 +15,9 @@ import {
   ExpressAdapter,
   NestExpressApplication,
 } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
   initializeTransactionalContext();
   patchTypeORMRepositoryWithBaseRepository();
 
@@ -51,7 +52,8 @@ async function bootstrap() {
 
   setupSwagger(app);
 
-  await app.listen(3000);
+  const configService = app.get(ConfigService);
+  await app.listen(configService.get('PORT'));
 }
 
-bootstrap();
+void bootstrap();

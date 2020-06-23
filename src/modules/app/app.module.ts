@@ -1,6 +1,5 @@
 import 'providers/polyfill.provider';
-
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'utils/strategies';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,7 +10,9 @@ import { UserModule } from 'modules/user/user.module';
 import { AuthModule } from 'modules/auth/auth.module';
 import { BillModule } from 'modules/bill/bill.module';
 import { TransactionModule } from 'modules/transaction/transaction.module';
-import { AppService } from './services';
+import { AppService } from 'modules/app/services';
+import { contextMiddleware, RegisterPromotionMiddleware } from 'middlewares';
+import { UserAuthSubscriber } from 'modules/user/subscribers';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AppService } from './services';
         migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
         namingStrategy: new SnakeNamingStrategy(),
         synchronize: false,
+        subscribers: [UserAuthSubscriber],
         migrationsRun: true,
         logger: 'file',
         logging: true,
@@ -44,4 +46,9 @@ import { AppService } from './services';
   ],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
+    consumer.apply(contextMiddleware).forRoutes('*');
+    consumer.apply(RegisterPromotionMiddleware).forRoutes('/Auth/login');
+  }
+}

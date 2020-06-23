@@ -11,12 +11,11 @@ const providers = [ValidatorService, GeneratorService];
   imports: [
     HttpModule,
     JwtModule.registerAsync({
-      imports: [SharedModule],
       useFactory: (configService: ConfigService) => ({
         privateKey: configService.get('JWT_SECRET_KEY'),
-        signOptions: {
-          expiresIn: configService.get<number>('JWT_EXPIRATION_TIME'),
-        },
+        // signOptions: {
+        //   expiresIn: configService.get<number>('JWT_EXPIRATION_TIME'),
+        // },
       }),
       inject: [ConfigService],
     }),
