@@ -1,4 +1,4 @@
-import { UserAuthEntity } from 'modules/user/entities';
+import { UserAuthEntity } from '../entities';
 import { Repository } from 'typeorm';
 import { EntityRepository } from 'typeorm/decorator/EntityRepository';
 

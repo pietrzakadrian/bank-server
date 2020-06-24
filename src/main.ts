@@ -1,88 +1,59 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { NestFactory, Reflector } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
-import {
-    ExpressAdapter,
-    NestExpressApplication,
-} from '@nestjs/platform-express';
+import { Reflector, NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
-import * as RateLimit from 'express-rate-limit';
-import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
+import { AppModule } from 'modules/app/app.module';
 import * as helmet from 'helmet';
+import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
+import * as RateLimit from 'express-rate-limit';
 import * as morgan from 'morgan';
-import { SharedModule } from 'shared/modules';
-import { ConfigService } from 'shared/services';
+import { setupSwagger } from 'utils';
 import {
-    initializeTransactionalContext,
-    patchTypeORMRepositoryWithBaseRepository,
+  initializeTransactionalContext,
+  patchTypeORMRepositoryWithBaseRepository,
 } from 'typeorm-transactional-cls-hooked';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 
-import { AppModule } from './app.module';
-import { setupSwagger } from './viveo-swagger';
+async function bootstrap(): Promise<void> {
+  initializeTransactionalContext();
+  patchTypeORMRepositoryWithBaseRepository();
 
-async function bootstrap() {
-    initializeTransactionalContext();
-    patchTypeORMRepositoryWithBaseRepository();
-    const app = await NestFactory.create<NestExpressApplication>(
-        AppModule,
-        new ExpressAdapter(),
-        {
-            cors: true,
-        },
-    );
-    app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
-    app.use(helmet());
-    app.use(
-        RateLimit({
-            windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 100, // limit each IP to 100 requests per windowMs
-        }),
-    );
-    app.use(compression());
-    app.use(morgan('combined'));
-    app.setGlobalPrefix('api');
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(),
+    { cors: true },
+  );
 
-    const reflector = app.get(Reflector);
+  app.enable('trust proxy');
+  app.use(helmet());
+  app.use(RateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
+  app.use(compression());
+  app.use(morgan('combined'));
+  app.setGlobalPrefix('api');
 
-    app.useGlobalFilters(
-        new HttpExceptionFilter(reflector),
-        new QueryFailedFilter(reflector),
-    );
+  const reflector = app.get(Reflector);
 
-    app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
+  app.useGlobalFilters(
+    new HttpExceptionFilter(reflector),
+    new QueryFailedFilter(reflector),
+  );
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      dismissDefaultMessages: true,
+      validationError: { target: false },
+    }),
+  );
 
-    app.useGlobalPipes(
-        new ValidationPipe({
-            whitelist: true,
-            transform: true,
-            dismissDefaultMessages: true,
-            validationError: {
-                target: false,
-            },
-        }),
-    );
+  setupSwagger(app);
 
-    const configService = app.select(SharedModule).get(ConfigService);
-
-    app.connectMicroservice({
-        transport: Transport.TCP,
-        options: {
-            port: configService.getNumber('TRANSPORT_PORT'),
-            retryAttempts: 5,
-            retryDelay: 3000,
-        },
-    });
-
-    await app.startAllMicroservicesAsync();
-
-    if (['development', 'staging'].includes(configService.nodeEnv)) {
-        setupSwagger(app);
-    }
-
-    const port = configService.getNumber('PORT');
-    await app.listen(port);
-
-    console.info(`server running on port ${port}`);
+  const configService = app.get(ConfigService);
+  await app.listen(configService.get('PORT'));
 }
 
-bootstrap();
+void bootstrap();
