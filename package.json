@@ -62,7 +62,7 @@
     "@types/express": "^4.17.6",
     "@types/express-rate-limit": "^5.0.0",
     "@types/helmet": "^0.0.47",
-    "@types/jest": "^26.0.2",
+    "@types/jest": "^26.0.3",
     "@types/lodash": "^4.14.157",
     "@types/morgan": "^1.9.1",
     "@types/node": "^14.0.14",
