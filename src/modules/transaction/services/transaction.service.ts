@@ -20,7 +20,7 @@ import {
 import { TransactionEntity } from 'modules/transaction/entities';
 import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
-import { UtilsService } from 'utils/services';
+import { UtilsService, ValidatorService } from 'utils/services';
 import { UpdateResult } from 'typeorm';
 
 @Injectable()
@@ -29,6 +29,7 @@ export class TransactionService {
     private readonly _transactionRepository: TransactionRepository,
     private readonly _billRepository: BillRepository,
     private readonly _billService: BillService,
+    private readonly _validatorService: ValidatorService,
   ) {}
 
   public async getTransactions(
@@ -84,9 +85,7 @@ export class TransactionService {
       'transaction',
     );
 
-    queryBuilder
-      // .andWhere('transaction.authorizationStatus = false')
-      .orderBy('transaction.id', Order.DESC);
+    queryBuilder.orderBy('transaction.id', Order.DESC);
 
     if (options.recipientUser) {
       queryBuilder
@@ -132,21 +131,32 @@ export class TransactionService {
       this._billService.findBill(createTransactionDto.senderBill, user),
     ]);
 
-    if (!recipientBill || !senderBill) {
-      throw new BillNotFoundException();
-    }
+    this._validatorService.isCorrectRecipient(
+      senderBill?.id,
+      recipientBill?.id,
+    );
 
-    if (recipientBill === senderBill) {
-      throw new AttemptMakeTransferToMyselfException();
-    }
+    // if (!recipientBill || !senderBill) {
+    //   throw new BillNotFoundException();
+    // }
 
-    if (
-      user.userAuth.role !== RoleType.ADMIN &&
-      (Number(senderBill.amountMoney) < createTransactionDto.amountMoney ||
-        createTransactionDto.amountMoney <= 0)
-    ) {
-      throw new AmountMoneyNotEnoughException();
-    }
+    // if (recipientBill.id === senderBill.id) {
+    //   throw new AttemptMakeTransferToMyselfException();
+    // }
+
+    this._validatorService.isCorrectAmountMoney(
+      user.userAuth.role,
+      senderBill.amountMoney,
+      createTransactionDto.amountMoney,
+    );
+
+    // if (
+    //   user.userAuth.role !== RoleType.ADMIN &&
+    //   (Number(senderBill.amountMoney) < createTransactionDto.amountMoney ||
+    //     createTransactionDto.amountMoney <= 0)
+    // ) {
+    //   throw new AmountMoneyNotEnoughException();
+    // }
 
     const createdTransaction = {
       recipientBill,
@@ -171,23 +181,29 @@ export class TransactionService {
   ): Promise<UpdateResult | any> {
     const {
       amountMoney: senderAmountMoney,
-      senderBill: [{ amountMoney }],
+      senderBill: [{ amountMoney: transactionAmountMoney }],
       senderBill: [transaction],
     } = await this._findTransactionByAuthorizationKey(
       confirmTransactionDto.authorizationKey,
       user,
     );
 
-    if (!senderAmountMoney || !amountMoney) {
+    if (!transaction) {
       throw new TransactionNotFoundException();
     }
 
-    if (
-      Number(senderAmountMoney) < amountMoney &&
-      user.userAuth.role !== RoleType.ADMIN
-    ) {
-      throw new AmountMoneyNotEnoughException();
-    }
+    // if (
+    //   Number(senderAmountMoney) < amountMoney &&
+    //   user.userAuth.role !== RoleType.ADMIN
+    // ) {
+    //   throw new AmountMoneyNotEnoughException();
+    // }
+
+    this._validatorService.isCorrectAmountMoney(
+      user.userAuth.role,
+      senderAmountMoney,
+      transactionAmountMoney,
+    );
 
     return this._updateTransactionAuthorizationStatus(transaction);
   }
@@ -206,20 +222,20 @@ export class TransactionService {
           subQuery
             .select(
               `COALESCE(
-                                TRUNC(
-                                    SUM(
-                                        CASE WHEN "transactions"."recipient_bill_id" = "bill"."id" 
-                                        THEN 1 / 
-                                            CASE WHEN "senderBillCurrency"."id" = "recipientBillCurrency"."id" 
-                                            THEN 1 
-                                            ELSE 
-                                                CASE WHEN "recipientBillCurrency"."base" 
-                                                THEN "senderBillCurrency"."current_exchange_rate" :: decimal 
-                                                ELSE "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientBillCurrency"."current_exchange_rate" :: decimal 
-                                                END
-                                            END
-                                        ELSE -1 
-                                    END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
+                          TRUNC(
+                              SUM(
+                                  CASE WHEN "transactions"."recipient_bill_id" = "bill"."id" 
+                                  THEN 1 / 
+                                      CASE WHEN "senderBillCurrency"."id" = "recipientBillCurrency"."id" 
+                                      THEN 1 
+                                      ELSE 
+                                          CASE WHEN "recipientBillCurrency"."base" 
+                                          THEN "senderBillCurrency"."current_exchange_rate" :: decimal 
+                                          ELSE "senderBillCurrency"."current_exchange_rate" :: decimal * "recipientBillCurrency"."current_exchange_rate" :: decimal 
+                                          END
+                                      END
+                                  ELSE -1 
+                                  END * "transactions"."amount_money"), 2), '0.00') :: numeric`,
             )
             .from(TransactionEntity, 'transactions')
             .leftJoin('transactions.recipientBill', 'recipientBill')
