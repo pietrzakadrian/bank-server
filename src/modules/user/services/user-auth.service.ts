@@ -1,6 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { RoleType } from 'common/constants';
-import { CreateFailedException, PinCodeGenerationIncorrect } from 'exceptions';
+import {
+  CreateFailedException,
+  PinCodeGenerationIncorrectException,
+} from 'exceptions';
 import { UserAuthEntity, UserEntity } from 'modules/user/entities';
 import { UserAuthRepository, UserRepository } from 'modules/user/repositories';
 import { UserService } from 'modules/user/services';
@@ -63,6 +66,13 @@ export class UserAuthService {
     return this._userAuthRepository.update(userAuth.id, { role });
   }
 
+  public async updatePassword(
+    userAuth: UserAuthEntity,
+    password: string,
+  ): Promise<UpdateResult> {
+    return this._userAuthRepository.update(userAuth.id, { password });
+  }
+
   public async findUserAuth(
     options: Partial<{ pinCode: number; role: RoleType }>,
   ): Promise<UserEntity | undefined> {
@@ -109,7 +119,7 @@ export class UserAuthService {
     try {
       return user ? await this._createPinCode() : pinCode;
     } catch (error) {
-      throw new PinCodeGenerationIncorrect(error);
+      throw new PinCodeGenerationIncorrectException(error);
     }
   }
 

@@ -7,6 +7,7 @@ import {
   Patch,
   UseGuards,
   UseInterceptors,
+  Body,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -21,7 +22,7 @@ import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { UserEntity } from 'modules/user/entities';
 import { UserConfigService, UserService } from 'modules/user/services';
-import { UserDto } from 'modules/user/dtos';
+import { UserDto, UserUpdateDto } from 'modules/user/dtos';
 
 @Controller('Users')
 @ApiTags('Users')
@@ -42,8 +43,30 @@ export class UserController {
     description: 'Get user',
     type: UserDto,
   })
-  async getUserData(@AuthUser() user: UserEntity) {
+  async getUserData(@AuthUser() user: UserEntity): Promise<UserDto> {
     return user.toDto();
+  }
+
+  @Patch('/')
+  @UseGuards(AuthGuard, RolesGuard)
+  @UseInterceptors(AuthUserInterceptor)
+  @ApiBearerAuth()
+  @Roles(RoleType.USER, RoleType.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Update user',
+    type: UserDto,
+  })
+  async setUserData(
+    @AuthUser() user: UserEntity,
+    @Body() userUpdateDto: UserUpdateDto,
+  ): Promise<UserDto> {
+    const userEntity = await this._userService.updateUserData(
+      user,
+      userUpdateDto,
+    );
+    return userEntity.toDto();
   }
 
   @Get('/:email/checkEmail')
@@ -53,7 +76,7 @@ export class UserController {
     description: 'Get user',
     type: AbstractCheckDto,
   })
-  async checkEmail(@Param('email') email: string) {
+  async checkEmail(@Param('email') email: string): Promise<AbstractCheckDto> {
     const userEmail = await this._userService.getUser({ email });
     return new AbstractCheckDto(userEmail);
   }

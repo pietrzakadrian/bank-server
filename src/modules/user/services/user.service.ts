@@ -1,14 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { PageMetaDto } from 'common/dtos';
-import { CreateFailedException } from 'exceptions';
+import {
+  CreateFailedException,
+  EmailAddressExistException,
+  CurrencyNotFoundException,
+} from 'exceptions';
 import { UserRegisterDto } from 'modules/auth/dtos';
 import { BillService } from 'modules/bill/services';
-import { UsersPageDto, UsersPageOptionsDto } from 'modules/user/dtos';
+import {
+  UsersPageDto,
+  UsersPageOptionsDto,
+  UserUpdateDto,
+} from 'modules/user/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { UserRepository } from 'modules/user/repositories';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { UserAuthService } from './user-auth.service';
 import { UserConfigService } from './user-config.service';
+import { CurrencyService } from 'modules/currency/services';
 
 @Injectable()
 export class UserService {
@@ -17,6 +26,7 @@ export class UserService {
     private readonly _userAuthService: UserAuthService,
     private readonly _userConfigService: UserConfigService,
     private readonly _billService: BillService,
+    private readonly _currencyService: CurrencyService,
   ) {}
 
   @Transactional()
@@ -80,5 +90,60 @@ export class UserService {
     });
 
     return new UsersPageDto(users.toDtos(), pageMetaDto);
+  }
+
+  public async updateUserData(
+    user: UserEntity,
+    userUpdateDto: UserUpdateDto,
+  ): Promise<UserEntity> {
+    console.log('wchodze tutaj');
+
+    if (userUpdateDto.email) {
+      const isEmail = await this.getUser({ email: userUpdateDto.email });
+
+      if (isEmail) {
+        throw new EmailAddressExistException();
+      }
+
+      await this._userRepository.update(user.id, {
+        email: userUpdateDto.email,
+      });
+    }
+
+    if (userUpdateDto.firstName) {
+      await this._userRepository.update(user.id, {
+        firstName: userUpdateDto.firstName,
+      });
+    }
+
+    if (userUpdateDto.lastName) {
+      await this._userRepository.update(user.id, {
+        lastName: userUpdateDto.lastName,
+      });
+    }
+
+    if (userUpdateDto.password) {
+      await this._userAuthService.updatePassword(
+        user.userAuth,
+        userUpdateDto.password,
+      );
+    }
+
+    if (userUpdateDto.currency) {
+      const currency = await this._currencyService.findCurrency({
+        uuid: userUpdateDto.currency,
+      });
+
+      if (!currency) {
+        throw new CurrencyNotFoundException();
+      }
+
+      await this._userConfigService.updateMainCurrency(
+        user.userConfig,
+        currency,
+      );
+    }
+
+    return this.getUser({ uuid: user.uuid });
   }
 }

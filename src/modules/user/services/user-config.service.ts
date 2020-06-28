@@ -4,56 +4,66 @@ import { CurrencyService } from 'modules/currency/services';
 import { UserConfigEntity } from 'modules/user/entities';
 import { UserConfigRepository } from 'modules/user/repositories';
 import { UpdateResult } from 'typeorm';
+import { CurrencyEntity } from 'modules/currency/entities';
 
 @Injectable()
 export class UserConfigService {
-    constructor(
-        private readonly _userConfigRepository: UserConfigRepository,
-        private readonly _currencyService: CurrencyService,
-    ) {}
+  constructor(
+    private readonly _userConfigRepository: UserConfigRepository,
+    private readonly _currencyService: CurrencyService,
+  ) {}
 
-    public async createUserConfig(createdUser): Promise<UserConfigEntity> {
-        const currency = await this._currencyService.findCurrency({
-            uuid: createdUser.currency,
-        });
+  public async createUserConfig(createdUser): Promise<UserConfigEntity> {
+    const currency = await this._currencyService.findCurrency({
+      uuid: createdUser.currency,
+    });
 
-        if (!currency) {
-            throw new CurrencyNotFoundException();
-        }
-
-        const createdCurrency: UserConfigEntity = { ...createdUser, currency };
-        const config = this._userConfigRepository.create(createdCurrency);
-
-        try {
-            return this._userConfigRepository.save(config);
-        } catch (error) {
-            throw new CreateFailedException(error);
-        }
+    if (!currency) {
+      throw new CurrencyNotFoundException();
     }
 
-    public async updateLastPresentLoggedDate(
-        userConfig: UserConfigEntity,
-    ): Promise<UpdateResult> {
-        return this._userConfigRepository.update(userConfig.id, {
-            lastPresentLoggedDate: new Date(),
-        });
-    }
+    const createdCurrency: UserConfigEntity = { ...createdUser, currency };
+    const config = this._userConfigRepository.create(createdCurrency);
 
-    public async unsetAllNotifications(
-        userConfig: UserConfigEntity,
-    ): Promise<UpdateResult> {
-        return this._userConfigRepository.update(userConfig.id, {
-            notificationStatus: false,
-            notificationCount: 0,
-        });
+    try {
+      return this._userConfigRepository.save(config);
+    } catch (error) {
+      throw new CreateFailedException(error);
     }
+  }
 
-    public async unsetAllMessages(
-        userConfig: UserConfigEntity,
-    ): Promise<UpdateResult> {
-        return this._userConfigRepository.update(userConfig.id, {
-            messageStatus: false,
-            messageCount: 0,
-        });
-    }
+  public async updateLastPresentLoggedDate(
+    userConfig: UserConfigEntity,
+  ): Promise<UpdateResult> {
+    return this._userConfigRepository.update(userConfig.id, {
+      lastPresentLoggedDate: new Date(),
+    });
+  }
+
+  public async unsetAllNotifications(
+    userConfig: UserConfigEntity,
+  ): Promise<UpdateResult> {
+    return this._userConfigRepository.update(userConfig.id, {
+      notificationStatus: false,
+      notificationCount: 0,
+    });
+  }
+
+  public async unsetAllMessages(
+    userConfig: UserConfigEntity,
+  ): Promise<UpdateResult> {
+    return this._userConfigRepository.update(userConfig.id, {
+      messageStatus: false,
+      messageCount: 0,
+    });
+  }
+
+  public async updateMainCurrency(
+    userConfig: UserConfigEntity,
+    currency: CurrencyEntity,
+  ): Promise<UpdateResult> {
+    return this._userConfigRepository.update(userConfig.id, {
+      currency,
+    });
+  }
 }
