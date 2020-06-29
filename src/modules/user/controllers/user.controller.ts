@@ -77,7 +77,9 @@ export class UserController {
     type: AbstractCheckDto,
   })
   async checkEmail(@Param('email') email: string): Promise<AbstractCheckDto> {
-    const userEmail = await this._userService.getUser({ email });
+    const userEmail = await this._userService.getUser({
+      email: email.toLocaleLowerCase(),
+    });
     return new AbstractCheckDto(userEmail);
   }
 
