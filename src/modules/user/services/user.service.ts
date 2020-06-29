@@ -96,8 +96,6 @@ export class UserService {
     user: UserEntity,
     userUpdateDto: UserUpdateDto,
   ): Promise<UserEntity> {
-    console.log('wchodze tutaj');
-
     if (userUpdateDto.email) {
       const isEmail = await this.getUser({ email: userUpdateDto.email });
 

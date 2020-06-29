@@ -15,8 +15,6 @@ export class UserAuthSubscriber
   }
 
   beforeInsert(event: InsertEvent<UserAuthEntity>): void {
-    console.log('event', event.entity);
-
     if (event.entity.password) {
       event.entity.password = UtilsService.generateHash(event.entity.password);
     }
