@@ -1,10 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { Order, RoleType } from 'common/constants';
+import { Injectable, Logger } from '@nestjs/common';
+import { Order } from 'common/constants';
 import { PageMetaDto } from 'common/dtos';
 import {
-  AmountMoneyNotEnoughException,
-  AttemptMakeTransferToMyselfException,
-  BillNotFoundException,
   CreateFailedException,
   TransactionNotFoundException,
 } from 'exceptions';
@@ -23,10 +20,15 @@ import { UserEntity } from 'modules/user/entities';
 import { UtilsService, ValidatorService } from 'utils/services';
 import { UpdateResult } from 'typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
+import { UserConfigService } from 'modules/user/services';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class TransactionService {
-  private _emailSubject = {
+  private readonly _logger = new Logger(TransactionService.name);
+  private readonly _configService = new ConfigService();
+  private readonly _emailSubject = {
     en: 'Payment authorization',
     de: 'Zahlungsermächtigung',
     pl: 'Autoryzacja płatności',
@@ -38,6 +40,7 @@ export class TransactionService {
     private readonly _billService: BillService,
     private readonly _validatorService: ValidatorService,
     private readonly _mailerService: MailerService,
+    private readonly _userConfigService: UserConfigService,
   ) {}
 
   public async getTransactions(
@@ -144,27 +147,11 @@ export class TransactionService {
       recipientBill?.id,
     );
 
-    // if (!recipientBill || !senderBill) {
-    //   throw new BillNotFoundException();
-    // }
-
-    // if (recipientBill.id === senderBill.id) {
-    //   throw new AttemptMakeTransferToMyselfException();
-    // }
-
     this._validatorService.isCorrectAmountMoney(
       user.userAuth.role,
       senderBill.amountMoney,
       createTransactionDto.amountMoney,
     );
-
-    // if (
-    //   user.userAuth.role !== RoleType.ADMIN &&
-    //   (Number(senderBill.amountMoney) < createTransactionDto.amountMoney ||
-    //     createTransactionDto.amountMoney <= 0)
-    // ) {
-    //   throw new AmountMoneyNotEnoughException();
-    // }
 
     const createdTransaction = {
       recipientBill,
@@ -179,7 +166,7 @@ export class TransactionService {
     this._mailerService
       .sendMail({
         to: senderBill.user.email,
-        from: 'payment@bank.pietrzakadrian.com',
+        from: this._configService.get('EMAIL_ADDRESS'),
         subject: this._emailSubject[createTransactionDto.locale],
         template:
           __dirname +
@@ -195,10 +182,14 @@ export class TransactionService {
         },
       })
       .then((success) => {
-        console.log(success);
+        this._logger.log(
+          `An email with the authorization code has been sent to: ${success.accepted}`,
+        );
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(() => {
+        this._logger.error(
+          `An email with a confirmation code has not been sent. Theoretical recipient: ${senderBill.user.email}`,
+        );
       });
 
     try {
@@ -208,10 +199,11 @@ export class TransactionService {
     }
   }
 
+  @Transactional()
   public async confirmTransaction(
     user: UserEntity,
     confirmTransactionDto: ConfirmTransactionDto,
-  ): Promise<UpdateResult | any> {
+  ): Promise<void> {
     const createdTransaction = await this._findTransactionByAuthorizationKey(
       confirmTransactionDto.authorizationKey,
       user,
@@ -227,20 +219,22 @@ export class TransactionService {
       senderBill: [transaction],
     } = createdTransaction;
 
-    // if (
-    //   Number(senderAmountMoney) < amountMoney &&
-    //   user.userAuth.role !== RoleType.ADMIN
-    // ) {
-    //   throw new AmountMoneyNotEnoughException();
-    // }
-
     this._validatorService.isCorrectAmountMoney(
       user.userAuth.role,
       senderAmountMoney,
       transactionAmountMoney,
     );
 
-    return this._updateTransactionAuthorizationStatus(transaction);
+    try {
+      this._logger.log(`UWAGA`);
+      await this._updateTransactionAuthorizationStatus(transaction);
+      await this._userConfigService.setNewNotification(
+        transaction.recipientBill.user.userConfig,
+      );
+      this._logger.log(`AFTER`);
+    } catch (error) {
+      throw new CreateFailedException(error);
+    }
   }
 
   private async _findTransactionByAuthorizationKey(
@@ -282,6 +276,9 @@ export class TransactionService {
         'bill_amount_money',
       )
       .leftJoinAndSelect('bill.senderBill', 'transaction')
+      .leftJoinAndSelect('transaction.recipientBill', 'recipientBill')
+      .leftJoinAndSelect('recipientBill.user', 'recipientUser')
+      .leftJoinAndSelect('recipientUser.userConfig', 'userConfig')
       .leftJoinAndSelect('bill.currency', 'currency')
       .where('transaction.authorizationKey = :authorizationKey', {
         authorizationKey,

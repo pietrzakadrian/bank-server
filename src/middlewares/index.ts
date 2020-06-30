@@ -1,2 +1,2 @@
-export * from './context.middelware';
+export * from './context.middleware';
 export * from './register-promotion.middleware';
