@@ -1,12 +1,10 @@
-'use strict';
-
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTransactionPayloadDto {
-    @ApiProperty()
-    readonly uuid: string;
+  @ApiProperty()
+  readonly uuid: string;
 
-    constructor(uuid: string) {
-        this.uuid = uuid;
-    }
+  constructor(uuid: string) {
+    this.uuid = uuid;
+  }
 }

@@ -22,14 +22,22 @@ import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
 import { UtilsService, ValidatorService } from 'utils/services';
 import { UpdateResult } from 'typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class TransactionService {
+  private _emailSubject = {
+    en: 'Payment authorization',
+    de: 'Zahlungsermächtigung',
+    pl: 'Autoryzacja płatności',
+  };
+
   constructor(
     private readonly _transactionRepository: TransactionRepository,
     private readonly _billRepository: BillRepository,
     private readonly _billService: BillService,
     private readonly _validatorService: ValidatorService,
+    private readonly _mailerService: MailerService,
   ) {}
 
   public async getTransactions(
@@ -168,6 +176,31 @@ export class TransactionService {
 
     const transaction = this._transactionRepository.create(createdTransaction);
 
+    this._mailerService
+      .sendMail({
+        to: senderBill.user.email,
+        from: 'payment@bank.pietrzakadrian.com',
+        subject: this._emailSubject[createTransactionDto.locale],
+        template:
+          __dirname +
+          `/../templates/transaction.template.${createTransactionDto.locale}.hbs`,
+        context: {
+          amountMoney: createTransactionDto.amountMoney.toLocaleString(
+            undefined,
+            { minimumFractionDigits: 2 },
+          ),
+          currencyName: senderBill.currency.name,
+          recipient: `${recipientBill.user.firstName} ${recipientBill.user.lastName}`,
+          authorizationKey: createdTransaction.authorizationKey,
+        },
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     try {
       return this._transactionRepository.save(transaction);
     } catch (error) {
@@ -179,18 +212,20 @@ export class TransactionService {
     user: UserEntity,
     confirmTransactionDto: ConfirmTransactionDto,
   ): Promise<UpdateResult | any> {
-    const {
-      amountMoney: senderAmountMoney,
-      senderBill: [{ amountMoney: transactionAmountMoney }],
-      senderBill: [transaction],
-    } = await this._findTransactionByAuthorizationKey(
+    const createdTransaction = await this._findTransactionByAuthorizationKey(
       confirmTransactionDto.authorizationKey,
       user,
     );
 
-    if (!transaction) {
+    if (!createdTransaction) {
       throw new TransactionNotFoundException();
     }
+
+    const {
+      amountMoney: senderAmountMoney,
+      senderBill: [{ amountMoney: transactionAmountMoney }],
+      senderBill: [transaction],
+    } = createdTransaction;
 
     // if (
     //   Number(senderAmountMoney) < amountMoney &&
@@ -212,8 +247,6 @@ export class TransactionService {
     authorizationKey: string,
     user: UserEntity,
   ): Promise<BillEntity | undefined> {
-    // return sender's
-
     const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
     queryBuilder

@@ -5,6 +5,7 @@ import { IUserLoginBodyRequest } from 'interfaces';
 import { BillService } from 'modules/bill/services';
 import { TransactionService } from 'modules/transaction/services';
 import { UserAuthService } from 'modules/user/services';
+import { Language } from 'common/constants/language.constant';
 
 @Injectable()
 export class RegisterPromotionMiddleware implements NestMiddleware {
@@ -52,6 +53,7 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
       transferTitle: this._promotionTransferTitle,
       recipientBill: recipientBill.uuid,
       senderBill: senderBill.uuid,
+      locale: Language.EN,
     };
 
     await this._transactionService.createTransaction(

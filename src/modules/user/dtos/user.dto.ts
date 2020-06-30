@@ -1,5 +1,3 @@
-'use strict';
-
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional } from 'class-validator';
 import { AbstractDto } from 'common/dtos';

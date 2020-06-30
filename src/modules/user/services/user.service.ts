@@ -108,12 +108,6 @@ export class UserService {
       });
     }
 
-    if (userUpdateDto.firstName) {
-      await this._userRepository.update(user.id, {
-        firstName: userUpdateDto.firstName,
-      });
-    }
-
     if (userUpdateDto.lastName) {
       await this._userRepository.update(user.id, {
         lastName: userUpdateDto.lastName,

@@ -400,6 +400,7 @@ export class BillService {
     queryBuilder
       .where('bill.uuid = :uuid', { uuid })
       .leftJoinAndSelect('bill.currency', 'currency')
+      .leftJoinAndSelect('bill.user', 'user')
       .addSelect(
         (subQuery) =>
           subQuery
