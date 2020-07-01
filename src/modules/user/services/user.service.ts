@@ -11,6 +11,7 @@ import {
   UsersPageDto,
   UsersPageOptionsDto,
   UserUpdateDto,
+  UserDto,
 } from 'modules/user/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { UserRepository } from 'modules/user/repositories';
@@ -31,7 +32,9 @@ export class UserService {
   ) {}
 
   @Transactional()
-  public async createUser(userRegisterDto: UserRegisterDto): Promise<any> {
+  public async createUser(
+    userRegisterDto: UserRegisterDto,
+  ): Promise<UserEntity> {
     const user = this._userRepository.create(userRegisterDto);
     await this._userRepository.save(user);
 

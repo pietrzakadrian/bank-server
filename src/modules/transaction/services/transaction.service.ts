@@ -203,7 +203,7 @@ export class TransactionService {
   public async confirmTransaction(
     user: UserEntity,
     confirmTransactionDto: ConfirmTransactionDto,
-  ): Promise<UpdateResult> {
+  ): Promise<void> {
     const createdTransaction = await this._findTransactionByAuthorizationKey(
       confirmTransactionDto.authorizationKey,
       user,
@@ -225,7 +225,14 @@ export class TransactionService {
       transactionAmountMoney,
     );
 
-    return this._updateTransactionAuthorizationStatus(transaction);
+    try {
+      await this._updateTransactionAuthorizationStatus(transaction);
+      await this._userConfigService.setNotification(
+        transaction.recipientBill.user.userConfig,
+      );
+    } catch (error) {
+      throw new CreateFailedException(error);
+    }
   }
 
   private async _findTransactionByAuthorizationKey(

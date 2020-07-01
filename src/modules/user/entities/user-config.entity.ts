@@ -6,11 +6,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity({ name: 'users_config' })
 export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
-  /**
-   * This is a @Virtual column.
-   * Used only to map entity correctly using the .getManyAndCount() method.
-   */
-  @Column({ select: false, insert: false, update: false, nullable: true })
+  @Column()
   readonly notificationCount: number;
 
   /**
