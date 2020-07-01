@@ -1,3 +1,5 @@
+import 'providers/polyfill.provider';
+
 import { SnakeNamingStrategy } from 'utils/strategies';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionOptions } from 'typeorm';

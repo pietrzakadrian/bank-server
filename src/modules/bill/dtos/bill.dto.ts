@@ -16,7 +16,7 @@ export class BillDto extends AbstractDto {
   @ApiProperty({ type: () => CurrencyDto })
   readonly currency: CurrencyDto;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: () => UserDto })
   @IsOptional()
   readonly user?: UserDto;
 

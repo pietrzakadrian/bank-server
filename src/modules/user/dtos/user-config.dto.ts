@@ -2,11 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { CurrencyDto } from 'modules/currency/dtos';
 import { UserConfigEntity } from 'modules/user/entities';
+import { Type } from 'class-transformer';
 
 export class UserConfigDto extends AbstractDto {
   @ApiProperty()
   readonly notificationCount: number;
 
+  @Type(() => Number)
   @ApiProperty()
   readonly messageCount: number;
 

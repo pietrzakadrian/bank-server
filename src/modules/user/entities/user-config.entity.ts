@@ -2,14 +2,7 @@ import { AbstractEntity } from 'common/entities';
 import { CurrencyEntity } from 'modules/currency/entities';
 import { UserConfigDto } from 'modules/user/dtos';
 import { UserEntity } from 'modules/user/entities';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity({ name: 'users_config' })
 export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
@@ -29,12 +22,6 @@ export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
 
   @Column({ nullable: true })
   lastPresentLoggedDate?: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp with time zone',
-    nullable: true,
-  })
-  updatedAt: Date;
 
   @OneToOne(() => UserEntity, (user: UserEntity) => user.userConfig, {
     nullable: false,
