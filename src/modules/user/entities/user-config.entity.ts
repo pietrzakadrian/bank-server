@@ -13,11 +13,25 @@ import {
 
 @Entity({ name: 'users_config' })
 export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
-  @Column({ default: false })
-  notificationStatus: boolean;
+  // @Column({ default: false })
+  // notificationStatus: boolean;
 
-  @Column({ default: 0 })
-  notificationCount: number;
+  /**
+   * This is a @Virtual column.
+   * Used only to map entity correctly using the .getManyAndCount() method.
+   */
+  @Column({ select: false, insert: false, update: false, nullable: true })
+  readonly notificationStatus: boolean;
+
+  // @Column({ default: 0 })
+  // notificationCount: number;
+
+  /**
+   * This is a @Virtual column.
+   * Used only to map entity correctly using the .getManyAndCount() method.
+   */
+  @Column({ select: false, insert: false, update: false, nullable: true })
+  readonly notificationCount: string;
 
   @Column({ default: false })
   messageStatus: boolean;
@@ -26,7 +40,7 @@ export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
   messageCount: number;
 
   @Column({ nullable: true })
-  lastPresentLoggedDate: Date;
+  lastPresentLoggedDate?: Date;
 
   @UpdateDateColumn({
     type: 'timestamp with time zone',

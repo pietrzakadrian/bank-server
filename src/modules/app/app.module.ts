@@ -16,6 +16,7 @@ import { UserAuthSubscriber } from 'modules/user/subscribers';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MessageModule } from 'modules/message/message.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     BillModule,
     TransactionModule,
     LanguageModule,
+    MessageModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],

@@ -40,24 +40,6 @@ export class UserConfigService {
     });
   }
 
-  public async unsetAllNotifications(
-    userConfig: UserConfigEntity,
-  ): Promise<UpdateResult> {
-    return this._userConfigRepository.update(userConfig.id, {
-      notificationStatus: false,
-      notificationCount: 0,
-    });
-  }
-
-  public async unsetAllMessages(
-    userConfig: UserConfigEntity,
-  ): Promise<UpdateResult> {
-    return this._userConfigRepository.update(userConfig.id, {
-      messageStatus: false,
-      messageCount: 0,
-    });
-  }
-
   public async updateMainCurrency(
     userConfig: UserConfigEntity,
     currency: CurrencyEntity,

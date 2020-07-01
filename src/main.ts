@@ -32,7 +32,8 @@ async function bootstrap(): Promise<void> {
   app.use(RateLimit({ windowMs: 15 * 60 * 1000, max: 200 }));
   app.use(compression());
   app.use(morgan('combined'));
-  app.setGlobalPrefix('api');
+
+  app.setGlobalPrefix('bank');
 
   const reflector = app.get(Reflector);
 

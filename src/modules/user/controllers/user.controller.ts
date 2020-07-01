@@ -43,8 +43,10 @@ export class UserController {
     description: 'Get user',
     type: UserDto,
   })
-  async getUserData(@AuthUser() user: UserEntity): Promise<UserDto> {
-    return user.toDto();
+  async getUserData(@AuthUser() user: UserEntity): Promise<UserDto | any> {
+    // return user.toDto();
+    const userEntity = await this._userService.getUser({ uuid: user.uuid });
+    return userEntity.toDto();
   }
 
   @Patch('/')
@@ -62,11 +64,11 @@ export class UserController {
     @AuthUser() user: UserEntity,
     @Body() userUpdateDto: UserUpdateDto,
   ): Promise<UserDto> {
-    const userEntity = await this._userService.updateUserData(
+    const userWithNewData = await this._userService.updateUserData(
       user,
       userUpdateDto,
     );
-    return userEntity.toDto();
+    return userWithNewData.toDto();
   }
 
   @Get('/:email/checkEmail')
@@ -81,31 +83,5 @@ export class UserController {
       email: email.toLocaleLowerCase(),
     });
     return new AbstractCheckDto(userEmail);
-  }
-
-  @Patch('/notifications')
-  @UseGuards(AuthGuard, RolesGuard)
-  @UseInterceptors(AuthUserInterceptor)
-  @ApiBearerAuth()
-  @Roles(RoleType.USER, RoleType.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiNoContentResponse({
-    description: 'All notification unset',
-  })
-  async uncheckNotifications(@AuthUser() user: UserEntity): Promise<void> {
-    await this._userConfigService.unsetAllNotifications(user.userConfig);
-  }
-
-  @Patch('/messages')
-  @UseGuards(AuthGuard, RolesGuard)
-  @UseInterceptors(AuthUserInterceptor)
-  @ApiBearerAuth()
-  @Roles(RoleType.USER, RoleType.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiNoContentResponse({
-    description: 'All messages unset',
-  })
-  async uncheckMessages(@AuthUser() user: UserEntity): Promise<void> {
-    await this._userConfigService.unsetAllMessages(user.userConfig);
   }
 }

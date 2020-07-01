@@ -22,13 +22,13 @@ export class UserAuthEntity extends AbstractEntity<UserAuthDto> {
   password: string;
 
   @Column({ nullable: true })
-  lastSuccessfulLoggedDate: Date;
+  lastSuccessfulLoggedDate?: Date;
 
   @Column({ nullable: true })
-  lastFailedLoggedDate: Date;
+  lastFailedLoggedDate?: Date;
 
   @Column({ nullable: true })
-  lastLogoutDate: Date;
+  lastLogoutDate?: Date;
 
   @UpdateDateColumn({
     type: 'timestamp with time zone',

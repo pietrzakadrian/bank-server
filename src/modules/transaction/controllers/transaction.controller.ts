@@ -69,7 +69,7 @@ export class TransactionController {
   async createTransaction(
     @AuthUser() user: UserEntity,
     @Body() createTransactionDto: CreateTransactionDto,
-  ): Promise<CreateTransactionPayloadDto | any> {
+  ): Promise<CreateTransactionPayloadDto> {
     const { uuid } = await this._transactionService.createTransaction(
       user,
       createTransactionDto,
@@ -105,7 +105,7 @@ export class TransactionController {
   async getAuthorizationKey(
     @Param('uuid') uuid: string,
     @AuthUser() senderUser: UserEntity,
-  ) {
+  ): Promise<TransactionAuthorizationKeyPayloadDto> {
     const { authorizationKey } = await this._transactionService.getTransaction({
       uuid,
       senderUser,

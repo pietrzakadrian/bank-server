@@ -18,6 +18,7 @@ import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { UserAuthService } from './user-auth.service';
 import { UserConfigService } from './user-config.service';
 import { CurrencyService } from 'modules/currency/services';
+import { MessageEntity } from 'modules/message/entities';
 
 @Injectable()
 export class UserService {
@@ -59,7 +60,20 @@ export class UserService {
         .leftJoinAndSelect('user.userAuth', 'userAuth')
         .leftJoinAndSelect('user.userConfig', 'userConfig')
         .leftJoinAndSelect('userConfig.currency', 'currency')
-        .orWhere('user.uuid = :uuid', { uuid: options.uuid });
+        .addSelect(
+          (subQuery) =>
+            subQuery
+              .select(`"messages"."id"`)
+              .from(MessageEntity, 'messages')
+              .leftJoin('messages.recipient', 'recipient')
+              .leftJoin('messages.sender', 'sender')
+              .leftJoin('messages.templates', 'templates')
+              .leftJoin('templates.language', 'language')
+              .where('recipient.uuid = :uuid', { uuid: options.uuid }),
+          'userConfig_message_count',
+        );
+
+      queryBuilder.orWhere('user.uuid = :uuid', { uuid: options.uuid });
     }
 
     if (options.email) {

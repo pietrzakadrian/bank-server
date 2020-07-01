@@ -10,6 +10,7 @@ import {
   OneToOne,
   UpdateDateColumn,
 } from 'typeorm';
+import { MessageEntity } from 'modules/message/entities';
 
 @Entity({ name: 'users' })
 export class UserEntity extends AbstractEntity<UserDto> {
@@ -23,7 +24,7 @@ export class UserEntity extends AbstractEntity<UserDto> {
   email: string;
 
   @Column({ nullable: true })
-  avatar: string;
+  avatar?: string;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
@@ -49,6 +50,18 @@ export class UserEntity extends AbstractEntity<UserDto> {
     nullable: false,
   })
   bills: BillEntity[];
+
+  @OneToMany(() => MessageEntity, (message: MessageEntity) => message.sender, {
+    nullable: false,
+  })
+  sender: MessageEntity[];
+
+  @OneToMany(
+    () => MessageEntity,
+    (message: MessageEntity) => message.recipient,
+    { nullable: false },
+  )
+  recipient: MessageEntity[];
 
   dtoClass = UserDto;
 }

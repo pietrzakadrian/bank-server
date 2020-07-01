@@ -11,8 +11,8 @@ export class BillEntity extends AbstractEntity<BillDto> {
   accountBillNumber: string;
 
   /**
-   * this is a virtual column.
-   * used only to map entity correctly using the .getManyAndCount() method.
+   * This is a @Virtual column.
+   * Used only to map entity correctly using the .getManyAndCount() method.
    */
   @Column({ select: false, insert: false, update: false, nullable: true })
   readonly amountMoney: string;
