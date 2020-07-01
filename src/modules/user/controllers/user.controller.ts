@@ -9,12 +9,7 @@ import {
   UseInterceptors,
   Body,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiNoContentResponse,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RoleType } from 'common/constants';
 import { AbstractCheckDto } from 'common/dtos';
 import { AuthUser, Roles } from 'decorators';
@@ -43,8 +38,7 @@ export class UserController {
     description: 'Get user',
     type: UserDto,
   })
-  async getUserData(@AuthUser() user: UserEntity): Promise<UserDto | any> {
-    // return user.toDto();
+  async getUserData(@AuthUser() user: UserEntity): Promise<UserDto> {
     const userEntity = await this._userService.getUser({ uuid: user.uuid });
     return userEntity.toDto();
   }

@@ -11,16 +11,18 @@ import {
 } from '@nestjs/common';
 import { MessageService } from '../services/message.service';
 import { MessagesPageOptionsDto, MessagesPageDto } from '../dtos';
-import { AuthUser } from 'decorators';
+import { AuthUser, Roles } from 'decorators';
 import { UserEntity } from 'modules/user/entities';
-import { AuthGuard } from 'guards';
+import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
+import { RoleType } from 'common/constants';
 
 @Controller('Messages')
 @ApiTags('Messages')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @UseInterceptors(AuthUserInterceptor)
 @ApiBearerAuth()
+@Roles(RoleType.USER, RoleType.ADMIN)
 export class MessageController {
   constructor(private readonly _messageService: MessageService) {}
 
