@@ -24,7 +24,11 @@ export class ValidatorService {
       throw new AmountMoneyNotEnoughException();
     }
 
-    if (role === RoleType.ADMIN) {
+    if (
+      Object.values(RoleType)
+        .filter((item) => item !== RoleType.USER)
+        .includes(role)
+    ) {
       return true;
     }
 

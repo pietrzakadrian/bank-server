@@ -21,10 +21,7 @@ export class UserAuthSubscriber
   }
 
   beforeUpdate(event: UpdateEvent<UserAuthEntity>): void {
-    if (
-      event.entity.password &&
-      event.entity.password !== event.databaseEntity.password
-    ) {
+    if (event.entity?.password !== event.databaseEntity?.password) {
       event.entity.password = UtilsService.generateHash(event.entity.password);
     }
   }

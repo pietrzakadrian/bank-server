@@ -17,6 +17,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MessageModule } from 'modules/message/message.module';
+import { NotificationModule } from 'modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MessageModule } from 'modules/message/message.module';
     TransactionModule,
     LanguageModule,
     MessageModule,
+    NotificationModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [SharedModule],

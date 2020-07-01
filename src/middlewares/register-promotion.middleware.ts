@@ -23,11 +23,11 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
     req: IUserLoginBodyRequest,
     res: Response,
     next: NextFunction,
-  ): Promise<any> {
+  ): Promise<void> {
     const { pinCode } = req.body;
     const [user, rootUser] = await Promise.all([
       this._userAuthService.findUserAuth({ pinCode }),
-      this._userAuthService.findUserAuth({ role: RoleType.ADMIN }),
+      this._userAuthService.findUserAuth({ role: RoleType.ROOT }),
     ]);
 
     if (!user || !rootUser) {

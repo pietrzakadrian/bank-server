@@ -76,7 +76,7 @@ export class AppService implements OnModuleInit {
       currency: uuid,
     });
 
-    await this._userAuthService.updateRole(userAuth, RoleType.ADMIN);
+    await this._userAuthService.updateRole(userAuth, RoleType.ROOT);
 
     this._logger.log(`Root user have been initiated`);
   }
