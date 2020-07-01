@@ -4,14 +4,8 @@ import { CurrencyDto } from 'modules/currency/dtos';
 import { UserConfigEntity } from 'modules/user/entities';
 
 export class UserConfigDto extends AbstractDto {
-  // @ApiProperty()
-  // readonly notificationStatus: boolean;
-
-  // @ApiProperty()
-  // readonly notificationCount: number;
-
   @ApiProperty()
-  readonly messageStatus: boolean;
+  readonly notificationCount: number;
 
   @ApiProperty()
   readonly messageCount: number;
@@ -21,9 +15,7 @@ export class UserConfigDto extends AbstractDto {
 
   constructor(userConfig: UserConfigEntity) {
     super(userConfig);
-    // this.notificationStatus = userConfig.notificationStatus;
-    // this.notificationCount = userConfig.notificationCount;
-    this.messageStatus = userConfig.messageStatus;
+    this.notificationCount = userConfig.notificationCount;
     this.messageCount = userConfig.messageCount;
     this.currency = userConfig.currency.toDto();
   }

@@ -63,13 +63,21 @@ export class UserService {
         .addSelect(
           (subQuery) =>
             subQuery
-              .select(`"messages"."id"`)
-              .from(MessageEntity, 'messages')
-              .leftJoin('messages.recipient', 'recipient')
-              .leftJoin('messages.sender', 'sender')
-              .leftJoin('messages.templates', 'templates')
-              .leftJoin('templates.language', 'language')
-              .where('recipient.uuid = :uuid', { uuid: options.uuid }),
+              .select(`COUNT(messages)`)
+              .from(
+                (subQuery2) =>
+                  subQuery2
+                    .select(`"messages"."id"`)
+                    .from(MessageEntity, 'messages')
+                    .leftJoin('messages.recipient', 'recipient')
+                    .leftJoin('messages.sender', 'sender')
+                    .leftJoin('messages.templates', 'templates')
+                    .leftJoin('templates.language', 'language')
+                    .where('recipient.uuid = :uuid', { uuid: options.uuid })
+                    .andWhere('messages.readed = :readed', { readed: false })
+                    .groupBy(`"messages"."id"`),
+                'messages',
+              ),
           'userConfig_message_count',
         );
 

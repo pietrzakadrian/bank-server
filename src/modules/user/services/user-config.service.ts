@@ -46,13 +46,4 @@ export class UserConfigService {
   ): Promise<UpdateResult> {
     return this._userConfigRepository.update(userConfig.id, { currency });
   }
-
-  public async setNewNotification(
-    userConfig: UserConfigEntity,
-  ): Promise<UpdateResult> {
-    return this._userConfigRepository.update(userConfig.id, {
-      notificationStatus: true,
-      notificationCount: userConfig.notificationCount + 1,
-    });
-  }
 }
