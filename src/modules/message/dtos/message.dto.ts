@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { UserDto } from 'modules/user/dtos';
 import { MessageEntity } from 'modules/message/entities';
-import { MessageTemplateDto } from 'modules/message/dtos';
+import { MessageTemplateDto, MessageKeyDto } from 'modules/message/dtos';
 
 export class MessageDto extends AbstractDto {
   @ApiProperty()
@@ -26,6 +26,9 @@ export class MessageDto extends AbstractDto {
   })
   readonly templates: MessageTemplateDto[];
 
+  @ApiProperty({ type: () => MessageKeyDto })
+  readonly key: MessageKeyDto;
+
   constructor(message: MessageEntity) {
     super(message);
     this.readed = message.readed;
@@ -34,5 +37,6 @@ export class MessageDto extends AbstractDto {
     this.sender = message.sender.toDto();
     this.recipient = message.recipient.toDto();
     this.templates = message.templates.toDtos();
+    this.key = message.key.toDto();
   }
 }

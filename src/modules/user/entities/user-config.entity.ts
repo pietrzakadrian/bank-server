@@ -6,7 +6,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 
 @Entity({ name: 'users_config' })
 export class UserConfigEntity extends AbstractEntity<UserConfigDto> {
-  @Column()
+  @Column({ default: 0 })
   readonly notificationCount: number;
 
   /**

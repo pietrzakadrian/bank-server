@@ -10,7 +10,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { MessageDto } from 'modules/message/dtos';
-import { MessageTemplateEntity } from 'modules/message/entities';
+import {
+  MessageTemplateEntity,
+  MessageKeyEntity,
+} from 'modules/message/entities';
 
 @Entity({ name: 'messages' })
 export class MessageEntity extends AbstractEntity<MessageDto> {
@@ -48,6 +51,13 @@ export class MessageEntity extends AbstractEntity<MessageDto> {
     { nullable: false },
   )
   templates: MessageTemplateEntity[];
+
+  @ManyToOne(() => MessageKeyEntity, (key: MessageKeyEntity) => key.message, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'message_key_id' })
+  key: MessageKeyEntity;
 
   dtoClass = MessageDto;
 }

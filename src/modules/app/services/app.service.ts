@@ -6,6 +6,7 @@ import { CurrencyService } from 'modules/currency/services';
 import { LanguageService } from 'modules/language/services';
 import { UserAuthService, UserService } from 'modules/user/services';
 import { ConfigService } from '@nestjs/config';
+import { MessageKeyService } from 'modules/message/services/message-key.service';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -18,6 +19,7 @@ export class AppService implements OnModuleInit {
   private _languageService: LanguageService;
   private _userService: UserService;
   private _userAuthService: UserAuthService;
+  private _messageKeyService: MessageKeyService;
 
   constructor(private readonly _moduleRef: ModuleRef) {}
 
@@ -36,10 +38,18 @@ export class AppService implements OnModuleInit {
       CurrencyService,
       this._moduleOptions,
     );
+    this._messageKeyService = this._moduleRef.get(
+      MessageKeyService,
+      this._moduleOptions,
+    );
 
-    await this._initLanguage();
     await this._initExchangeRates();
-    await Promise.all([this._initRootUser(), this._initAuthorUser()]);
+    await Promise.all([
+      this._initRootUser(),
+      this._initAuthorUser(),
+      this._initLanguage(),
+      this._initMessageKeys(),
+    ]);
   }
 
   private async _initExchangeRates(): Promise<void> {
@@ -50,6 +60,11 @@ export class AppService implements OnModuleInit {
   private async _initLanguage(): Promise<void> {
     await this._languageService.setLanguages();
     this._logger.log(`Languages have been initiated`);
+  }
+
+  private async _initMessageKeys(): Promise<void> {
+    await this._messageKeyService.setMessageKeys();
+    this._logger.log(`Message keys have been initiated`);
   }
 
   private async _initRootUser(): Promise<void> {
