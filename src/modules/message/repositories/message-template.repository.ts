@@ -1,4 +1,4 @@
-import { MessageTemplateEntity } from '../entities';
+import { MessageTemplateEntity } from 'modules/message/entities';
 import { Repository } from 'typeorm';
 import { EntityRepository } from 'typeorm/decorator/EntityRepository';
 

@@ -9,8 +9,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { MessageDto } from '../dtos/message.dto';
-import { MessageTemplateEntity } from './message-template.entity';
+import { MessageDto } from 'modules/message/dtos';
+import { MessageTemplateEntity } from 'modules/message/entities';
 
 @Entity({ name: 'messages' })
 export class MessageEntity extends AbstractEntity<MessageDto> {

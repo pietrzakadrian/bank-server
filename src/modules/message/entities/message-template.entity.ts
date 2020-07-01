@@ -1,7 +1,7 @@
 import { AbstractEntity } from 'common/entities';
-import { Entity, ManyToOne, JoinColumn, Column, OneToMany } from 'typeorm';
-import { MessageTemplateDto } from '../dtos/message-template.dto';
-import { MessageEntity } from './message.entity';
+import { Entity, ManyToOne, JoinColumn, Column } from 'typeorm';
+import { MessageTemplateDto } from 'modules/message/dtos';
+import { MessageEntity } from 'modules/message/entities';
 import { LanguageEntity } from 'modules/language/entities';
 
 @Entity({ name: 'messages_templates' })

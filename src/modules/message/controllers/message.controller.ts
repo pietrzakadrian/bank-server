@@ -9,8 +9,8 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { MessageService } from '../services/message.service';
-import { MessagesPageOptionsDto, MessagesPageDto } from '../dtos';
+import { MessageService } from 'modules/message/services';
+import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
 import { AuthUser, Roles } from 'decorators';
 import { UserEntity } from 'modules/user/entities';
 import { AuthGuard, RolesGuard } from 'guards';

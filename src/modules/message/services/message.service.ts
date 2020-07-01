@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { MessageRepository } from '../repositories';
+import { MessageRepository } from 'modules/message/repositories';
 import { PageMetaDto } from 'common/dtos';
 import { UserEntity } from 'modules/user/entities';
-import { MessagesPageOptionsDto, MessagesPageDto } from '../dtos';
+import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
 
 @Injectable()
 export class MessageService {

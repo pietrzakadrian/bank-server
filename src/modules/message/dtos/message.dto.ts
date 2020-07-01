@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { UserDto } from 'modules/user/dtos';
-import { MessageEntity } from '../entities';
-import { MessageTemplateDto } from './message-template.dto';
+import { MessageEntity } from 'modules/message/entities';
+import { MessageTemplateDto } from 'modules/message/dtos';
 
 export class MessageDto extends AbstractDto {
   @ApiProperty()

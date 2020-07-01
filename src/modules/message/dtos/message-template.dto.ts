@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
-import { MessageTemplateEntity } from '../entities';
+import { MessageTemplateEntity } from 'modules/message/entities';
 import { IsOptional } from 'class-validator';
 import { LanguageDto } from 'modules/language/dtos';
 
