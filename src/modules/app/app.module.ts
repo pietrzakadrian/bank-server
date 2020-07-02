@@ -12,7 +12,10 @@ import { BillModule } from 'modules/bill/bill.module';
 import { TransactionModule } from 'modules/transaction/transaction.module';
 import { AppService } from 'modules/app/services';
 import { contextMiddleware, RegisterPromotionMiddleware } from 'middlewares';
-import { UserAuthSubscriber } from 'modules/user/subscribers';
+import {
+  UserAuthSubscriber,
+  UserConfigSubscriber,
+} from 'modules/user/subscribers';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -44,7 +47,7 @@ import { NotificationModule } from 'modules/notification/notification.module';
         migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
         namingStrategy: new SnakeNamingStrategy(),
         synchronize: false,
-        subscribers: [UserAuthSubscriber],
+        subscribers: [UserConfigSubscriber, UserAuthSubscriber],
         migrationsRun: true,
         logging: true,
       }),

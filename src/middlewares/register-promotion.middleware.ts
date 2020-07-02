@@ -19,7 +19,7 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
     private readonly _userAuthService: UserAuthService,
   ) {}
 
-  async use(
+  public async use(
     req: IUserLoginBodyRequest,
     res: Response,
     next: NextFunction,

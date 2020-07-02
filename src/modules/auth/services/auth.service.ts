@@ -59,7 +59,7 @@ export class AuthService {
     return user;
   }
 
-  public static setAuthUser(user: UserEntity) {
+  public static setAuthUser(user: UserEntity): void {
     ContextService.set(AuthService._authUserKey, user);
   }
 

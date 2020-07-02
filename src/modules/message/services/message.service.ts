@@ -3,10 +3,22 @@ import { MessageRepository } from 'modules/message/repositories';
 import { PageMetaDto } from 'common/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
+import { CreateMessageDto } from '../dtos/create-message.dto';
+import { UserService } from 'modules/user/services';
+import {
+  MessageKeyService,
+  MessageTemplateService,
+} from 'modules/message/services';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Injectable()
 export class MessageService {
-  constructor(private readonly _messageRepository: MessageRepository) {}
+  constructor(
+    private readonly _messageRepository: MessageRepository,
+    private readonly _messageKeyService: MessageKeyService,
+    private readonly _messageTemplateService: MessageTemplateService,
+    private readonly _userService: UserService,
+  ) {}
 
   public async getMessages(
     user: UserEntity,
@@ -42,5 +54,29 @@ export class MessageService {
     });
 
     return new MessagesPageDto(messages.toDtos(), pageMetaDto);
+  }
+
+  @Transactional()
+  public async createMessage(createMessageDto: CreateMessageDto): Promise<any> {
+    const [recipient, sender, key] = await Promise.all([
+      this._userService.getUser({ uuid: createMessageDto.recipient }),
+      this._userService.getUser({ uuid: createMessageDto.sender }),
+      this._messageKeyService.getMessageKey(createMessageDto.key),
+    ]);
+
+    const message = this._messageRepository.create({ recipient, sender, key });
+    await this._messageRepository.save(message);
+
+    const createdMessage = { message, ...createMessageDto };
+    const messageTemplate = await this._messageTemplateService.createMessageTemplate(
+      createdMessage,
+    );
+
+    return {
+      message: {
+        ...message,
+        messageTemplate,
+      },
+    };
   }
 }

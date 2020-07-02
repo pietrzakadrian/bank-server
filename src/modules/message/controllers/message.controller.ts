@@ -8,6 +8,8 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
+  Post,
+  Body,
 } from '@nestjs/common';
 import { MessageService } from 'modules/message/services';
 import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
@@ -16,13 +18,13 @@ import { UserEntity } from 'modules/user/entities';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { RoleType } from 'common/constants';
+import { CreateMessageDto } from '../dtos/create-message.dto';
 
 @Controller('Messages')
 @ApiTags('Messages')
 @UseGuards(AuthGuard, RolesGuard)
 @UseInterceptors(AuthUserInterceptor)
 @ApiBearerAuth()
-@Roles(RoleType.USER, RoleType.ADMIN)
 export class MessageController {
   constructor(private readonly _messageService: MessageService) {}
 
@@ -33,11 +35,25 @@ export class MessageController {
     description: "Get User's messages",
     type: MessagesPageDto,
   })
+  @Roles(RoleType.USER, RoleType.ADMIN)
   async getMessages(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: MessagesPageOptionsDto,
     @AuthUser() user: UserEntity,
   ): Promise<MessagesPageDto | undefined> {
     return this._messageService.getMessages(user, pageOptionsDto);
+  }
+
+  @Post('/')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Create Message',
+  })
+  @Roles(RoleType.USER, RoleType.ADMIN)
+  async createMessage(
+    @Body() createMessageDto: CreateMessageDto,
+  ): Promise<any> {
+    return this._messageService.createMessage(createMessageDto);
   }
 }

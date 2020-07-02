@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { LanguageRepository } from 'modules/language/repositories';
 import { InsertResult } from 'typeorm';
+import { LanguageEntity } from '../entities';
 
 @Injectable()
 export class LanguageService {
@@ -11,6 +12,16 @@ export class LanguageService {
   ];
 
   constructor(private readonly _languageRepository: LanguageRepository) {}
+
+  public async getLanguage(uuid: string): Promise<LanguageEntity> {
+    const queryBuilder = this._languageRepository.createQueryBuilder(
+      'language',
+    );
+
+    queryBuilder.where('language.uuid = :uuid', { uuid });
+
+    return queryBuilder.getOne();
+  }
 
   public async setLanguages(): Promise<void> {
     for (const { name, code } of this._languages) {

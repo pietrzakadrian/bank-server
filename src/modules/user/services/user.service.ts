@@ -35,12 +35,12 @@ export class UserService {
   public async createUser(
     userRegisterDto: UserRegisterDto,
   ): Promise<UserEntity> {
-    const user = this._userRepository.create(userRegisterDto);
-    await this._userRepository.save(user);
-
-    const createdUser = { ...userRegisterDto, user };
-
     try {
+      const user = this._userRepository.create(userRegisterDto);
+      await this._userRepository.save(user);
+
+      const createdUser = { ...userRegisterDto, user };
+
       await Promise.all([
         this._userAuthService.createUserAuth(createdUser),
         this._userConfigService.createUserConfig(createdUser),

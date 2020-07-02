@@ -8,9 +8,14 @@ import {
 import { MessageService } from './services/message.service';
 import { MessageController } from './controllers/message.controller';
 import { MessageKeyService } from './services/message-key.service';
+import { UserModule } from 'modules/user/user.module';
+import { MessageTemplateService } from './services';
+import { LanguageModule } from 'modules/language/language.module';
 
 @Module({
   imports: [
+    UserModule,
+    LanguageModule,
     TypeOrmModule.forFeature([
       MessageRepository,
       MessageTemplateRepository,
@@ -18,7 +23,7 @@ import { MessageKeyService } from './services/message-key.service';
     ]),
   ],
   controllers: [MessageController],
-  exports: [MessageService, MessageKeyService],
-  providers: [MessageService, MessageKeyService],
+  exports: [MessageService, MessageKeyService, MessageTemplateService],
+  providers: [MessageService, MessageKeyService, MessageTemplateService],
 })
 export class MessageModule {}
