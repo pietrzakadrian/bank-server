@@ -9,7 +9,7 @@ export class MessageTemplateDto extends AbstractDto {
   readonly subject: string;
 
   @ApiProperty()
-  readonly content: string;
+  content: string;
 
   @ApiPropertyOptional()
   @IsOptional()

@@ -41,6 +41,7 @@ export class MessageService {
       .leftJoin('messages.sender', 'sender')
       .leftJoinAndSelect('messages.templates', 'templates')
       .leftJoinAndSelect('templates.language', 'language')
+      .leftJoinAndSelect('messages.key', 'key')
       .where(':userId IN ("recipient"."id", "sender"."id")')
       .orderBy('messages.createdAt', pageOptionsDto.order)
       .setParameter('userId', user.id)

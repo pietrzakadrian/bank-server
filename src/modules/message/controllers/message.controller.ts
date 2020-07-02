@@ -10,7 +10,9 @@ import {
   UseInterceptors,
   Post,
   Body,
+  Res,
 } from '@nestjs/common';
+import handlebars from 'handlebars';
 import { MessageService } from 'modules/message/services';
 import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
 import { AuthUser, Roles } from 'decorators';
@@ -19,6 +21,8 @@ import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { RoleType } from 'common/constants';
 import { CreateMessageDto } from '../dtos/create-message.dto';
+import { Response } from 'express';
+import { forEach } from 'lodash';
 
 @Controller('Messages')
 @ApiTags('Messages')
@@ -40,8 +44,28 @@ export class MessageController {
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: MessagesPageOptionsDto,
     @AuthUser() user: UserEntity,
-  ): Promise<MessagesPageDto | undefined> {
-    return this._messageService.getMessages(user, pageOptionsDto);
+  ): Promise<MessagesPageDto | undefined | any> {
+    const messages = await this._messageService.getMessages(
+      user,
+      pageOptionsDto,
+    );
+
+    messages.data.map((data) =>
+      data.templates.map((template) => {
+        const temp = handlebars.compile(template.content, {
+          strict: true,
+        });
+
+        const result = temp({
+          developerAge: 22,
+          customerCount: 1500,
+        });
+
+        template.content = result;
+      }),
+    );
+
+    return messages;
   }
 
   @Post('/')
