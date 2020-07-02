@@ -10,7 +10,6 @@ import {
   UseInterceptors,
   Post,
   Body,
-  Res,
 } from '@nestjs/common';
 import handlebars from 'handlebars';
 import { MessageService } from 'modules/message/services';
@@ -21,8 +20,6 @@ import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { RoleType } from 'common/constants';
 import { CreateMessageDto } from '../dtos/create-message.dto';
-import { Response } from 'express';
-import { forEach } from 'lodash';
 
 @Controller('Messages')
 @ApiTags('Messages')
