@@ -20,6 +20,7 @@ import { UserAuthService } from './user-auth.service';
 import { UserConfigService } from './user-config.service';
 import { CurrencyService } from 'modules/currency/services';
 import { MessageEntity } from 'modules/message/entities';
+import { query } from 'express';
 
 @Injectable()
 export class UserService {
@@ -65,22 +66,24 @@ export class UserService {
         .leftJoinAndSelect('userConfig.currency', 'currency')
         .addSelect(
           (subQuery) =>
-            subQuery
-              .select(`COUNT(messages)`)
-              .from(
-                (subQuery2) =>
-                  subQuery2
-                    .select(`"messages"."id"`)
-                    .from(MessageEntity, 'messages')
-                    .leftJoin('messages.recipient', 'recipient')
-                    .leftJoin('messages.sender', 'sender')
-                    .leftJoin('messages.templates', 'templates')
-                    .leftJoin('templates.language', 'language')
-                    .where('recipient.uuid = :uuid', { uuid: options.uuid })
-                    .andWhere('messages.readed = :readed', { readed: false })
-                    .groupBy(`"messages"."id"`),
-                'messages',
-              ),
+            subQuery.select(`COUNT(messages)`).from(
+              (subQuery2) =>
+                subQuery2
+                  .select(`"messages"."id"`)
+                  .from(MessageEntity, 'messages')
+                  .leftJoin('messages.recipient', 'recipient')
+                  .leftJoin('messages.sender', 'sender')
+                  .leftJoin('messages.templates', 'templates')
+                  .leftJoin('templates.language', 'language')
+                  .where('recipient.uuid = :uuid', {
+                    uuid: options.uuid,
+                  })
+                  .andWhere('messages.readed = :readed', {
+                    readed: false,
+                  })
+                  .groupBy(`"messages"."id"`),
+              'messages',
+            ),
           'userConfig_message_count',
         );
 
@@ -96,25 +99,12 @@ export class UserService {
     return queryBuilder.getOne();
   }
 
-  public async getUsers(
-    pageOptionsDto: UsersPageOptionsDto,
-  ): Promise<UsersPageDto> {
+  public async getUsersCount(): Promise<any> {
+    console.log('elo');
+
     const queryBuilder = this._userRepository.createQueryBuilder('user');
 
-    const [users, usersCount] = await queryBuilder
-      .leftJoinAndSelect('user.userAuth', 'userAuth')
-      .leftJoinAndSelect('user.userConfig', 'userConfig')
-      .leftJoinAndSelect('userConfig.currency', 'currency')
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.take)
-      .getManyAndCount();
-
-    const pageMetaDto = new PageMetaDto({
-      pageOptionsDto,
-      itemCount: usersCount,
-    });
-
-    return new UsersPageDto(users.toDtos(), pageMetaDto);
+    return queryBuilder.getCount();
   }
 
   public async updateUserData(

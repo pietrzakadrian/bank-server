@@ -17,10 +17,15 @@ import {
 } from 'modules/user/services';
 import { BillModule } from 'modules/bill/bill.module';
 import { CurrencyModule } from 'modules/currency/currency.module';
+import { UserConfigSubscriber } from './subscribers';
+import { MessageModule } from 'modules/message/message.module';
+import { LanguageModule } from 'modules/language/language.module';
 
 @Module({
   imports: [
     BillModule,
+    LanguageModule,
+    forwardRef(() => MessageModule),
     forwardRef(() => CurrencyModule),
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([
@@ -34,6 +39,11 @@ import { CurrencyModule } from 'modules/currency/currency.module';
   ],
   controllers: [UserController],
   exports: [UserAuthService, UserConfigService, UserService],
-  providers: [UserAuthService, UserConfigService, UserService],
+  providers: [
+    UserAuthService,
+    UserConfigService,
+    UserService,
+    UserConfigSubscriber,
+  ],
 })
 export class UserModule {}

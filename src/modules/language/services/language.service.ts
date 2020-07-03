@@ -13,6 +13,14 @@ export class LanguageService {
 
   constructor(private readonly _languageRepository: LanguageRepository) {}
 
+  public async getLanguages(): Promise<LanguageEntity[]> {
+    const queryBuilder = this._languageRepository.createQueryBuilder(
+      'language',
+    );
+
+    return queryBuilder.getMany();
+  }
+
   public async getLanguage(uuid: string): Promise<LanguageEntity> {
     const queryBuilder = this._languageRepository.createQueryBuilder(
       'language',

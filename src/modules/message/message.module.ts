@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
   MessageRepository,
@@ -14,8 +14,8 @@ import { LanguageModule } from 'modules/language/language.module';
 
 @Module({
   imports: [
-    UserModule,
     LanguageModule,
+    forwardRef(() => UserModule),
     TypeOrmModule.forFeature([
       MessageRepository,
       MessageTemplateRepository,

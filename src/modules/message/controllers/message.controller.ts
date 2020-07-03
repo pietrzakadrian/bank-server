@@ -11,9 +11,15 @@ import {
   Post,
   Body,
 } from '@nestjs/common';
-import handlebars from 'handlebars';
-import { MessageService } from 'modules/message/services';
-import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
+import {
+  MessageService,
+  MessageTemplateService,
+} from 'modules/message/services';
+import {
+  MessagesPageOptionsDto,
+  MessagesPageDto,
+  MessageDto,
+} from 'modules/message/dtos';
 import { AuthUser, Roles } from 'decorators';
 import { UserEntity } from 'modules/user/entities';
 import { AuthGuard, RolesGuard } from 'guards';
@@ -42,27 +48,7 @@ export class MessageController {
     pageOptionsDto: MessagesPageOptionsDto,
     @AuthUser() user: UserEntity,
   ): Promise<MessagesPageDto | undefined | any> {
-    const messages = await this._messageService.getMessages(
-      user,
-      pageOptionsDto,
-    );
-
-    messages.data.map((data) =>
-      data.templates.map((template) => {
-        const temp = handlebars.compile(template.content, {
-          strict: true,
-        });
-
-        const result = temp({
-          developerAge: 22,
-          customerCount: 1500,
-        });
-
-        template.content = result;
-      }),
-    );
-
-    return messages;
+    return this._messageService.getMessages(user, pageOptionsDto);
   }
 
   @Post('/')
@@ -70,11 +56,12 @@ export class MessageController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Create Message',
+    type: MessageDto,
   })
   @Roles(RoleType.USER, RoleType.ADMIN)
   async createMessage(
     @Body() createMessageDto: CreateMessageDto,
-  ): Promise<any> {
+  ): Promise<MessageDto | any> {
     return this._messageService.createMessage(createMessageDto);
   }
 }

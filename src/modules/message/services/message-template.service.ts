@@ -4,6 +4,7 @@ import { InsertResult } from 'typeorm';
 import { MessageEntity, MessageTemplateEntity } from '../entities';
 import { LanguageEntity } from 'modules/language/entities';
 import { LanguageService } from 'modules/language/services';
+import { MessageTemplateDto } from '../dtos';
 
 @Injectable()
 export class MessageTemplateService {
@@ -12,8 +13,10 @@ export class MessageTemplateService {
     private readonly _languageService: LanguageService,
   ) {}
 
-  public async createMessageTemplate(createdMessage): Promise<any> {
-    let messagesTemplates = [];
+  public async createMessageTemplate(
+    createdMessage,
+  ): Promise<MessageTemplateEntity[] | any> {
+    let templates = [];
 
     for (const {
       subject,
@@ -31,10 +34,10 @@ export class MessageTemplateService {
         actions,
       );
 
-      messagesTemplates = [...messagesTemplates, messageTemplate];
+      templates = [...templates, messageTemplate];
     }
 
-    return messagesTemplates;
+    return templates;
   }
 
   private async _setMessageTemplate(

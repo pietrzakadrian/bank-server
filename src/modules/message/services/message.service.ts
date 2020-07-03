@@ -1,21 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { MessageRepository } from 'modules/message/repositories';
 import { PageMetaDto } from 'common/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { MessagesPageOptionsDto, MessagesPageDto } from 'modules/message/dtos';
-import { CreateMessageDto } from '../dtos/create-message.dto';
+import { CreateMessageDto } from '../dtos';
 import { UserService } from 'modules/user/services';
 import {
   MessageKeyService,
   MessageTemplateService,
 } from 'modules/message/services';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { MessageEntity } from '../entities';
 
 @Injectable()
 export class MessageService {
   constructor(
     private readonly _messageRepository: MessageRepository,
+    @Inject(forwardRef(() => MessageKeyService))
     private readonly _messageKeyService: MessageKeyService,
+    @Inject(forwardRef(() => MessageTemplateService))
     private readonly _messageTemplateService: MessageTemplateService,
     private readonly _userService: UserService,
   ) {}
@@ -57,8 +60,40 @@ export class MessageService {
     return new MessagesPageDto(messages.toDtos(), pageMetaDto);
   }
 
+  public async getMessageByMessageKey(
+    options: Partial<{
+      uuid: string;
+      name: string;
+      user: UserEntity;
+    }>,
+  ): Promise<MessageEntity | undefined> {
+    const queryBuilder = this._messageRepository.createQueryBuilder('messages');
+
+    queryBuilder
+      .leftJoinAndSelect('messages.key', 'key')
+      .leftJoinAndSelect('messages.recipient', 'recipient');
+
+    if (options.uuid) {
+      queryBuilder.orWhere('key.uuid = :uuid', { uuid: options.uuid });
+    }
+
+    if (options.name) {
+      queryBuilder.orWhere('key.name = :name', { name: options.name });
+    }
+
+    if (options.user) {
+      queryBuilder.andWhere('recipient.id = :user', {
+        user: options.user.id,
+      });
+    }
+
+    return queryBuilder.getOne();
+  }
+
   @Transactional()
-  public async createMessage(createMessageDto: CreateMessageDto): Promise<any> {
+  public async createMessage(
+    createMessageDto: CreateMessageDto,
+  ): Promise<MessageEntity | any> {
     const [recipient, sender, key] = await Promise.all([
       this._userService.getUser({ uuid: createMessageDto.recipient }),
       this._userService.getUser({ uuid: createMessageDto.sender }),
@@ -69,15 +104,11 @@ export class MessageService {
     await this._messageRepository.save(message);
 
     const createdMessage = { message, ...createMessageDto };
-    const messageTemplate = await this._messageTemplateService.createMessageTemplate(
+
+    const templates = await this._messageTemplateService.createMessageTemplate(
       createdMessage,
     );
 
-    return {
-      message: {
-        ...message,
-        messageTemplate,
-      },
-    };
+    return { ...message, templates: templates.toDtos() };
   }
 }

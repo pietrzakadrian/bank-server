@@ -5,19 +5,19 @@ export class CreateMessageTemplateDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  readonly language: string;
+  language: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  readonly subject: string;
+  subject: string;
 
   @IsString()
   @IsNotEmpty()
   @ApiProperty()
-  readonly content: string;
+  content: string;
 
   @IsOptional()
   @ApiPropertyOptional()
-  readonly actions?: string;
+  actions?: string;
 }

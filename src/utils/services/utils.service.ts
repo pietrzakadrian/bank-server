@@ -43,4 +43,10 @@ export class UtilsService {
       .toUpperCase()
       .substr(0, length);
   }
+
+  static getAge(d1: Date, d2?: Date): number {
+    d2 = d2 || new Date();
+    const diff = d2.getTime() - d1.getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+  }
 }
