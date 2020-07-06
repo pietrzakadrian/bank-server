@@ -11,6 +11,8 @@ import {
 } from 'modules/message/services';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
 import { MessageEntity } from '../entities';
+import { ReadMessageDto } from '../dtos/read-message.dto';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class MessageService {
@@ -110,5 +112,27 @@ export class MessageService {
     );
 
     return { ...message, templates: templates.toDtos() };
+  }
+
+  public async readMessages(
+    recipient: UserEntity,
+    readMessageDto: ReadMessageDto,
+  ): Promise<UpdateResult> {
+    const queryBuilder = this._messageRepository.createQueryBuilder('message');
+
+    if (readMessageDto.uuid) {
+      return queryBuilder
+        .update()
+        .set({ readed: true })
+        .where('recipient = :recipient', { recipient: recipient.id })
+        .andWhere('uuid = :uuid', { uuid: readMessageDto.uuid })
+        .execute();
+    }
+
+    return queryBuilder
+      .update()
+      .set({ readed: true })
+      .where('recipient = :recipient', { recipient: recipient.id })
+      .execute();
   }
 }

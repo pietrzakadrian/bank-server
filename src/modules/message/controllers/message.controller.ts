@@ -10,22 +10,21 @@ import {
   UseInterceptors,
   Post,
   Body,
+  Patch,
 } from '@nestjs/common';
-import {
-  MessageService,
-  MessageTemplateService,
-} from 'modules/message/services';
+import { MessageService } from 'modules/message/services';
 import {
   MessagesPageOptionsDto,
   MessagesPageDto,
   MessageDto,
+  ReadMessageDto,
+  CreateMessageDto,
 } from 'modules/message/dtos';
 import { AuthUser, Roles } from 'decorators';
 import { UserEntity } from 'modules/user/entities';
 import { AuthGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import { RoleType } from 'common/constants';
-import { CreateMessageDto } from '../dtos/create-message.dto';
 
 @Controller('Messages')
 @ApiTags('Messages')
@@ -63,5 +62,20 @@ export class MessageController {
     @Body() createMessageDto: CreateMessageDto,
   ): Promise<MessageDto | any> {
     return this._messageService.createMessage(createMessageDto);
+  }
+
+  @Patch('/')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Readed message',
+    type: MessageDto,
+  })
+  @Roles(RoleType.USER, RoleType.ADMIN)
+  async readMessage(
+    @AuthUser() user: UserEntity,
+    @Body() readMessageDto: ReadMessageDto,
+  ): Promise<MessageDto | any> {
+    return this._messageService.readMessages(user, readMessageDto);
   }
 }

@@ -121,7 +121,7 @@ export class UserConfigSubscriber
     const customerCount = await this._userService.getUsersCount();
 
     for (const { uuid: language, code } of languages) {
-      const content = await this._getWelcomeMessageContent(code.toLowerCase());
+      const content = await this._getWelcomeMessageContent(code);
       const compiledContent = this._getCompiledContent(content, {
         developerAge: this._developerAge,
         customerCount,
@@ -129,8 +129,8 @@ export class UserConfigSubscriber
       const messageTemplate = this._createMessageTemplate(
         language,
         compiledContent,
-        this._messageOptions[code.toLowerCase()].subject,
-        this._messageOptions[code.toLowerCase()].actions,
+        this._messageOptions[code].subject,
+        this._messageOptions[code].actions,
       );
 
       messageTemplates = [...messageTemplates, messageTemplate];

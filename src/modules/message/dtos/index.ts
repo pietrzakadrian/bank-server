@@ -5,3 +5,4 @@ export * from './messages-page.dto';
 export * from './messages-page-options.dto';
 export * from './create-message-template.dto';
 export * from './create-message.dto';
+export * from './read-message.dto';

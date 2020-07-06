@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsArray } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray } from 'class-validator';
 import { CreateMessageTemplateDto } from './create-message-template.dto';
 
 export class CreateMessageDto {

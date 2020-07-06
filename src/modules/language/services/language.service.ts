@@ -6,9 +6,9 @@ import { LanguageEntity } from '../entities';
 @Injectable()
 export class LanguageService {
   private readonly _languages = [
-    { name: 'Polish', code: 'PL' },
-    { name: 'English', code: 'EN' },
-    { name: 'German', code: 'DE' },
+    { name: 'Polish', code: 'pl' },
+    { name: 'English', code: 'en' },
+    { name: 'German', code: 'de' },
   ];
 
   constructor(private readonly _languageRepository: LanguageRepository) {}
