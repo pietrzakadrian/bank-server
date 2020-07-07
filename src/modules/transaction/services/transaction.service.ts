@@ -88,8 +88,8 @@ export class TransactionService {
     options: Partial<{
       uuid: string;
       authorizationKey: string;
-      recipientUser: UserEntity;
-      senderUser: UserEntity;
+      recipient: UserEntity;
+      sender: UserEntity;
     }>,
   ): Promise<TransactionEntity | undefined> {
     const queryBuilder = this._transactionRepository.createQueryBuilder(
@@ -98,21 +98,21 @@ export class TransactionService {
 
     queryBuilder.orderBy('transaction.id', Order.DESC);
 
-    if (options.recipientUser) {
+    if (options.recipient) {
       queryBuilder
         .leftJoin('transaction.recipientBill', 'recipientBill')
         .leftJoin('recipientBill.user', 'recipientUser')
         .orWhere('recipientUser.id = :user', {
-          user: options.recipientUser.id,
+          user: options.recipient.id,
         });
     }
 
-    if (options.senderUser) {
+    if (options.sender) {
       queryBuilder
         .leftJoin('transaction.senderBill', 'senderBill')
         .leftJoin('senderBill.user', 'senderUser')
         .orWhere('senderUser.id = :user', {
-          user: options.senderUser.id,
+          user: options.sender.id,
         });
     }
 

@@ -320,6 +320,8 @@ export class BillService {
   }
 
   public async createAccountBill(createdUser): Promise<BillEntity> {
+    console.log('TRZECI');
+
     const [accountBillNumber, currency] = await Promise.all([
       this._createBillNumber(),
       this._currencyService.findCurrency({ uuid: createdUser.currency }),

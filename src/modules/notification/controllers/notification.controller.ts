@@ -20,6 +20,7 @@ import {
   TransactionsPageDto,
   TransactionsPageOptionsDto,
 } from 'modules/transaction/dtos';
+import { UserConfigService } from 'modules/user/services';
 
 @Controller('Notifications')
 @ApiTags('Notifications')
@@ -28,7 +29,10 @@ import {
 @ApiBearerAuth()
 @Roles(RoleType.USER, RoleType.ADMIN)
 export class NotificationController {
-  constructor(private readonly _transactionService: TransactionService) {}
+  constructor(
+    private readonly _transactionService: TransactionService,
+    private readonly _userConfigSerivce: UserConfigService,
+  ) {}
 
   @Get('/')
   @HttpCode(HttpStatus.OK)
@@ -44,6 +48,11 @@ export class NotificationController {
     pageOptionsDto: TransactionsPageOptionsDto,
     @AuthUser() user: UserEntity,
   ): Promise<TransactionsPageDto> {
-    return this._transactionService.getTransactions(user, pageOptionsDto);
+    const [transactions] = await Promise.all([
+      this._transactionService.getTransactions(user, pageOptionsDto),
+      this._userConfigSerivce.setNotification(user.userConfig, true),
+    ]);
+
+    return transactions;
   }
 }

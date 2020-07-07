@@ -54,23 +54,45 @@ export class UserAuthService {
   public async updateLastLogoutDate(
     userAuth: UserAuthEntity,
   ): Promise<UpdateResult> {
-    return this._userAuthRepository.update(userAuth.id, {
-      lastLogoutDate: new Date(),
-    });
+    const queryBuilder = this._userAuthRepository.createQueryBuilder(
+      'userAuth',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ lastLogoutDate: new Date() })
+      .where('id = :id', { id: userAuth.id })
+      .execute();
   }
 
   public async updateRole(
     userAuth: UserAuthEntity,
     role: RoleType,
   ): Promise<UpdateResult> {
-    return this._userAuthRepository.update(userAuth.id, { role });
+    const queryBuilder = this._userAuthRepository.createQueryBuilder(
+      'userAuth',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ role })
+      .where('id = :id', { id: userAuth.id })
+      .execute();
   }
 
   public async updatePassword(
     userAuth: UserAuthEntity,
     password: string,
   ): Promise<UpdateResult> {
-    return this._userAuthRepository.update(userAuth.id, { password });
+    const queryBuilder = this._userAuthRepository.createQueryBuilder(
+      'userAuth',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ password })
+      .where('id = :id', { id: userAuth.id })
+      .execute();
   }
 
   public async findUserAuth(
@@ -90,20 +112,17 @@ export class UserAuthService {
     }
 
     if (options.role) {
-      queryBuilder.orWhere('userAuth.role = :role', {
-        role: options.role,
-      });
+      queryBuilder.orWhere('userAuth.role = :role', { role: options.role });
     }
 
     return queryBuilder.getOne();
   }
 
   public async createUserAuth(createdUser): Promise<UserAuthEntity[]> {
+    console.log('PIERWSZY');
+
     const pinCode = await this._createPinCode();
-    const auth = this._userAuthRepository.create({
-      ...createdUser,
-      pinCode,
-    });
+    const auth = this._userAuthRepository.create({ ...createdUser, pinCode });
 
     try {
       return this._userAuthRepository.save(auth);
@@ -130,17 +149,29 @@ export class UserAuthService {
   private async _updateLastFailedLoggedDate(
     userAuth: UserAuthEntity,
   ): Promise<UpdateResult> {
-    return this._userAuthRepository.update(userAuth.id, {
-      lastFailedLoggedDate: new Date(),
-    });
+    const queryBuilder = this._userAuthRepository.createQueryBuilder(
+      'userAuth',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ lastFailedLoggedDate: new Date() })
+      .where('id = :id', { id: userAuth.id })
+      .execute();
   }
 
   private async _updateLastSuccessfulLoggedDate(
     userAuth: UserAuthEntity,
     lastPresentLoggedDate?: Date,
   ): Promise<UpdateResult> {
-    return this._userAuthRepository.update(userAuth.id, {
-      lastSuccessfulLoggedDate: lastPresentLoggedDate ?? new Date(),
-    });
+    const queryBuilder = this._userAuthRepository.createQueryBuilder(
+      'userAuth',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ lastSuccessfulLoggedDate: lastPresentLoggedDate ?? new Date() })
+      .where('id = :id', { id: userAuth.id })
+      .execute();
   }
 }

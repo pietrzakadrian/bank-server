@@ -8,10 +8,10 @@ import { UserAuthService } from 'modules/user/services';
 import { Language } from 'common/constants/language.constant';
 
 @Injectable()
-export class RegisterPromotionMiddleware implements NestMiddleware {
-  private readonly _promotionValue = 10;
-  private readonly _promotionTransferTitle = `Create an account`;
-  private readonly _promotionKey = `PROMO10`;
+export class WelcomePromotionMiddleware implements NestMiddleware {
+  private readonly _promotionValue = 5;
+  private readonly _promotionTransferTitle = `Thank you for registering! :)`;
+  private readonly _promotionKey = `WELCOME5`;
 
   constructor(
     private readonly _billService: BillService,
@@ -25,12 +25,12 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
     next: NextFunction,
   ): Promise<void> {
     const { pinCode } = req.body;
-    const [user, authorUser] = await Promise.all([
+    const [user, rootUser] = await Promise.all([
       this._userAuthService.findUserAuth({ pinCode }),
-      this._userAuthService.findUserAuth({ role: RoleType.ROOT }),
+      this._userAuthService.findUserAuth({ role: RoleType.ADMIN }),
     ]);
 
-    if (!user || !authorUser) {
+    if (!user || !rootUser) {
       return next();
     }
 
@@ -44,7 +44,7 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
     }
 
     const [senderBill, recipientBill] = await Promise.all([
-      this._billService.getBill(authorUser),
+      this._billService.getBill(rootUser),
       this._billService.getBill(user),
     ]);
 
@@ -57,11 +57,11 @@ export class RegisterPromotionMiddleware implements NestMiddleware {
     };
 
     await this._transactionService.createTransaction(
-      authorUser,
+      rootUser,
       createdTransaction,
       this._promotionKey,
     );
-    await this._transactionService.confirmTransaction(authorUser, {
+    await this._transactionService.confirmTransaction(rootUser, {
       authorizationKey: this._promotionKey,
     });
 

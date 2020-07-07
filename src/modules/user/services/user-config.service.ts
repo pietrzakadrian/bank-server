@@ -14,6 +14,8 @@ export class UserConfigService {
   ) {}
 
   public async createUserConfig(createdUser): Promise<UserConfigEntity> {
+    console.log('DRUGI');
+
     const currency = await this._currencyService.findCurrency({
       uuid: createdUser.currency,
     });
@@ -35,23 +37,46 @@ export class UserConfigService {
   public async updateLastPresentLoggedDate(
     userConfig: UserConfigEntity,
   ): Promise<UpdateResult> {
-    return this._userConfigRepository.update(userConfig.id, {
-      lastPresentLoggedDate: new Date(),
-    });
+    const queryBuilder = this._userConfigRepository.createQueryBuilder(
+      'userConfig',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ lastPresentLoggedDate: new Date() })
+      .where('id = :id', { id: userConfig.id })
+      .execute();
   }
 
   public async updateMainCurrency(
     userConfig: UserConfigEntity,
     currency: CurrencyEntity,
   ): Promise<UpdateResult> {
-    return this._userConfigRepository.update(userConfig.id, { currency });
+    const queryBuilder = this._userConfigRepository.createQueryBuilder(
+      'userConfig',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ currency })
+      .where('id = :id', { id: userConfig.id })
+      .execute();
   }
 
   public async setNotification(
     userConfig: UserConfigEntity,
+    reset = false,
   ): Promise<UpdateResult> {
-    return this._userConfigRepository.update(userConfig.id, {
-      notificationCount: userConfig.notificationCount + 1,
-    });
+    const queryBuilder = this._userConfigRepository.createQueryBuilder(
+      'userConfig',
+    );
+
+    return queryBuilder
+      .update()
+      .set({
+        notificationCount: () => (reset ? '0' : 'notification_count + 1'),
+      })
+      .where('id = :id', { id: userConfig.id })
+      .execute();
   }
 }
