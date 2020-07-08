@@ -256,6 +256,6 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   }
 
   private async _makeMessage(createdMessage: CreateMessageDto): Promise<void> {
-    await this._messageService.createMessage(createdMessage);
+    return this._messageService.createMessage(createdMessage);
   }
 }
