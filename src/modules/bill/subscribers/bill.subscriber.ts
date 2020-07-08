@@ -130,7 +130,14 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     });
     const templates = await this._createdMessageTemplates(languages);
 
-    return this._makeMessage(key, sender, recipient, templates);
+    const createdMessage = this._getCreatedMessage(
+      key.uuid,
+      sender.uuid,
+      recipient.uuid,
+      templates,
+    );
+
+    return this._makeMessage(createdMessage);
   }
 
   private async _initRegisterPromotion(
@@ -249,19 +256,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     });
   }
 
-  private async _makeMessage(
-    key: MessageKeyEntity,
-    sender: UserEntity,
-    recipient: UserEntity,
-    templates: CreateMessageTemplateDto[],
-  ): Promise<void> {
-    const createdMessage = this._getCreatedMessage(
-      key.uuid,
-      sender.uuid,
-      recipient.uuid,
-      templates,
-    );
-
+  private async _makeMessage(createdMessage: CreateMessageDto): Promise<void> {
     await this._messageService.createMessage(createdMessage);
   }
 }
