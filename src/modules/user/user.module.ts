@@ -1,4 +1,4 @@
-import { forwardRef, Module, Global } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'modules/auth/auth.module';
 import { BillRepository } from 'modules/bill/repositories';

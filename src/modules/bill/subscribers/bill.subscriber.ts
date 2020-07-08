@@ -21,6 +21,10 @@ import {
   CreateMessageTemplateDto,
   CreateMessageDto,
 } from 'modules/message/dtos';
+import { LanguageEntity } from 'modules/language/entities';
+import { ICreatedMessage } from 'interfaces';
+import { CreateTransactionDto } from 'modules/transaction/dtos';
+import { MessageKeyEntity } from 'modules/message/entities';
 
 @Injectable()
 @EventSubscriber()
@@ -49,7 +53,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   };
 
   /*
-    NOTE: It need to use different dependencies,
+    NOTE: It need to use different services,
     that's why this subscriber is connected by the constructor.
    */
   constructor(
@@ -76,7 +80,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     ]);
   }
 
-  private async _initWelcomeTransfer(recipientBill: BillEntity) {
+  private async _initWelcomeTransfer(recipientBill: BillEntity): Promise<void> {
     const transaction = await this._transactionService.getTransaction({
       recipient: recipientBill.user,
       authorizationKey: this._messageKey,
@@ -104,14 +108,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
       locale: Language.EN,
     };
 
-    await this._transactionService.createTransaction(
-      sender,
-      createdTransaction,
-      this._promotionKey,
-    );
-    await this._transactionService.confirmTransaction(sender, {
-      authorizationKey: this._promotionKey,
-    });
+    return this._makeTransfer(createdTransaction, sender, this._messageKey);
   }
 
   private async _initWelcomeMessage(recipient: UserEntity): Promise<void> {
@@ -133,14 +130,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     });
     const templates = await this._createdMessageTemplates(languages);
 
-    const createdMessage = this._getCreatedMessage(
-      key.uuid,
-      sender.uuid,
-      recipient.uuid,
-      templates,
-    );
-
-    await this._messageService.createMessage(createdMessage);
+    return this._makeMessage(key, sender, recipient, templates);
   }
 
   private async _initRegisterPromotion(
@@ -173,14 +163,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
       locale: Language.EN,
     };
 
-    await this._transactionService.createTransaction(
-      sender,
-      createdTransaction,
-      this._promotionKey,
-    );
-    await this._transactionService.confirmTransaction(sender, {
-      authorizationKey: this._promotionKey,
-    });
+    return this._makeTransfer(createdTransaction, sender, this._promotionKey);
   }
 
   private _getCreatedMessage(
@@ -192,7 +175,10 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     return { key, sender, recipient, templates };
   }
 
-  private _getCompiledContent(content: string, variables: any): any {
+  private _getCompiledContent(
+    content: string,
+    variables: ICreatedMessage,
+  ): any {
     const template = handlebars.compile(content.toString());
 
     return template({
@@ -202,7 +188,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   }
 
   private async _createdMessageTemplates(
-    languages,
+    languages: LanguageEntity[],
   ): Promise<CreateMessageTemplateDto[]> {
     let messageTemplates = [];
     const customerCount = await this._userService.getUsersCount();
@@ -246,5 +232,36 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     actions?: string,
   ): CreateMessageTemplateDto {
     return { language, content, subject, actions };
+  }
+
+  private async _makeTransfer(
+    createdTransaction: CreateTransactionDto,
+    sender: UserEntity,
+    authorizationKey: string,
+  ): Promise<void> {
+    await this._transactionService.createTransaction(
+      sender,
+      createdTransaction,
+      authorizationKey,
+    );
+    await this._transactionService.confirmTransaction(sender, {
+      authorizationKey,
+    });
+  }
+
+  private async _makeMessage(
+    key: MessageKeyEntity,
+    sender: UserEntity,
+    recipient: UserEntity,
+    templates: CreateMessageTemplateDto[],
+  ): Promise<void> {
+    const createdMessage = this._getCreatedMessage(
+      key.uuid,
+      sender.uuid,
+      recipient.uuid,
+      templates,
+    );
+
+    await this._messageService.createMessage(createdMessage);
   }
 }
