@@ -22,7 +22,13 @@ export class MessageKeyService {
   }
 
   public async setMessageKeys(): Promise<void> {
+    const messageKeys = await this._getMessageKeys();
+
     for (const { name } of this._messageKeys) {
+      if (messageKeys.find((messageKey) => messageKey.name === name)) {
+        continue;
+      }
+
       await this._createMessageKeys(name);
     }
   }
@@ -32,14 +38,14 @@ export class MessageKeyService {
       'message_key',
     );
 
-    return queryBuilder
-      .insert()
-      .values({ name })
-      .onConflict(
-        `("name") DO UPDATE 
-          SET name = :name`,
-      )
-      .setParameter('name', name)
-      .execute();
+    return queryBuilder.insert().values({ name }).execute();
+  }
+
+  private async _getMessageKeys(): Promise<MessageKeyEntity[]> {
+    const queryBuilder = this._messageKeyRepository.createQueryBuilder(
+      'messageKey',
+    );
+
+    return queryBuilder.getMany();
   }
 }

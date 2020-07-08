@@ -32,7 +32,13 @@ export class LanguageService {
   }
 
   public async setLanguages(): Promise<void> {
+    const languages = await this.getLanguages();
+
     for (const { name, code } of this._languages) {
+      if (languages.find((language) => language.code === code)) {
+        continue;
+      }
+
       await this._createLanguage(name, code);
     }
   }
@@ -45,14 +51,6 @@ export class LanguageService {
       'language',
     );
 
-    return queryBuilder
-      .insert()
-      .values({ name, code })
-      .onConflict(
-        `("name") DO UPDATE
-                SET name = :name`,
-      )
-      .setParameter('name', name)
-      .execute();
+    return queryBuilder.insert().values({ name, code }).execute();
   }
 }
