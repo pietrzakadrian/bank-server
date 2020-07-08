@@ -1,27 +1,37 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
-import { RoleType } from 'common/constants';
-import { NextFunction, Response } from 'express';
-import { IUserLoginBodyRequest } from 'interfaces';
-import { BillService } from 'modules/bill/services';
-import { TransactionService } from 'modules/transaction/services';
-import { UserAuthService, UserService } from 'modules/user/services';
-import { Language } from 'common/constants/language.constant';
-import { UtilsService } from 'utils/services';
+import { Injectable } from '@nestjs/common';
+import { BillEntity } from '../entities';
+import {
+  EntitySubscriberInterface,
+  EventSubscriber,
+  InsertEvent,
+  Connection,
+} from 'typeorm';
+import { InjectConnection } from '@nestjs/typeorm';
 import { MessageService } from 'modules/message/services';
+import { UserService, UserAuthService } from 'modules/user/services';
 import { LanguageService } from 'modules/language/services';
+import { UserEntity } from 'modules/user/entities';
+import { RoleType, Language } from 'common/constants';
+import { TransactionService } from 'modules/transaction/services';
+import { BillService } from 'modules/bill/services';
+import { UtilsService } from 'utils/services';
+import * as fs from 'fs';
+import handlebars from 'handlebars';
 import {
   CreateMessageTemplateDto,
   CreateMessageDto,
 } from 'modules/message/dtos';
-import * as fs from 'fs';
-import handlebars from 'handlebars';
 
 @Injectable()
-export class WelcomePromotionMiddleware implements NestMiddleware {
+@EventSubscriber()
+export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   private readonly _developerAge = UtilsService.getAge(new Date(1997, 9, 16));
-  private readonly _promotionValue = 5;
-  private readonly _promotionTransferTitle = `Thank you for registering! :)`;
-  private readonly _promotionKey = `WELCOME5`;
+  private readonly _promotionValue = 10;
+  private readonly _promotionTransferTitle = `Create an account`;
+  private readonly _promotionKey = `PROMO10`;
+  private readonly _messageValue = 5;
+  private readonly _messageTransferTitle = `Thank you for registering! :)`;
+  private readonly _messageKey = `WELCOME5`;
   private readonly _messageName = 'WELCOME_MESSAGE';
   private readonly _messageOptions = {
     en: {
@@ -38,55 +48,57 @@ export class WelcomePromotionMiddleware implements NestMiddleware {
     },
   };
 
+  /*
+    NOTE: It need to use different dependencies,
+    that's why this subscriber is connected by the constructor.
+   */
   constructor(
-    private readonly _billService: BillService,
-    private readonly _transactionService: TransactionService,
+    @InjectConnection() readonly connection: Connection,
+    private readonly _messageService: MessageService,
     private readonly _userService: UserService,
     private readonly _userAuthService: UserAuthService,
-    private readonly _messageService: MessageService,
     private readonly _languageService: LanguageService,
-  ) {}
-
-  public async use(
-    req: IUserLoginBodyRequest,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
-    await Promise.all([
-      this._initWelcomeTransfer(req.body.pinCode),
-      this._initWelcomeMessage(req.body.pinCode),
-    ]);
-
-    next();
+    private readonly _transactionService: TransactionService,
+    private readonly _billService: BillService,
+  ) {
+    connection.subscribers.push(this);
   }
 
-  private async _initWelcomeTransfer(pinCode: number) {
-    const [recipient, sender] = await Promise.all([
-      this._userAuthService.findUserAuth({ pinCode }),
-      this._userAuthService.findUserAuth({ role: RoleType.ADMIN }),
+  public listenTo() {
+    return BillEntity;
+  }
+
+  public async afterInsert(event: InsertEvent<BillEntity>): Promise<void> {
+    await Promise.all([
+      this._initWelcomeMessage(event.entity.user),
+      this._initWelcomeTransfer(event.entity),
+      this._initRegisterPromotion(event.entity),
     ]);
+  }
 
-    if (!recipient || !sender) {
-      return;
-    }
-
+  private async _initWelcomeTransfer(recipientBill: BillEntity) {
     const transaction = await this._transactionService.getTransaction({
-      recipient,
-      authorizationKey: this._promotionKey,
+      recipient: recipientBill.user,
+      authorizationKey: this._messageKey,
     });
 
     if (transaction) {
       return;
     }
 
-    const [senderBill, recipientBill] = await Promise.all([
-      this._billService.getBill(sender),
-      this._billService.getBill(recipient),
-    ]);
+    const sender = await this._userAuthService.findUserAuth({
+      role: RoleType.ADMIN,
+    });
+
+    if (!sender) {
+      return;
+    }
+
+    const senderBill = await this._billService.getBill(sender);
 
     const createdTransaction = {
-      amountMoney: this._promotionValue,
-      transferTitle: this._promotionTransferTitle,
+      amountMoney: this._messageValue,
+      transferTitle: this._messageTransferTitle,
       recipientBill: recipientBill.uuid,
       senderBill: senderBill.uuid,
       locale: Language.EN,
@@ -102,13 +114,7 @@ export class WelcomePromotionMiddleware implements NestMiddleware {
     });
   }
 
-  private async _initWelcomeMessage(pinCode: number) {
-    const recipient = await this._userAuthService.findUserAuth({ pinCode });
-
-    if (!recipient) {
-      return;
-    }
-
+  private async _initWelcomeMessage(recipient: UserEntity): Promise<void> {
     const message = await this._messageService.getMessageByMessageKey({
       user: recipient,
       name: this._messageName,
@@ -137,6 +143,46 @@ export class WelcomePromotionMiddleware implements NestMiddleware {
     await this._messageService.createMessage(createdMessage);
   }
 
+  private async _initRegisterPromotion(
+    recipientBill: BillEntity,
+  ): Promise<void> {
+    const transaction = await this._transactionService.getTransaction({
+      recipient: recipientBill.user,
+      authorizationKey: this._promotionKey,
+    });
+
+    if (transaction) {
+      return;
+    }
+
+    const sender = await this._userAuthService.findUserAuth({
+      role: RoleType.ROOT,
+    });
+
+    if (!sender) {
+      return;
+    }
+
+    const senderBill = await this._billService.getBill(sender);
+
+    const createdTransaction = {
+      amountMoney: this._promotionValue,
+      transferTitle: this._promotionTransferTitle,
+      recipientBill: recipientBill.uuid,
+      senderBill: senderBill.uuid,
+      locale: Language.EN,
+    };
+
+    await this._transactionService.createTransaction(
+      sender,
+      createdTransaction,
+      this._promotionKey,
+    );
+    await this._transactionService.confirmTransaction(sender, {
+      authorizationKey: this._promotionKey,
+    });
+  }
+
   private _getCreatedMessage(
     key: string,
     sender: string,
@@ -146,7 +192,7 @@ export class WelcomePromotionMiddleware implements NestMiddleware {
     return { key, sender, recipient, templates };
   }
 
-  private _getCompiledContent(content, variables) {
+  private _getCompiledContent(content: string, variables: any): any {
     const template = handlebars.compile(content.toString());
 
     return template({
@@ -183,8 +229,7 @@ export class WelcomePromotionMiddleware implements NestMiddleware {
   private async _getWelcomeMessageContent(locale: string): Promise<string> {
     try {
       const data = await fs.promises.readFile(
-        __dirname +
-          `/../modules/message/templates/welcome.template.${locale}.hbs`,
+        __dirname + `/../../message/templates/welcome.template.${locale}.hbs`,
         'utf8',
       );
 

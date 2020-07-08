@@ -18,15 +18,15 @@ import {
 import { BillModule } from 'modules/bill/bill.module';
 import { CurrencyModule } from 'modules/currency/currency.module';
 import { MessageModule } from 'modules/message/message.module';
-import { LanguageModule } from 'modules/language/language.module';
+import { TransactionModule } from 'modules/transaction/transaction.module';
 
 @Module({
   imports: [
-    BillModule,
-    LanguageModule,
     forwardRef(() => MessageModule),
     forwardRef(() => CurrencyModule),
+    forwardRef(() => BillModule),
     forwardRef(() => AuthModule),
+    forwardRef(() => TransactionModule),
     TypeOrmModule.forFeature([
       UserRepository,
       UserAuthRepository,

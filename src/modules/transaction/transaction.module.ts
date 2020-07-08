@@ -11,9 +11,9 @@ import { UserModule } from 'modules/user/user.module';
 
 @Module({
   imports: [
+    forwardRef(() => UserModule),
     forwardRef(() => CurrencyModule),
-    BillModule,
-    UserModule,
+    forwardRef(() => BillModule),
     TypeOrmModule.forFeature([
       TransactionRepository,
       BillRepository,

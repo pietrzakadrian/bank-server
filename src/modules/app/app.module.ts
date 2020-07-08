@@ -11,11 +11,7 @@ import { AuthModule } from 'modules/auth/auth.module';
 import { BillModule } from 'modules/bill/bill.module';
 import { TransactionModule } from 'modules/transaction/transaction.module';
 import { AppService } from 'modules/app/services';
-import {
-  contextMiddleware,
-  RegisterPromotionMiddleware,
-  WelcomePromotionMiddleware,
-} from 'middlewares';
+import { contextMiddleware } from 'middlewares';
 import { UserAuthSubscriber } from 'modules/user/subscribers';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -85,7 +81,5 @@ import { NotificationModule } from 'modules/notification/notification.module';
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): MiddlewareConsumer | void {
     consumer.apply(contextMiddleware).forRoutes('*');
-    consumer.apply(RegisterPromotionMiddleware).forRoutes('/Auth/login');
-    consumer.apply(WelcomePromotionMiddleware).forRoutes('/Auth/login');
   }
 }
