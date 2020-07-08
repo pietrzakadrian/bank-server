@@ -17,7 +17,6 @@ import {
 } from 'modules/user/services';
 import { BillModule } from 'modules/bill/bill.module';
 import { CurrencyModule } from 'modules/currency/currency.module';
-import { UserConfigSubscriber } from './subscribers';
 import { MessageModule } from 'modules/message/message.module';
 import { LanguageModule } from 'modules/language/language.module';
 
@@ -39,11 +38,6 @@ import { LanguageModule } from 'modules/language/language.module';
   ],
   controllers: [UserController],
   exports: [UserAuthService, UserConfigService, UserService],
-  providers: [
-    UserAuthService,
-    UserConfigService,
-    UserService,
-    UserConfigSubscriber,
-  ],
+  providers: [UserAuthService, UserConfigService, UserService],
 })
 export class UserModule {}
