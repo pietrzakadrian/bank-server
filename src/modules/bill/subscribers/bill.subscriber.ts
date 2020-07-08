@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BillEntity } from '../entities';
+import { BillEntity } from 'modules/bill/entities';
 import {
   EntitySubscriberInterface,
   EventSubscriber,
@@ -24,7 +24,6 @@ import {
 import { LanguageEntity } from 'modules/language/entities';
 import { ICreatedMessage } from 'interfaces';
 import { CreateTransactionDto } from 'modules/transaction/dtos';
-import { MessageKeyEntity } from 'modules/message/entities';
 
 @Injectable()
 @EventSubscriber()
