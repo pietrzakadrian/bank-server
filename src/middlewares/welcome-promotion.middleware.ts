@@ -187,7 +187,6 @@ export class WelcomePromotionMiddleware implements NestMiddleware {
           `/../modules/message/templates/welcome.template.${locale}.hbs`,
         'utf8',
       );
-      console.log(__dirname);
 
       return data;
     } catch (error) {

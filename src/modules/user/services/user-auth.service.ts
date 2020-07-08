@@ -119,8 +119,6 @@ export class UserAuthService {
   }
 
   public async createUserAuth(createdUser): Promise<UserAuthEntity[]> {
-    console.log('PIERWSZY');
-
     const pinCode = await this._createPinCode();
     const auth = this._userAuthRepository.create({ ...createdUser, pinCode });
 

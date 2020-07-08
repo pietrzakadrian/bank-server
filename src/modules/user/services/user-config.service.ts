@@ -14,8 +14,6 @@ export class UserConfigService {
   ) {}
 
   public async createUserConfig(createdUser): Promise<UserConfigEntity> {
-    console.log('DRUGI');
-
     const currency = await this._currencyService.findCurrency({
       uuid: createdUser.currency,
     });

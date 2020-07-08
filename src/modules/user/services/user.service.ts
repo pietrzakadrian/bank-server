@@ -99,11 +99,8 @@ export class UserService {
     return queryBuilder.getOne();
   }
 
-  public async getUsersCount(): Promise<any> {
-    console.log('elo');
-
+  public async getUsersCount(): Promise<number> {
     const queryBuilder = this._userRepository.createQueryBuilder('user');
-
     return queryBuilder.getCount();
   }
 
