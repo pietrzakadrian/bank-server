@@ -75,7 +75,7 @@ export class AuthController {
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(AuthUserInterceptor)
   @ApiBearerAuth()
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   async userLogout(@AuthUser() user: UserEntity): Promise<void> {
     await this._userAuthService.updateLastLogoutDate(user.userAuth);
   }

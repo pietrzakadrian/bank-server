@@ -35,13 +35,13 @@ export class MessageKeyService {
 
   private async _createMessageKeys(name: string): Promise<InsertResult> {
     const queryBuilder = this._messageKeyRepository.createQueryBuilder(
-      'message_key',
+      'messageKey',
     );
 
     return queryBuilder.insert().values({ name }).execute();
   }
 
-  private async _getMessageKeys(): Promise<MessageKeyEntity[]> {
+  private async _getMessageKeys(): Promise<MessageKeyEntity[] | undefined> {
     const queryBuilder = this._messageKeyRepository.createQueryBuilder(
       'messageKey',
     );

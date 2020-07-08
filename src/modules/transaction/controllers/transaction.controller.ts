@@ -44,7 +44,7 @@ export class TransactionController {
 
   @Get('/')
   @HttpCode(HttpStatus.OK)
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get transactions',
@@ -60,7 +60,7 @@ export class TransactionController {
 
   @Post('create')
   @HttpCode(HttpStatus.OK)
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @ApiOkResponse({
     status: HttpStatus.OK,
     description: 'create transfer',
@@ -80,7 +80,7 @@ export class TransactionController {
 
   @Patch('confirm')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @ApiNoContentResponse({
     description: 'confirm transfer',
   })
@@ -96,7 +96,7 @@ export class TransactionController {
 
   @Get('/:uuid/authorizationKey')
   @HttpCode(HttpStatus.OK)
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @ApiOkResponse({
     status: HttpStatus.OK,
     description: 'get authorization key',

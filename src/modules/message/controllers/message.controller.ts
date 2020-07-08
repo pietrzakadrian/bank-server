@@ -41,7 +41,7 @@ export class MessageController {
     description: "Get User's messages",
     type: MessagesPageDto,
   })
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   async getMessages(
     @Query(new ValidationPipe({ transform: true }))
     pageOptionsDto: MessagesPageOptionsDto,
@@ -57,7 +57,7 @@ export class MessageController {
     description: 'Create Message',
     type: MessageDto,
   })
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   async createMessage(
     @Body() createMessageDto: CreateMessageDto,
   ): Promise<MessageDto | any> {
@@ -71,7 +71,7 @@ export class MessageController {
     description: 'Readed message',
     type: MessageDto,
   })
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   async readMessage(
     @AuthUser() user: UserEntity,
     @Body() readMessageDto: ReadMessageDto,

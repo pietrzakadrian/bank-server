@@ -27,7 +27,7 @@ import { UserConfigService } from 'modules/user/services';
 @UseGuards(AuthGuard, RolesGuard)
 @UseInterceptors(AuthUserInterceptor)
 @ApiBearerAuth()
-@Roles(RoleType.USER, RoleType.ADMIN)
+@Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
 export class NotificationController {
   constructor(
     private readonly _transactionService: TransactionService,
@@ -36,7 +36,7 @@ export class NotificationController {
 
   @Get('/')
   @HttpCode(HttpStatus.OK)
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @ApiResponse({
     status: HttpStatus.OK,
     description:

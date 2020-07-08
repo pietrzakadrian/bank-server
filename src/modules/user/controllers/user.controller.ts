@@ -31,7 +31,7 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(AuthUserInterceptor)
   @ApiBearerAuth()
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -47,7 +47,7 @@ export class UserController {
   @UseGuards(AuthGuard, RolesGuard)
   @UseInterceptors(AuthUserInterceptor)
   @ApiBearerAuth()
-  @Roles(RoleType.USER, RoleType.ADMIN)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
