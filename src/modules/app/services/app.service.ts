@@ -44,12 +44,9 @@ export class AppService implements OnModuleInit {
     );
 
     await this._initExchangeRates();
-    await Promise.all([
-      this._initRootUser(),
-      this._initAuthorUser(),
-      this._initLanguage(),
-      this._initMessageKeys(),
-    ]);
+    await this._initLanguage();
+    await this._initMessageKeys();
+    await Promise.all([this._initRootUser(), this._initAuthorUser()]);
   }
 
   private async _initExchangeRates(): Promise<void> {

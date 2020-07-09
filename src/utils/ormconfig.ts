@@ -21,6 +21,7 @@ const config: ConnectionOptions = {
   subscribers: [UserAuthSubscriber],
   synchronize: false,
   logging: true,
+  logger: 'file',
 };
 
 export = config;

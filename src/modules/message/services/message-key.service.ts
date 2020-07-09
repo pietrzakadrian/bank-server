@@ -10,13 +10,22 @@ export class MessageKeyService {
   constructor(private readonly _messageKeyRepository: MessageKeyRepository) {}
 
   public async getMessageKey(
-    uuid: string,
+    options: Partial<{
+      uuid: string;
+      name: string;
+    }>,
   ): Promise<MessageKeyEntity | undefined> {
     const queryBuilder = this._messageKeyRepository.createQueryBuilder(
       'messageKey',
     );
 
-    queryBuilder.where('messageKey.uuid = :uuid', { uuid });
+    if (options.uuid) {
+      queryBuilder.orWhere('messageKey.uuid = :uuid', { uuid: options.uuid });
+    }
+
+    if (options.name) {
+      queryBuilder.orWhere('messageKey.name = :name', { name: options.name });
+    }
 
     return queryBuilder.getOne();
   }

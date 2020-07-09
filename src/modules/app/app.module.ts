@@ -47,6 +47,7 @@ import { NotificationModule } from 'modules/notification/notification.module';
         subscribers: [UserAuthSubscriber],
         migrationsRun: true,
         logging: true,
+        logger: 'file',
       }),
       inject: [ConfigService],
     }),

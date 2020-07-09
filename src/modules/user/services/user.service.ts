@@ -45,11 +45,14 @@ export class UserService {
       await Promise.all([
         this._userAuthService.createUserAuth(createdUser),
         this._userConfigService.createUserConfig(createdUser),
-        this._billService.createAccountBill(createdUser),
       ]);
+
+      await this._billService.createAccountBill(createdUser);
 
       return this.getUser({ uuid: user.uuid });
     } catch (error) {
+      console.log(error);
+
       throw new CreateFailedException(error);
     }
   }

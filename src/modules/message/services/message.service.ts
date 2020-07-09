@@ -62,31 +62,26 @@ export class MessageService {
     return new MessagesPageDto(messages.toDtos(), pageMetaDto);
   }
 
-  public async getMessageByMessageKey(
+  public async getMessageByMessageName(
     options: Partial<{
-      uuid: string;
       name: string;
       user: UserEntity;
     }>,
   ): Promise<MessageEntity | undefined> {
     const queryBuilder = this._messageRepository.createQueryBuilder('messages');
 
-    queryBuilder
-      .leftJoinAndSelect('messages.key', 'key')
-      .leftJoinAndSelect('messages.recipient', 'recipient');
-
-    if (options.uuid) {
-      queryBuilder.orWhere('key.uuid = :uuid', { uuid: options.uuid });
-    }
+    queryBuilder.leftJoinAndSelect('messages.key', 'key');
 
     if (options.name) {
       queryBuilder.orWhere('key.name = :name', { name: options.name });
     }
 
     if (options.user) {
-      queryBuilder.andWhere('recipient.id = :user', {
-        user: options.user.id,
-      });
+      queryBuilder
+        .leftJoinAndSelect('messages.recipient', 'recipient')
+        .andWhere('recipient.id = :user', {
+          user: options.user.id,
+        });
     }
 
     return queryBuilder.getOne();
@@ -99,7 +94,7 @@ export class MessageService {
     const [recipient, sender, key] = await Promise.all([
       this._userService.getUser({ uuid: createMessageDto.recipient }),
       this._userService.getUser({ uuid: createMessageDto.sender }),
-      this._messageKeyService.getMessageKey(createMessageDto.key),
+      this._messageKeyService.getMessageKey({ uuid: createMessageDto.key }),
     ]);
 
     const message = this._messageRepository.create({ recipient, sender, key });

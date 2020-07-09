@@ -7,7 +7,7 @@ import {
   Connection,
 } from 'typeorm';
 import { InjectConnection } from '@nestjs/typeorm';
-import { MessageService } from 'modules/message/services';
+import { MessageService, MessageKeyService } from 'modules/message/services';
 import { UserService, UserAuthService } from 'modules/user/services';
 import { LanguageService } from 'modules/language/services';
 import { UserEntity } from 'modules/user/entities';
@@ -24,6 +24,7 @@ import {
 import { LanguageEntity } from 'modules/language/entities';
 import { ICreatedMessage } from 'interfaces';
 import { CreateTransactionDto } from 'modules/transaction/dtos';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 @EventSubscriber()
@@ -51,6 +52,8 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     },
   };
 
+  private readonly _configService = new ConfigService();
+
   /*
     NOTE: It need to use different services,
     that's why this subscriber is connected by the constructor.
@@ -58,6 +61,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   constructor(
     @InjectConnection() readonly connection: Connection,
     private readonly _messageService: MessageService,
+    private readonly _messageKeyService: MessageKeyService,
     private readonly _userService: UserService,
     private readonly _userAuthService: UserAuthService,
     private readonly _languageService: LanguageService,
@@ -72,11 +76,16 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   }
 
   public async afterInsert(event: InsertEvent<BillEntity>): Promise<void> {
-    await Promise.all([
-      this._initWelcomeMessage(event.entity.user),
-      this._initWelcomeTransfer(event.entity),
-      this._initRegisterPromotion(event.entity),
-    ]);
+    const rootEmail = this._configService.get('BANK_ROOT_EMAIL');
+    const authorEmail = this._configService.get('BANK_AUTHOR_EMAIL');
+
+    if (![rootEmail, authorEmail].includes(event.entity.user.email)) {
+      await Promise.all([
+        this._initWelcomeMessage(event.entity.user),
+        this._initWelcomeTransfer(event.entity),
+        this._initRegisterPromotion(event.entity),
+      ]);
+    }
   }
 
   private async _initWelcomeTransfer(recipientBill: BillEntity): Promise<void> {
@@ -111,7 +120,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   }
 
   private async _initWelcomeMessage(recipient: UserEntity): Promise<void> {
-    const message = await this._messageService.getMessageByMessageKey({
+    const message = await this._messageService.getMessageByMessageName({
       user: recipient,
       name: this._messageName,
     });
@@ -120,7 +129,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
       return;
     }
 
-    const { key } = await this._messageService.getMessageByMessageKey({
+    const key = await this._messageKeyService.getMessageKey({
       name: this._messageName,
     });
     const languages = await this._languageService.getLanguages();
