@@ -33,8 +33,6 @@ async function bootstrap(): Promise<void> {
   app.use(compression());
   app.use(morgan('combined'));
 
-  app.setGlobalPrefix('bank');
-
   const reflector = app.get(Reflector);
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
