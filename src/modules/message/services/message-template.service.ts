@@ -45,7 +45,7 @@ export class MessageTemplateService {
     content: string,
     message: MessageEntity,
     language: LanguageEntity,
-    actions?: string,
+    actions?: string[],
   ): Promise<MessageTemplateEntity> {
     const messageTemplate = this._messageTemplateRepository.create({
       subject,

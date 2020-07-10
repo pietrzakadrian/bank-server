@@ -51,8 +51,6 @@ export class UserService {
 
       return this.getUser({ uuid: user.uuid });
     } catch (error) {
-      console.log(error);
-
       throw new CreateFailedException(error);
     }
   }

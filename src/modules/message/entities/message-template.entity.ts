@@ -12,8 +12,8 @@ export class MessageTemplateEntity extends AbstractEntity<MessageTemplateDto> {
   @Column('text')
   content: string;
 
-  @Column({ nullable: true })
-  actions?: string;
+  @Column('simple-array', { nullable: true })
+  actions?: string[];
 
   @ManyToOne(
     () => MessageEntity,

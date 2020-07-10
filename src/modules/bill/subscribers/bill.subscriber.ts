@@ -40,15 +40,24 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
   private readonly _messageOptions = {
     en: {
       subject: 'Cooperation proposal',
-      actions: 'Ok, I will send you my opinion',
+      actions: [
+        `<a href="mailto:contact@pietrzakadrian.com">I want to send you feedback now</a>`,
+        `I'll do it in a moment`,
+      ],
     },
     de: {
       subject: 'Kooperationsvorschlag',
-      actions: 'Ok, ich sende dir meine Meinung',
+      actions: [
+        `<a href="mailto:contact@pietrzakadrian.com">Ich möchte Ihnen jetzt Feedback senden</a>`,
+        `Ich mache es gleich`,
+      ],
     },
     pl: {
       subject: 'Propozycja współpracy',
-      actions: 'Ok, wyślę Tobie moją opinię',
+      actions: [
+        `<a href="mailto:contact@pietrzakadrian.com">Chcę przesłać opinię teraz</a>`,
+        `Zrobię to za chwilę`,
+      ],
     },
   };
 
@@ -244,7 +253,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     language: string,
     content: string,
     subject: string,
-    actions?: string,
+    actions?: { param: string },
   ): CreateMessageTemplateDto {
     return { language, content, subject, actions };
   }

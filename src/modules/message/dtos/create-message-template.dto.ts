@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsArray,
+  IsJSON,
+} from 'class-validator';
 
 export class CreateMessageTemplateDto {
   @IsString()
@@ -19,5 +25,6 @@ export class CreateMessageTemplateDto {
 
   @IsOptional()
   @ApiPropertyOptional()
-  actions?: string;
+  @IsJSON()
+  actions?: { param: string };
 }

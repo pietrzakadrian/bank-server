@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { AbstractDto } from 'common/dtos';
 import { MessageTemplateEntity } from 'modules/message/entities';
-import { IsOptional } from 'class-validator';
+import { IsOptional, IsArray } from 'class-validator';
 import { LanguageDto } from 'modules/language/dtos';
 
 export class MessageTemplateDto extends AbstractDto {
@@ -13,7 +13,8 @@ export class MessageTemplateDto extends AbstractDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  readonly actions?: string;
+  @IsArray()
+  readonly actions?: string[];
 
   @ApiProperty({ type: () => LanguageDto })
   readonly language: LanguageDto;
