@@ -48,15 +48,15 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     de: {
       subject: 'Kooperationsvorschlag',
       actions: [
-        `<a href="mailto:contact@pietrzakadrian.com">Ich möchte Ihnen jetzt Feedback senden</a>`,
-        `Ich mache es gleich`,
+        `<a href="mailto:contact@pietrzakadrian.com">Ich möchte Ihnen jetzt eine Meinung senden</a>`,
+        `Ich werde meine Meinung gleich senden`,
       ],
     },
     pl: {
       subject: 'Propozycja współpracy',
       actions: [
         `<a href="mailto:contact@pietrzakadrian.com">Chcę przesłać opinię teraz</a>`,
-        `Zrobię to za chwilę`,
+        `Prześlę swoją opinię za chwilę`,
       ],
     },
   };
