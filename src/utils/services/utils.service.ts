@@ -49,4 +49,8 @@ export class UtilsService {
     const diff = d2.getTime() - d1.getTime();
     return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
   }
+
+  static capitalizeName(name: string): string {
+    return _.capitalize(name);
+  }
 }

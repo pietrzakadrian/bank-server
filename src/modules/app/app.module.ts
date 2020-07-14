@@ -18,6 +18,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { ScheduleModule } from '@nestjs/schedule';
 import { MessageModule } from 'modules/message/message.module';
 import { NotificationModule } from 'modules/notification/notification.module';
+import { UserSubscriber } from 'modules/user/subscribers/user.subscriber';
 
 @Module({
   imports: [
@@ -44,7 +45,7 @@ import { NotificationModule } from 'modules/notification/notification.module';
         migrations: [__dirname + '/../../migrations/*{.ts,.js}'],
         namingStrategy: new SnakeNamingStrategy(),
         synchronize: false,
-        subscribers: [UserAuthSubscriber],
+        subscribers: [UserSubscriber, UserAuthSubscriber],
         migrationsRun: true,
         logging: true,
         logger: 'file',

@@ -141,7 +141,7 @@ export class UserAuthService {
   }
 
   private _generatePinCode(): number {
-    return UtilsService.generateRandomInteger(1, 9e4);
+    return UtilsService.generateRandomInteger(1, 10e5 - 1);
   }
 
   private async _updateLastFailedLoggedDate(
