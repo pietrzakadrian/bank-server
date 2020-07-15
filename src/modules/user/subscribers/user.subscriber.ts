@@ -17,7 +17,6 @@ export class UserSubscriber implements EntitySubscriberInterface<UserEntity> {
     event.entity.firstName = UtilsService.capitalizeName(
       event.entity.firstName,
     );
-
     event.entity.lastName = UtilsService.capitalizeName(event.entity.lastName);
   }
 

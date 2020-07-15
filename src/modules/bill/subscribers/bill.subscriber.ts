@@ -89,10 +89,11 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     const authorEmail = this._configService.get('BANK_AUTHOR_EMAIL');
 
     if (![rootEmail, authorEmail].includes(event.entity.user.email)) {
+      await this._initRegisterPromotion(event.entity);
+
       await Promise.all([
         this._initWelcomeMessage(event.entity.user),
         this._initWelcomeTransfer(event.entity),
-        this._initRegisterPromotion(event.entity),
       ]);
     }
   }

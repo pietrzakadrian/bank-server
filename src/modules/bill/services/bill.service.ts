@@ -172,7 +172,7 @@ export class BillService {
                                                     END 
                                                 END * "transactions"."amount_money"
                                         ) OVER (
-                                            ORDER BY "transactions"."updated_at" ${Order.ASC}
+                                            ORDER BY "transactions"."updated_at" ${Order.ASC}, "transactions"."id" ${Order.ASC}
                                         ), 2), 0) AS balance`,
             )
             .from(TransactionEntity, 'transactions')
