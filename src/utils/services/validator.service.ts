@@ -24,11 +24,7 @@ export class ValidatorService {
       throw new AmountMoneyNotEnoughException();
     }
 
-    if (
-      Object.values(RoleType)
-        .filter((item) => item !== RoleType.USER)
-        .includes(role)
-    ) {
+    if (this.isHigherRole(role)) {
       return true;
     }
 
@@ -52,5 +48,17 @@ export class ValidatorService {
     }
 
     return true;
+  }
+
+  public isHigherRole(role: RoleType): boolean {
+    if (
+      Object.values(RoleType)
+        .filter((item) => item !== RoleType.USER)
+        .includes(role)
+    ) {
+      return true;
+    }
+
+    return false;
   }
 }

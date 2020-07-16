@@ -20,7 +20,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import * as fs from 'fs';
 import { RoleType } from 'common/constants';
 import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
@@ -36,7 +35,6 @@ import {
 import { TransactionService } from 'modules/transaction/services';
 import { UserEntity } from 'modules/user/entities';
 import { Response } from 'express';
-import { Readable } from 'nodemailer/lib/xoauth2';
 
 @Controller('Transactions')
 @ApiTags('Transactions')

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { PageMetaDto } from 'common/dtos';
 import {
   CreateFailedException,
   EmailAddressExistException,
@@ -7,12 +6,7 @@ import {
 } from 'exceptions';
 import { UserRegisterDto } from 'modules/auth/dtos';
 import { BillService } from 'modules/bill/services';
-import {
-  UsersPageDto,
-  UsersPageOptionsDto,
-  UserUpdateDto,
-  UserDto,
-} from 'modules/user/dtos';
+import { UserUpdateDto } from 'modules/user/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { UserRepository } from 'modules/user/repositories';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
@@ -20,7 +14,6 @@ import { UserAuthService } from './user-auth.service';
 import { UserConfigService } from './user-config.service';
 import { CurrencyService } from 'modules/currency/services';
 import { MessageEntity } from 'modules/message/entities';
-import { query } from 'express';
 
 @Injectable()
 export class UserService {

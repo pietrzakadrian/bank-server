@@ -130,9 +130,7 @@ export class TransactionService {
     if (options.authorizationStatus) {
       queryBuilder.andWhere(
         'transaction.authorizationStatus = :authorizationStatus',
-        {
-          authorizationStatus: options.authorizationStatus,
-        },
+        { authorizationStatus: options.authorizationStatus },
       );
     }
 
@@ -189,12 +187,18 @@ export class TransactionService {
 
     const transaction = this._transactionRepository.create(createdTransaction);
 
-    await this.sendEmailWithAuthorizationKey(
-      createdTransaction,
-      createTransactionDto,
-      senderBill,
-      recipientBill,
+    const isHigherRole = this._validatorService.isHigherRole(
+      user.userAuth.role,
     );
+
+    if (!isHigherRole) {
+      await this.sendEmailWithAuthorizationKey(
+        createdTransaction,
+        createTransactionDto,
+        senderBill,
+        recipientBill,
+      );
+    }
 
     try {
       return this._transactionRepository.save(transaction);
