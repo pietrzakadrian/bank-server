@@ -11,6 +11,7 @@ import {
   UseGuards,
   UseInterceptors,
   ValidationPipe,
+  Res,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,6 +20,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import * as fs from 'fs';
 import { RoleType } from 'common/constants';
 import { AuthUser, Roles } from 'decorators';
 import { AuthGuard, RolesGuard } from 'guards';
@@ -33,6 +35,8 @@ import {
 } from 'modules/transaction/dtos';
 import { TransactionService } from 'modules/transaction/services';
 import { UserEntity } from 'modules/user/entities';
+import { Response } from 'express';
+import { Readable } from 'nodemailer/lib/xoauth2';
 
 @Controller('Transactions')
 @ApiTags('Transactions')
@@ -112,5 +116,37 @@ export class TransactionController {
     });
 
     return new TransactionAuthorizationKeyPayloadDto(authorizationKey);
+  }
+
+  @Get('/:uuid/:locale/confirmationFile')
+  @HttpCode(HttpStatus.OK)
+  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
+  @ApiOkResponse({
+    status: HttpStatus.OK,
+    description: 'get authorization key',
+    type: TransactionAuthorizationKeyPayloadDto,
+  })
+  async getConfirmation(
+    @Param('uuid') uuid: string,
+    @Param('locale') locale: string,
+    @AuthUser() user: UserEntity,
+    @Res() res: Response,
+  ): Promise<void> {
+    const compiledHtmlContent = await this._transactionService.getConfirmationDocumentFile(
+      user,
+      uuid,
+      locale,
+    );
+    const buffer = await this._transactionService.htmlToPdfBuffer(
+      compiledHtmlContent,
+    );
+    const stream = this._transactionService.getReadableStream(buffer);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Length': buffer.length,
+    });
+
+    stream.pipe(res);
   }
 }

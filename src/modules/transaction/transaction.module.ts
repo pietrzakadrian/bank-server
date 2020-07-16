@@ -8,9 +8,11 @@ import { TransactionService } from 'modules/transaction/services';
 import { CurrencyModule } from 'modules/currency/currency.module';
 import { BillModule } from 'modules/bill/bill.module';
 import { UserModule } from 'modules/user/user.module';
+import { LanguageModule } from 'modules/language/language.module';
 
 @Module({
   imports: [
+    LanguageModule,
     forwardRef(() => UserModule),
     forwardRef(() => CurrencyModule),
     forwardRef(() => BillModule),

@@ -146,9 +146,9 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     const sender = await this._userAuthService.findUserAuth({
       role: RoleType.ADMIN,
     });
-    const templates = await this._createdMessageTemplates(languages);
+    const templates = await this._createMessageTemplates(languages);
 
-    const createdMessage = this._getCreatedMessage(
+    const createdMessage = this._getCreateMessage(
       key.uuid,
       sender.uuid,
       recipient.uuid,
@@ -164,6 +164,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     const transaction = await this._transactionService.getTransaction({
       recipient: recipientBill.user,
       authorizationKey: this._promotionKey,
+      authorizationStatus: true,
     });
 
     if (transaction) {
@@ -191,7 +192,7 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     return this._makeTransfer(createdTransaction, sender, this._promotionKey);
   }
 
-  private _getCreatedMessage(
+  private _getCreateMessage(
     key: string,
     sender: string,
     recipient: string,
@@ -200,19 +201,20 @@ export class BillSubscriber implements EntitySubscriberInterface<BillEntity> {
     return { key, sender, recipient, templates };
   }
 
+  /**
+   * TODO: This method is re-declared somewhere and fails the DRY principle.
+   * Transfer it to a separate service
+   */
   private _getCompiledContent(
     content: string,
     variables: ICreatedMessage,
   ): any {
     const template = handlebars.compile(content.toString());
 
-    return template({
-      developerAge: variables.developerAge,
-      customerCount: variables.customerCount,
-    });
+    return template(variables);
   }
 
-  private async _createdMessageTemplates(
+  private async _createMessageTemplates(
     languages: LanguageEntity[],
   ): Promise<CreateMessageTemplateDto[]> {
     let messageTemplates = [];

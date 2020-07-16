@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { MessageTemplateRepository } from '../repositories';
-import { InsertResult } from 'typeorm';
 import { MessageEntity, MessageTemplateEntity } from '../entities';
 import { LanguageEntity } from 'modules/language/entities';
 import { LanguageService } from 'modules/language/services';
-import { MessageTemplateDto } from '../dtos';
 
 @Injectable()
 export class MessageTemplateService {
@@ -15,7 +13,7 @@ export class MessageTemplateService {
 
   public async createMessageTemplate(
     createdMessage,
-  ): Promise<MessageTemplateEntity[] | any> {
+  ): Promise<MessageTemplateEntity[]> {
     let templates = [];
 
     for (const {

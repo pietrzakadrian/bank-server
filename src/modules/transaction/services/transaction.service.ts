@@ -23,6 +23,11 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { UserConfigService } from 'modules/user/services';
 import { Transactional } from 'typeorm-transactional-cls-hooked';
+import { Readable } from 'stream';
+import * as pdf from 'html-pdf';
+import { LanguageService } from 'modules/language/services';
+import * as fs from 'fs';
+import handlebars from 'handlebars';
 
 @Injectable()
 export class TransactionService {
@@ -41,6 +46,7 @@ export class TransactionService {
     private readonly _validatorService: ValidatorService,
     private readonly _mailerService: MailerService,
     private readonly _userConfigService: UserConfigService,
+    private readonly _languageService: LanguageService,
   ) {}
 
   public async getTransactions(
@@ -91,6 +97,8 @@ export class TransactionService {
       authorizationKey: string;
       recipient: UserEntity;
       sender: UserEntity;
+      user: UserEntity;
+      authorizationStatus: boolean;
     }>,
   ): Promise<TransactionEntity | undefined> {
     const queryBuilder = this._transactionRepository.createQueryBuilder(
@@ -103,24 +111,29 @@ export class TransactionService {
       queryBuilder
         .leftJoin('transaction.recipientBill', 'recipientBill')
         .leftJoin('recipientBill.user', 'recipientUser')
-        .orWhere('recipientUser.id = :user', {
-          user: options.recipient.id,
-        });
+        .andWhere('recipientUser.id = :user', { user: options.recipient.id });
     }
 
     if (options.sender) {
       queryBuilder
         .leftJoin('transaction.senderBill', 'senderBill')
         .leftJoin('senderBill.user', 'senderUser')
-        .orWhere('senderUser.id = :user', {
-          user: options.sender.id,
-        });
+        .andWhere('senderUser.id = :user', { user: options.sender.id });
     }
 
     if (options.uuid) {
-      queryBuilder.orWhere('transaction.uuid = :uuid', {
+      queryBuilder.andWhere('transaction.uuid = :uuid', {
         uuid: options.uuid,
       });
+    }
+
+    if (options.authorizationStatus) {
+      queryBuilder.andWhere(
+        'transaction.authorizationStatus = :authorizationStatus',
+        {
+          authorizationStatus: options.authorizationStatus,
+        },
+      );
     }
 
     if (options.authorizationKey) {
@@ -128,6 +141,18 @@ export class TransactionService {
         'transaction.authorizationKey = :authorizationKey',
         { authorizationKey: options.authorizationKey },
       );
+    }
+
+    if (options.user) {
+      queryBuilder
+        .leftJoinAndSelect('transaction.senderBill', 'senderBill')
+        .leftJoinAndSelect('senderBill.user', 'senderUser')
+        .leftJoinAndSelect('transaction.recipientBill', 'recipientBill')
+        .leftJoinAndSelect('recipientBill.user', 'recipientUser')
+        .leftJoinAndSelect('senderBill.currency', 'senderBillCurrency')
+        .andWhere('(senderUser.id = :user OR recipientUser.id = :user)', {
+          user: options.user.id,
+        });
     }
 
     return queryBuilder.getOne();
@@ -164,8 +189,28 @@ export class TransactionService {
 
     const transaction = this._transactionRepository.create(createdTransaction);
 
-    this._mailerService
-      .sendMail({
+    await this.sendEmailWithAuthorizationKey(
+      createdTransaction,
+      createTransactionDto,
+      senderBill,
+      recipientBill,
+    );
+
+    try {
+      return this._transactionRepository.save(transaction);
+    } catch (error) {
+      throw new CreateFailedException(error);
+    }
+  }
+
+  private async sendEmailWithAuthorizationKey(
+    createdTransaction,
+    createTransactionDto: CreateTransactionDto,
+    senderBill: BillEntity,
+    recipientBill: BillEntity,
+  ): Promise<void> {
+    try {
+      const email = await this._mailerService.sendMail({
         to: senderBill.user.email,
         from: this._configService.get('EMAIL_ADDRESS'),
         subject: this._emailSubject[createTransactionDto.locale],
@@ -181,22 +226,15 @@ export class TransactionService {
           recipient: `${recipientBill.user.firstName} ${recipientBill.user.lastName}`,
           authorizationKey: createdTransaction.authorizationKey,
         },
-      })
-      .then((success) => {
-        this._logger.log(
-          `An email with the authorization code has been sent to: ${success.accepted}`,
-        );
-      })
-      .catch(() => {
-        this._logger.error(
-          `An email with a confirmation code has not been sent. Theoretical recipient: ${senderBill.user.email}`,
-        );
       });
 
-    try {
-      return this._transactionRepository.save(transaction);
+      this._logger.log(
+        `An email with the authorization code has been sent to: ${email.accepted}`,
+      );
     } catch (error) {
-      throw new CreateFailedException(error);
+      this._logger.error(
+        `An email with a confirmation code has not been sent. Theoretical recipient: ${senderBill.user.email}`,
+      );
     }
   }
 
@@ -236,9 +274,14 @@ export class TransactionService {
     }
   }
 
+  /**
+   * NOTE: This query is created by the bill repository because it must include the current amount of the sender's money as well.
+   * This method is called when the user confirms the transfer.
+   * Attaching the current balance of the sender's account is necessary to validation before confirming the transfer.
+   */
   private async _findTransactionByAuthorizationKey(
     authorizationKey: string,
-    user: UserEntity,
+    sender: UserEntity,
   ): Promise<BillEntity | undefined> {
     const queryBuilder = this._billRepository.createQueryBuilder('bill');
 
@@ -283,7 +326,7 @@ export class TransactionService {
         authorizationKey,
       })
       .andWhere('bill.user = :user', {
-        user: user.id,
+        user: sender.id,
       })
       .andWhere('transaction.authorizationStatus = false')
       .orderBy('transaction.id', Order.DESC);
@@ -294,12 +337,89 @@ export class TransactionService {
   private async _updateTransactionAuthorizationStatus(
     transaction: TransactionEntity,
   ): Promise<UpdateResult> {
-    return this._transactionRepository.update(transaction.id, {
-      authorizationStatus: true,
-    });
+    const queryBuilder = this._transactionRepository.createQueryBuilder(
+      'transaction',
+    );
+
+    return queryBuilder
+      .update()
+      .set({ authorizationStatus: true })
+      .where('id = :id', { id: transaction.id })
+      .execute();
   }
 
   private _generateAuthrorizationKey() {
     return UtilsService.generateRandomString(5);
+  }
+
+  public async getConfirmationDocumentFile(
+    user: UserEntity,
+    uuid: string,
+    locale: string,
+  ): Promise<string> {
+    const transaction = await this.getTransaction({
+      user,
+      uuid,
+      authorizationStatus: true,
+    });
+
+    if (!transaction) {
+      throw new TransactionNotFoundException();
+    }
+
+    const variables = {
+      date: transaction.updatedAt,
+      senderName: `${transaction.senderBill.user.firstName} ${transaction.senderBill.user.lastName}`,
+      recipientName: `${transaction.recipientBill.user.firstName} ${transaction.recipientBill.user.lastName}`,
+      amountMoney: transaction.amountMoney,
+      currencyName: transaction.senderBill.currency.name,
+    };
+
+    const content = await this._getConfirmationFileContent(locale);
+    return this._getCompiledContent(content, variables);
+  }
+
+  public getReadableStream(buffer: Buffer): Readable {
+    const stream = new Readable();
+
+    stream.push(buffer);
+    stream.push(null);
+
+    return stream;
+  }
+
+  public async htmlToPdfBuffer(html: string): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      pdf.create(html).toBuffer((err, buffer) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(buffer);
+        }
+      });
+    });
+  }
+
+  private async _getConfirmationFileContent(locale: string): Promise<string> {
+    try {
+      const data = await fs.promises.readFile(
+        __dirname + `/../templates/confirmation.template.${locale}.hbs`,
+        'utf8',
+      );
+
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * TODO: This method is re-declared somewhere and fails the DRY principle.
+   * Transfer it to a separate service
+   */
+  private _getCompiledContent(content: string, variables): any {
+    const template = handlebars.compile(content.toString());
+
+    return template(variables);
   }
 }
