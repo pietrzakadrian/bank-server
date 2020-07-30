@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from 'modules/auth/auth.module';
+import { AuthModule } from 'modules/auth';
 import { BillRepository } from 'modules/bill/repositories';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { TransactionRepository } from 'modules/transaction/repositories';
@@ -15,10 +15,10 @@ import {
   UserConfigService,
   UserService,
 } from 'modules/user/services';
-import { BillModule } from 'modules/bill/bill.module';
-import { CurrencyModule } from 'modules/currency/currency.module';
-import { MessageModule } from 'modules/message/message.module';
-import { TransactionModule } from 'modules/transaction/transaction.module';
+import { BillModule } from 'modules/bill';
+import { CurrencyModule } from 'modules/currency';
+import { MessageModule } from 'modules/message';
+import { TransactionModule } from 'modules/transaction';
 
 @Module({
   imports: [

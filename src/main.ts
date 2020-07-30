@@ -1,6 +1,6 @@
 import { Reflector, NestFactory } from '@nestjs/core';
 import * as compression from 'compression';
-import { AppModule } from 'modules/app/app.module';
+import { AppModule } from 'modules/app';
 import * as helmet from 'helmet';
 import { HttpExceptionFilter, QueryFailedFilter } from 'filters';
 import * as RateLimit from 'express-rate-limit';

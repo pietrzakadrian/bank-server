@@ -5,12 +5,12 @@ import { BillRepository } from 'modules/bill/repositories';
 import { BillService } from 'modules/bill/services';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { TransactionRepository } from 'modules/transaction/repositories';
-import { CurrencyModule } from 'modules/currency/currency.module';
+import { CurrencyModule } from 'modules/currency';
 import { BillSubscriber } from './subscribers';
-import { MessageModule } from 'modules/message/message.module';
-import { UserModule } from 'modules/user/user.module';
-import { LanguageModule } from 'modules/language/language.module';
-import { TransactionModule } from 'modules/transaction/transaction.module';
+import { MessageModule } from 'modules/message';
+import { UserModule } from 'modules/user';
+import { LanguageModule } from 'modules/language';
+import { TransactionModule } from 'modules/transaction';
 
 @Module({
   imports: [

@@ -4,9 +4,9 @@ import { CurrencyController } from 'modules/currency/controllers';
 import { CurrencyCron } from 'modules/currency/crons';
 import { CurrencyRepository } from 'modules/currency/repositories';
 import { CurrencyService } from 'modules/currency/services';
-import { UserModule } from 'modules/user/user.module';
-import { BillModule } from 'modules/bill/bill.module';
-import { TransactionModule } from 'modules/transaction/transaction.module';
+import { UserModule } from 'modules/user';
+import { BillModule } from 'modules/bill';
+import { TransactionModule } from 'modules/transaction';
 
 @Module({
   imports: [

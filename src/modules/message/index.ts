@@ -8,9 +8,9 @@ import {
 import { MessageService } from './services/message.service';
 import { MessageController } from './controllers/message.controller';
 import { MessageKeyService } from './services/message-key.service';
-import { UserModule } from 'modules/user/user.module';
+import { UserModule } from 'modules/user';
 import { MessageTemplateService } from './services';
-import { LanguageModule } from 'modules/language/language.module';
+import { LanguageModule } from 'modules/language';
 
 @Module({
   imports: [

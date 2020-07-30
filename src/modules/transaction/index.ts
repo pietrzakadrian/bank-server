@@ -5,10 +5,10 @@ import { CurrencyRepository } from 'modules/currency/repositories';
 import { TransactionController } from 'modules/transaction/controllers';
 import { TransactionRepository } from 'modules/transaction/repositories';
 import { TransactionService } from 'modules/transaction/services';
-import { CurrencyModule } from 'modules/currency/currency.module';
-import { BillModule } from 'modules/bill/bill.module';
-import { UserModule } from 'modules/user/user.module';
-import { LanguageModule } from 'modules/language/language.module';
+import { CurrencyModule } from 'modules/currency';
+import { BillModule } from 'modules/bill';
+import { UserModule } from 'modules/user';
+import { LanguageModule } from 'modules/language';
 
 @Module({
   imports: [
