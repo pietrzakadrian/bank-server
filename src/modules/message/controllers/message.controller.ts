@@ -57,7 +57,7 @@ export class MessageController {
     description: 'Create Message',
     type: MessageDto,
   })
-  @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
+  @Roles(RoleType.ADMIN, RoleType.ROOT)
   async createMessage(
     @Body() createMessageDto: CreateMessageDto,
   ): Promise<MessageDto | any> {
