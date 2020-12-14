@@ -48,7 +48,6 @@ import { UserSubscriber } from 'modules/user/subscribers/user.subscriber';
         subscribers: [UserSubscriber, UserAuthSubscriber],
         migrationsRun: true,
         logging: true,
-        logger: 'file',
       }),
       inject: [ConfigService],
     }),
@@ -57,7 +56,7 @@ import { UserSubscriber } from 'modules/user/subscribers/user.subscriber';
         transport: {
           host: configService.get('EMAIL_HOST'),
           port: +configService.get('EMAIL_PORT'),
-          secure: false,
+          secure: true,
           auth: {
             user: configService.get('EMAIL_ADDRESS'),
             pass: configService.get('EMAIL_PASSWORD'),

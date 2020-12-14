@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import * as _ from 'lodash';
+import * as crypto from 'crypto';
 
 export class UtilsService {
   public static toDto<T, E>(
@@ -52,5 +53,14 @@ export class UtilsService {
 
   static capitalizeName(name: string): string {
     return _.capitalize(name);
+  }
+
+  /**
+   * encode (hash) text to sha256
+   * @param {string} text
+   * @returns {string}
+   */
+  static encodeString(text: string): string {
+    return crypto.createHash('sha256').update(text).digest('hex');
   }
 }

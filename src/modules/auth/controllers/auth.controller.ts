@@ -5,6 +5,7 @@ import {
   HttpStatus,
   Patch,
   Post,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,17 +17,20 @@ import {
 } from '@nestjs/swagger';
 import { RoleType } from 'common/constants';
 import { AuthUser, Roles } from 'decorators';
-import { AuthGuard, RolesGuard } from 'guards';
+import { AuthGuard, JwtResetPasswordGuard, RolesGuard } from 'guards';
 import { AuthUserInterceptor } from 'interceptors';
 import {
   LoginPayloadDto,
+  UserForgottenPasswordDto,
   UserLoginDto,
   UserRegisterDto,
+  UserResetPasswordDto,
 } from 'modules/auth/dtos';
 import { AuthService } from 'modules/auth/services';
 import { UserDto } from 'modules/user/dtos';
 import { UserEntity } from 'modules/user/entities';
 import { UserAuthService, UserService } from 'modules/user/services';
+import { Transactional } from 'typeorm-transactional-cls-hooked';
 
 @Controller('Auth')
 @ApiTags('Auth')
@@ -78,5 +82,33 @@ export class AuthController {
   @Roles(RoleType.USER, RoleType.ADMIN, RoleType.ROOT)
   async userLogout(@AuthUser() user: UserEntity): Promise<void> {
     await this._userAuthService.updateLastLogoutDate(user.userAuth);
+  }
+
+  @Post('password/forget')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Successfully token created',
+  })
+  async forgetPassword(
+    @Body() userForgottenPasswordDto: UserForgottenPasswordDto,
+  ): Promise<void> {
+    await this._authService.handleForgottenPassword(userForgottenPasswordDto);
+  }
+
+  @Patch('password/reset')
+  @ApiBearerAuth()
+  @UseGuards(JwtResetPasswordGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiNoContentResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Successfully reseted password',
+  })
+  @Transactional()
+  async resetPassword(
+    @Body() { password }: UserResetPasswordDto,
+    @Req() { user },
+  ) {
+    return this._authService.handleResetPassword(password, user);
   }
 }

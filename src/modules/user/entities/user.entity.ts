@@ -11,6 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { MessageEntity } from 'modules/message/entities';
+import { UserAuthForgottenPasswordEntity } from './user-auth-forgotten-password.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity extends AbstractEntity<UserDto> {
@@ -62,6 +63,14 @@ export class UserEntity extends AbstractEntity<UserDto> {
     { nullable: false },
   )
   recipient: MessageEntity[];
+
+  @OneToMany(
+    () => UserAuthForgottenPasswordEntity,
+    (UserAuthForgottenPassword: UserAuthForgottenPasswordEntity) =>
+      UserAuthForgottenPassword.user,
+    { cascade: true },
+  )
+  public userAuthForgottenPassword?: UserAuthForgottenPasswordEntity[];
 
   dtoClass = UserDto;
 }
