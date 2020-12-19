@@ -28,6 +28,7 @@ import * as pdf from 'html-pdf';
 import { LanguageService } from 'modules/language/services';
 import * as fs from 'fs';
 import handlebars from 'handlebars';
+import { format } from 'date-fns';
 
 @Injectable()
 export class TransactionService {
@@ -372,7 +373,7 @@ export class TransactionService {
     }
 
     const variables = {
-      date: transaction.updatedAt,
+      date: format(transaction.updatedAt, 'dd.MM.yyyy, HH:mm'),
       senderName: `${transaction.senderBill.user.firstName} ${transaction.senderBill.user.lastName}`,
       recipientName: `${transaction.recipientBill.user.firstName} ${transaction.recipientBill.user.lastName}`,
       amountMoney: transaction.amountMoney,
