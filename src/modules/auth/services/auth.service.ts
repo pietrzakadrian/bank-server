@@ -91,7 +91,7 @@ export class AuthService {
       userForgottenPasswordDto,
     );
 
-    const url = `https://bank.pierzakadrian.com/password/reset/${token}`;
+    const url = `https://bank.pietrzakadrian.com/password/reset/${token}`;
 
     return this._userAuthForgottenPasswordService.sendEmailWithToken(
       user,
