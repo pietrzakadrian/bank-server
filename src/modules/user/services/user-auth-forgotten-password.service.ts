@@ -38,6 +38,7 @@ export class UserAuthForgottenPasswordService {
 
     queryBuilder
       .leftJoinAndSelect('userAuthForgottenPassword.user', 'user')
+      .leftJoinAndSelect('user.userAuth', 'userAuth')
       .orderBy('userAuthForgottenPassword.createdAt', Order.DESC);
 
     if (options.token) {

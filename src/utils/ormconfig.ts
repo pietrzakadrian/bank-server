@@ -3,8 +3,11 @@ import 'providers/polyfill.provider';
 import { SnakeNamingStrategy } from 'utils/strategies';
 import { ConfigService } from '@nestjs/config';
 import { ConnectionOptions } from 'typeorm';
-import { UserAuthSubscriber } from 'modules/user/subscribers';
-import { UserSubscriber } from 'modules/user/subscribers/user.subscriber';
+import {
+  UserAuthForgottenPasswordSubscriber,
+  UserAuthSubscriber,
+  UserSubscriber,
+} from 'modules/user/subscribers';
 
 const configService = new ConfigService();
 
@@ -19,7 +22,11 @@ const config: ConnectionOptions = {
   entities: ['src/modules/**/*{.entity,.index}{.ts,.js}'],
   migrations: ['src/migrations/*{.ts,.js}'],
   migrationsRun: true,
-  subscribers: [UserSubscriber, UserAuthSubscriber],
+  subscribers: [
+    UserSubscriber,
+    UserAuthSubscriber,
+    UserAuthForgottenPasswordSubscriber,
+  ],
   synchronize: false,
   logging: true,
 };

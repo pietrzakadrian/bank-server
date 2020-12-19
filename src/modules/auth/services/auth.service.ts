@@ -104,6 +104,11 @@ export class AuthService {
     password: string,
     userAuthForgottenPasswordEntity: UserAuthForgottenPasswordEntity,
   ): Promise<void> {
+    console.log(
+      'userAuthForgottenPasswordEntity',
+      userAuthForgottenPasswordEntity,
+    );
+
     if (userAuthForgottenPasswordEntity.used) {
       throw new ForgottenTokenHasUsedException();
     }
