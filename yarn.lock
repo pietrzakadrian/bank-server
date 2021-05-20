@@ -4369,12 +4369,12 @@ html-escaper@^2.0.0:
   resolved "https://registry.yarnpkg.com/html-escaper/-/html-escaper-2.0.2.tgz#dfd60027da36a36dfcbe236262c00a5822681453"
   integrity sha512-H2iMtd0I4Mt5eYiapRdIDjp+XzelXQ0tFE4JS7YFwFevXXMmOp9myNrUvCg0D6ws8iqkRPBfKHgbwig1SmlLfg==
 
-html-pdf@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/html-pdf/-/html-pdf-2.2.0.tgz#4bcf91c24cb560e47aa3facfd033e0e1bf241b91"
-  integrity sha1-S8+Rwky1YOR6o/rP0DPg4b8kG5E=
+html-pdf@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/html-pdf/-/html-pdf-3.0.1.tgz#5a8f7b6bd49d624345938952f24b47e4a08f14db"
+  integrity sha512-CKNSacmQn+CKJ2GNfT4UYKaPy/T3Ndj82yJ2aju/UPmnvWNjIpyumqRqkFU0mwT6BTHBFhFGTnXN8dBn4Bdj0Q==
   optionalDependencies:
-    phantomjs-prebuilt "^2.1.4"
+    phantomjs-prebuilt "^2.1.16"
 
 html-to-text@5.1.1:
   version "5.1.1"
@@ -6961,7 +6961,7 @@ pgpass@1.x:
   dependencies:
     split "^1.0.0"
 
-phantomjs-prebuilt@^2.1.4:
+phantomjs-prebuilt@^2.1.16:
   version "2.1.16"
   resolved "https://registry.yarnpkg.com/phantomjs-prebuilt/-/phantomjs-prebuilt-2.1.16.tgz#efd212a4a3966d3647684ea8ba788549be2aefef"
   integrity sha1-79ISpKOWbTZHaE6ouniFSb4q7+8=
