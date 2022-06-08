@@ -21,8 +21,8 @@ import { CurrencyService } from 'modules/currency/services';
 import { TransactionEntity } from 'modules/transaction/entities';
 import { TransactionRepository } from 'modules/transaction/repositories';
 import { UserEntity } from 'modules/user/entities';
-import { UtilsService } from 'utils/services';
 import { getConnection } from 'typeorm';
+import { UtilsService } from 'utils/services';
 
 @Injectable()
 export class BillService {

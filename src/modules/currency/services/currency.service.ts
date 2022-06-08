@@ -77,13 +77,40 @@ export class CurrencyService {
       .execute();
   }
 
-  public async getCurrencyForeignExchangeRates(): Promise<any> {
-    const endpoint = `https://api.exchangeratesapi.io/latest?base=PLN&symbols=USD,EUR`;
+  public async getCurrencyForeignExchangeRates() {
+    const [EUR, USD] = await Promise.all([
+      this.getCurrencyForeignExchangeRatesForEUR(),
+      this.getCurrencyForeignExchangeRatesForUSD(),
+    ]);
+
+    const midEUR = 1 / ((EUR.rates[0].bid + EUR.rates[0].ask) / 2);
+    const midUSD = 1 / ((USD.rates[0].bid + USD.rates[0].ask) / 2);
+
+    return [
+      { name: EUR.code, currentExchangeRate: midEUR },
+      { name: USD.code, currentExchangeRate: midUSD },
+    ];
+  }
+
+  public async getCurrencyForeignExchangeRatesForUSD(): Promise<any> {
+    const endpoint = `https://api.nbp.pl/api/exchangerates/rates/c/usd/today/?format=json`;
 
     return this._httpService
       .get(endpoint)
       .toPromise()
-      .then((response) => response.data.rates)
+      .then((response) => response.data)
+      .catch((error) => {
+        throw new ForeignExchangeRatesNotFoundException(error);
+      });
+  }
+
+  public async getCurrencyForeignExchangeRatesForEUR(): Promise<any> {
+    const endpoint = `https://api.nbp.pl/api/exchangerates/rates/c/eur/today/?format=json`;
+
+    return this._httpService
+      .get(endpoint)
+      .toPromise()
+      .then((response) => response.data)
       .catch((error) => {
         throw new ForeignExchangeRatesNotFoundException(error);
       });
