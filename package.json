@@ -42,7 +42,7 @@
     "hbs": "^4.1.1",
     "helmet": "^3.23.3",
     "html-pdf": "^2.2.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
     "nodemailer": "^6.4.11",
